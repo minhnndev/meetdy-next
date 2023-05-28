@@ -12,7 +12,7 @@ FeatureBox.defaultProps = {
 function FeatureBox({ data }) {
     return (
         <div className="box">
-            <img src={data.image} />
+            <img src={data.image} alt='feature' />
             <h3>{data.title}</h3>
             <p>
                 {data.descrpition}

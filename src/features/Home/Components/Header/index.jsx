@@ -29,13 +29,13 @@ function Header({ data }) {
                     <p>
                         {data.description}
                     </p>
-                    <a href={data.linkDownload} target='_blank' className="btn">
+                    <a href={data.linkDownload} target='_blank' rel="noreferrer" className="btn">
                         <DownloadOutlined /> Tải ngay phiên bản mobile
                     </a>
                 </div>
 
                 <div className="image">
-                    <img src={data.image} />
+                    <img src={data.image} alt="img" />
                 </div>
             </section>
         </>

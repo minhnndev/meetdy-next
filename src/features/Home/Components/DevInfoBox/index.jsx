@@ -15,7 +15,7 @@ function DevInfoBox({ data }) {
     return (
         <div className="box">
             <div className="user">
-                <img src={data.image} />
+                <img src={data.image} alt="dev" />
                 <h3>{data.name}</h3>
                 <div className="contact-info">
                     <span><MailTwoTone />&nbsp;Email: {data.mail}</span>

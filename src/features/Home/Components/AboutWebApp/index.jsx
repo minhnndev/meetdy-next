@@ -21,7 +21,7 @@ function AboutWebApp({ data }) {
 
             <div className="column">
                 <div className="image">
-                    <img src={data.image} />
+                    <img src={data.image} alt="intro" />
                 </div>
 
                 <div className="content">
@@ -33,9 +33,9 @@ function AboutWebApp({ data }) {
                         </p>
                     ))}
 
-                    <div className="buttons">
+                    <div className="buttons center">
                         <Link to='/account/login' className="btn">
-                            <FireOutlined /> Trải nghiệm phiên bản web
+                            <FireOutlined /> Trải nghiệm phiên bản Web
                         </Link>
                     </div>
                 </div>

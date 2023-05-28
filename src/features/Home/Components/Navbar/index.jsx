@@ -7,8 +7,8 @@ function Navbar() {
 
     return (
         <header>
-            <a href="#" className="logo">
-                Zelo
+            <a href="#" className="logo" alt="logo">
+                Facebook.
             </a>
 
             <input type="checkbox" id="menu-bar" />
