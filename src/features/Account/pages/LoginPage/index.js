@@ -36,6 +36,7 @@ function LoginPage(props) {
                     username,
                     password
                 );
+                console.log('🚀 handleSubmit ~ token:', token)
                 localStorage.setItem('token', token);
                 localStorage.setItem('refreshToken', refreshToken);
                 dispatch(setLogin(true));
@@ -45,7 +46,7 @@ function LoginPage(props) {
                 if (isAdmin) history.push('/admin');
                 else history.push('/chat');
             } else {
-                message.error('hãy xác thực capcha', 5);
+                message.error('Hãy xác thực capcha', 5);
             }
         } catch (error) {
             setError(true);
@@ -55,8 +56,9 @@ function LoginPage(props) {
     };
 
     const onChange = (value) => {
-        console.log('Captcha value:', value);
-        setVerify(true);
+        // console.log('Captcha value:', value);
+        setError(false)
+        setVerify(true)
     };
 
     useEffect(() => {
@@ -113,7 +115,7 @@ function LoginPage(props) {
                                                 />
                                             </Col>
                                             <Col span={24}>
-                                                <br />
+                                                {/* <br /> */}
                                                 {keyGoogleCaptcha && (
                                                     <ReCAPTCHA
                                                         sitekey={

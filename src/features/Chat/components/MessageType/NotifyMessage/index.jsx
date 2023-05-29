@@ -321,7 +321,7 @@ function NotifyMessage({ message }) {
                             <div className='notify-message-content_group-avatar'>
                                 <div className='notify-message-content-title'>
                                     <span className='user-name-strong'>
-                                        Đã trờ thành bạn bè của nhau
+                                        Đã trở thành bạn bè của nhau
                                     </span>
                                 </div>
                             </div>

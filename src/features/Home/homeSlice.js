@@ -7,7 +7,6 @@ export const fetchInfoWebs = createAsyncThunk(
     `${KEY}/fetchInfoWebApp`,
     async () => {
         const data = await InfoWebApi.getInfoWeb();
-        console.log('🚀 ~ file: homeSlice.js:10 ~ data:', data)
         return data;
     }
 );

@@ -18,7 +18,7 @@ function DevInfoBox({ data }) {
                 <img src={data.image} alt="dev" />
                 <h3>{data.name}</h3>
                 <div className="contact-info">
-                    <span><MailTwoTone />&nbsp;Email: {data.mail}</span>
+                    <span><MailTwoTone />&nbsp;Email: {data.email}</span>
                     <span><GithubOutlined />&nbsp;Github: <a href={data.github}>{data.github}</a></span>
 
                 </div>
