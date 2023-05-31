@@ -17,10 +17,7 @@ function Home(props) {
         <Spin size="large" spinning={isLoading}>
             <div className="home_page">
                 <Header data={infoApp} />
-                <Feature data={features} />
-                <AboutWebApp data={infoWebApps} />
-                <Developer data={developers} />
-                <Footer data={infoWebApps.additionalInfo} />
+                <Footer data={infoWebApps} />
             </div>
         </Spin>
     );

@@ -1,35 +1,90 @@
 import { CloseOutlined, MenuOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
+import { Nav, Select, Button } from '@douyinfe/semi-ui';
+import {
+    IconStar,
+    IconSetting,
+    IconGlobe,
+    IconLanguage,
+} from '@douyinfe/semi-icons';
 function Navbar() {
+    const history = useHistory();
     const [isShowMenu, setIsShowMenu] = useState(false);
 
     return (
         <header>
-            <a href="#" className="logo" alt="logo">
-                Facebook.
-            </a>
+            <Nav
+                mode={'horizontal'}
+                header={{
+                    logo: (
+                        <img
+                            src="https://sf6-cdn-tos.douyinstatic.com/obj/eden-cn/ptlz_zlp/ljhwZthlaukjlkulzlp/root-web-sites/webcast_logo.svg"
+                            alt="logo"
+                        />
+                    ),
+                    text: 'ZALA',
+                }}
+                renderWrapper={({ itemElement, props }) => {
+                    const routerMap = {
+                        home: "/",
+                        features: '/features',
+                        privatepolicy: '/private-policy',
+                    };
+                    return (
+                        <Link
+                            style={{ textDecoration: "none" }}
+                            to={routerMap[props.itemKey]}
+                        >
+                            {itemElement}
+                        </Link>
+                    );
+                }}
+                items={[
+                    {
+                        itemKey: 'features',
+                        text: 'Tính năng',
+                        icon: <IconStar />,
+                    },
+                    {
+                        itemKey: 'privatepolicy',
+                        text: 'Quyền riêng tư',
+                        icon: <IconGlobe />,
+                    },
+                    {
+                        itemKey: 'platform',
+                        text: 'Nền tảng ứng dụng',
+                        icon: <IconSetting />,
+                        items: [
+                            'Mobile Application',
+                            'Website'
+                        ],
+                    },
+                ]}
 
-            <input type="checkbox" id="menu-bar" />
-            <label
-                for="menu-bar"
-                onClick={() => setIsShowMenu(!isShowMenu)}
-                className="menu-bar"
-            >
-                {isShowMenu ? <CloseOutlined /> : <MenuOutlined />}
-            </label>
+                onSelect={(key) => console.log(key)}
 
-            <nav className="navbar">
-                <a href="#home">Trang chủ</a>
-                <a href="#features">Tính năng</a>
-                <a href="#about">Ứng dụng</a>
-                <a href="#developer">Team phát triển</a>
-                <Link to='/account/registry'>Đăng ký</Link>
-                <Link to='/account/login'>Đăng nhập</Link>
-            </nav>
+                footer={
+                    <>
+                        <Select
+                            defaultValue="English"
+                            style={{ width: 150, marginRight: 10 }}
+                            insetLabel={<IconLanguage />}
+                        >
+                            <Select.Option value="vn-VI">
+                                Việt Nam
+                            </Select.Option>
+                            {/* <Select.Option value="en-EN">English</Select.Option> */}
+                        </Select>
+                        <Button onClick={() => history.push('/account/login')} style={{ marginRight: 10 }}>
+                            Đăng nhập / Đăng ký
+                        </Button>
+                    </>
+                }
+            />
         </header>
-    )
+    );
 }
 
-export default Navbar
+export default Navbar;
