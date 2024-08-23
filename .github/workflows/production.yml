@@ -52,4 +52,5 @@ jobs:
             docker compose down
             docker compose up -d
             docker image prune -f
+            docker images | grep 'nghiaphamln/meetdy-frontend' | awk '{if(NR>1) print \$3}' | xargs -r docker rmi -f
           EOF
