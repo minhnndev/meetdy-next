@@ -16,6 +16,7 @@ ARG REACT_APP_URL
 ENV REACT_APP_URL=$REACT_APP_URL
 
 COPY . .
-EXPOSE 80
+RUN npm run build
 
-CMD [ "npm", "start" ]
+FROM nginx:latest
+COPY --from=build-step /app/build /usr/share/nginx/html
