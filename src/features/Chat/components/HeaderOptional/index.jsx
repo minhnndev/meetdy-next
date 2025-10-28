@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import dateUtils from 'utils/dateUtils';
 import ConversationAvatar from '../ConversationAvatar';
 import ModalAddMemberToConver from '../ModalAddMemberToConver';
-import './style.scss';
+import './style.css';
 
 HeaderOptional.propTypes = {
     avatar: PropTypes.oneOfType([

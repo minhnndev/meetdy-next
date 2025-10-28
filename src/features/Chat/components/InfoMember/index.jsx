@@ -1,6 +1,6 @@
 import { CaretDownOutlined, CopyOutlined, ExclamationCircleOutlined, LinkOutlined, LockOutlined, UnlockOutlined, UnlockTwoTone } from '@ant-design/icons';
 import PropTypes from 'prop-types';
-import './style.scss';
+import './style.css';
 import { GrGroup } from "react-icons/gr";
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';

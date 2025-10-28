@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { defaultStyles, FileIcon } from 'react-file-icon';
 import fileHelpers from 'utils/fileHelpers';
 import ModalDetailMessageReply from '../../ModalDetailMessageReply';
-import './style.scss';
+import './style.css';
 
 
 

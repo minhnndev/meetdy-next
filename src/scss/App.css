@@ -1,0 +1,9 @@
+@import "../../node_modules/react-modal-video/css/modal-video.min.css";
+
+.modal-video-close-btn {
+    cursor: pointer;
+}
+
+h1 {
+    box-shadow: none;
+}

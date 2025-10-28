@@ -1,7 +1,7 @@
 import { Select } from 'antd';
 import React, { useState } from 'react';
 import dateUtils from 'utils/dateUtils';
-import './style.scss';
+import './style.css';
 const { Option } = Select;
 
 DateOfBirthField.propTypes = {};

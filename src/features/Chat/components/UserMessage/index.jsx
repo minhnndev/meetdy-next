@@ -28,7 +28,7 @@ import StickerMessage from '../MessageType/StickerMessage';
 import TextMessage from '../MessageType/TextMessage';
 import VideoMessage from '../MessageType/VideoMessage';
 import VoteMessage from '../MessageType/VoteMessage';
-import './style.scss';
+import './style.css';
 
 UserMessage.propTypes = {
     message: PropTypes.object,

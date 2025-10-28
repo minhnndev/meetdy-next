@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import ImageItem from '../ImageItem';
-import './style.scss';
+import './style.css';
 import { Image } from 'antd';
 import ModalVideoCustom from 'components/ModalVideoCustom';
 import ThumbnailCustom from 'components/ThumbnailCustom';

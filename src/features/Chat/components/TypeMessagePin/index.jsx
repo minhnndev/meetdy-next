@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { defaultStyles, FileIcon } from 'react-file-icon';
 import fileHelpers from 'utils/fileHelpers';
-import './style.scss';
+import './style.css';
 TypeMessagePin.propTypes = {
     type: PropTypes.string,
     content: PropTypes.string,

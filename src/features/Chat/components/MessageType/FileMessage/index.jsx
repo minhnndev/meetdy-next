@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { DownloadOutlined } from '@ant-design/icons';
 import fileHelpers from 'utils/fileHelpers';
 import { FileIcon, defaultStyles } from 'react-file-icon';
-import './style.scss';
+import './style.css';
 FileMessage.propTypes = {
     content: PropTypes.string.isRequired,
     dateAt: PropTypes.object.isRequired,

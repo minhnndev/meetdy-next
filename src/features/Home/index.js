@@ -7,7 +7,7 @@ import Developer from './Components/Developer';
 import Feature from './Components/Feature';
 import Footer from './Components/Footer';
 import Header from './Components/Header';
-import './style.scss';
+import './style.css';
 
 function Home(props) {
     const { developers, infoApp, isLoading, features, infoWebApps } =

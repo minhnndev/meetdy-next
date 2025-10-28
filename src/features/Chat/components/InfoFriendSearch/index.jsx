@@ -7,7 +7,7 @@ import Scrollbars from 'react-custom-scrollbars';
 import { useDispatch, useSelector } from 'react-redux';
 import InfoTitle from '../InfoTitle';
 import PersonalIcon from '../PersonalIcon';
-import './style.scss';
+import './style.css';
 InfoFriendSearch.propTypes = {
     onBack: PropTypes.func,
     members: PropTypes.array,

@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import ItemsSelected from '../ItemsSelected';
 import PersonalIcon from '../PersonalIcon';
-import './style.scss';
+import './style.css';
 
 ModalCreateGroup.propTypes = {
     isVisible: PropTypes.bool,

@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchNextPageMessage, fetchNextPageMessageOfChannel, setRaisePage } from '../../slice/chatSlice';
-import './style.scss';
+import './style.css';
 
 BodyChatContainer.propTypes = {
     scrollId: PropTypes.string,

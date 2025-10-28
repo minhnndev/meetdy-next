@@ -8,7 +8,7 @@ import React from 'react';
 import { defaultStyles, FileIcon } from 'react-file-icon';
 import fileHelpers from 'utils/fileHelpers';
 import PinItem from '../PinItem';
-import './style.scss';
+import './style.css';
 
 
 ModalDetailMessagePin.propTypes = {

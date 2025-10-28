@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Drawer } from 'antd';
-import './style.scss';
+import './style.css';
 import DrawerPinMessageStyle from './DrawerPinMessageStyle'
 import { CaretDownOutlined, CaretUpOutlined, RightOutlined } from '@ant-design/icons';
 import NutshellPinMessage from '../NutshellPinMessage/NutshellPinMessage';

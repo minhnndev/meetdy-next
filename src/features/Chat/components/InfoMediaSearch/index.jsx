@@ -8,7 +8,7 @@ import ContentTabPaneFile from '../ContentTabPaneFile';
 import ContentTabPaneMedia from '../ContentTabPaneMedia';
 import InfoTitle from '../InfoTitle';
 import TabPaneMedia from '../TabPaneMedia';
-import './style.scss';
+import './style.css';
 
 InfoMediaSearch.propTypes = {
     onBack: PropTypes.func,

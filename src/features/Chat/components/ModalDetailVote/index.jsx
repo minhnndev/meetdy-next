@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import PersonalIcon from '../PersonalIcon';
-import './style.scss';
+import './style.css';
 
 ModalDetailVote.propTypes = {
     visible: PropTypes.bool.isRequired,

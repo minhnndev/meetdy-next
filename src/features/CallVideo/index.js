@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import ActionNavbar from './components/ActionNavbar';
 import MyVideo from './components/MyVideo';
 import { Col, Row } from 'antd';
-import './style.scss';
+import './style.css';
 import peerjs from 'peerjs';
 import Peer from 'peerjs';
 

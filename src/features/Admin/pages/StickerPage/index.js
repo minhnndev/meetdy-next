@@ -23,7 +23,7 @@ import {
 import adminApi from 'api/adminApi';
 import { DeleteOutlined } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
-import './style.scss';
+import './style.css';
 
 StickerPage.propTypes = {};
 function StickerPage(props) {

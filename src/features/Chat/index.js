@@ -55,7 +55,7 @@ import {
     updateTimeForConver,
     updateVoteMessage,
 } from './slice/chatSlice';
-import './style.scss';
+import './style.css';
 
 Chat.propTypes = {
     socket: PropTypes.object,

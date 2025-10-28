@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import fileHelpers from 'utils/fileHelpers';
 import PersonalIcon from '../PersonalIcon';
-import './style.scss';
+import './style.css';
 
 TabPaneMedia.propTypes = {
     members: PropTypes.array,

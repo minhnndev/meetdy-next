@@ -8,7 +8,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import classifyUtils from 'utils/classifyUtils';
-import './style.scss';
+import './style.css';
 
 GroupCard.propTypes = {
     data: PropTypes.object,

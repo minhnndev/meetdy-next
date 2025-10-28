@@ -5,7 +5,7 @@ import AvatarCustom from 'components/AvatarCustom';
 import PropTypes from 'prop-types';
 import React from 'react';
 import COVERSATION_STYLE from './ConversationAvatarStyle';
-import './style.scss';
+import './style.css';
 ConversationAvatar.propTypes = {
     demension: PropTypes.number,
     isGroupCard: PropTypes.bool,

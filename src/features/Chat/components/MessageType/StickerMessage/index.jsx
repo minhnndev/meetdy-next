@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './style.scss';
+import './style.css';
 import { Image } from 'antd';
 import { fallback } from 'assets/images/fallbackImage'
 

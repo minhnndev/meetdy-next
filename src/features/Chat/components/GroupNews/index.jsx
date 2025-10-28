@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux'
 import InfoTitle from '../InfoTitle'
 import ListChannel from '../ListChannel'
 import TabPaneVote from '../TabPaneVote'
-import './style.scss'
+import './style.css'
 
 GroupNews.propTypes = {
     onBack: PropTypes.func,

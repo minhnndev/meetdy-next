@@ -3,7 +3,7 @@ import ConverMutipleSearch from 'components/ConverMutipleSearch';
 import ConverPersonalSearch from 'components/ConverPersonalSearch';
 import PropTypes from 'prop-types';
 import React from 'react';
-import './style.scss';
+import './style.css';
 
 FilterContainer.propTypes = {
     dataSingle: PropTypes.array,

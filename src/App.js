@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { fetchInfoWebs } from 'features/Home/homeSlice';
-import './scss/App.scss';
+import './scss/App.css';
 
 function App() {
     const dispatch = useDispatch();

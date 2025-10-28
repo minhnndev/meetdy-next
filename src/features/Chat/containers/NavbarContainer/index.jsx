@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import { setToTalUnread } from '../../slice/chatSlice';
 import NavbarStyle from './NavbarStyle';
-import './style.scss';
+import './style.css';
 
 NavbarContainer.propTypes = {
     onSaveCodeRevoke: PropTypes.func,

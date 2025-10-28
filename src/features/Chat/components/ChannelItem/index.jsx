@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { DeleteOutlined, ExclamationCircleOutlined, NumberOutlined } from '@ant-design/icons';
-import './style.scss';
+import './style.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMessageInChannel, getLastViewChannel, setCurrentChannel } from 'features/Chat/slice/chatSlice';
 import { Dropdown, Menu, message, Modal } from 'antd';

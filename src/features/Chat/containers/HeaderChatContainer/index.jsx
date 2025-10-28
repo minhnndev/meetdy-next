@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import './style.scss';
+import './style.css';
 import { useSelector } from 'react-redux';
 import HeaderOptional from 'features/Chat/components/HeaderOptional';
 

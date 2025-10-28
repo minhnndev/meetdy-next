@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { defaultStyles, FileIcon } from 'react-file-icon';
 import fileHelpers from 'utils/fileHelpers';
 import PersonalIcon from '../PersonalIcon';
-import './style.scss';
+import './style.css';
 
 
 

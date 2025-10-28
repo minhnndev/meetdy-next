@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './style.scss';
+import './style.css';
 import PersonalIcon from 'features/Chat/components/PersonalIcon';
 import { Button } from 'antd';
 

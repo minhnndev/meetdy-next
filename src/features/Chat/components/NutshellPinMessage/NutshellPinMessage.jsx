@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './style.scss';
+import './style.css';
 import { CaretDownOutlined, DashOutlined, MessageTwoTone, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu, message as MessageNotify, Modal } from 'antd';
 import NutshellPinMessageStyle from './NutshellPinMessageStyle';

@@ -2,7 +2,7 @@ import { Avatar } from 'antd';
 import AvatarCustom from 'components/AvatarCustom';
 import PropTypes from 'prop-types';
 import React from 'react';
-import './style.scss';
+import './style.css';
 
 LastView.propTypes = {
     lastView: PropTypes.array,

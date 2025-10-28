@@ -28,7 +28,7 @@ import {
     fetchSuggestFriend,
 } from './friendSlice';
 import FRIEND_STYLE from './friendStyle';
-import './style.scss';
+import './style.css';
 
 Friend.propTypes = {
     socket: PropTypes.object,

@@ -4,7 +4,7 @@ import React from 'react';
 import { defaultStyles, FileIcon } from 'react-file-icon';
 import { MdQuestionAnswer } from 'react-icons/md';
 import fileHelpers from 'utils/fileHelpers';
-import './style.scss';
+import './style.css';
 
 
 

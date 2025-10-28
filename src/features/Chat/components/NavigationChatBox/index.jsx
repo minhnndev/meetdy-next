@@ -13,7 +13,7 @@ import { IoText } from "react-icons/io5";
 import { useSelector } from 'react-redux';
 import ModalCreateVote from '../ModalCreateVote';
 import Sticker from '../Sticker';
-import './style.scss';
+import './style.css';
 
 NavigationChatBox.propTypes = {
     onClickTextFormat: PropTypes.func,

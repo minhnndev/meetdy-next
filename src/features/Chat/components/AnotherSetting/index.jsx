@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { leaveGroup } from '../../slice/chatSlice';
-import './style.scss';
+import './style.css';
 
 AnotherSetting.propTypes = {
     socket: PropTypes.object,

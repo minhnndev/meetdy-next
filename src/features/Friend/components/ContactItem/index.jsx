@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Tag } from 'antd'
 import PersonalIcon from 'features/Chat/components/PersonalIcon'
-import './style.scss'
+import './style.css'
 import UserCard from 'components/UserCard';
 import { useState } from 'react';
 import userApi from 'api/userApi';

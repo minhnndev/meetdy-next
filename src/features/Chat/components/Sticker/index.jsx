@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './style.scss';
+import './style.css';
 import { Tabs } from 'antd';
 import { GiftOutlined, SmileOutlined } from '@ant-design/icons';
 import ListSticker from '../ListSticker';
