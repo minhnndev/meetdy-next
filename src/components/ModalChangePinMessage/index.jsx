@@ -6,7 +6,7 @@ import { fetchPinMessages } from 'features/Chat/slice/chatSlice';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import './style.css';
+
 
 ModalChangePinMessage.propTypes = {
     visible: PropTypes.bool.isRequired,

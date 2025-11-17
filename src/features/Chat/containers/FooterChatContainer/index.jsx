@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import MENTION_STYLE from './MentionStyle';
-import './style.css';
+
 
 
 FooterChatContainer.propTypes = {

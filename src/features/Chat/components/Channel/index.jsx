@@ -1,7 +1,7 @@
 import { CaretDownOutlined, NumberOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import './style.css';
+
 import ChannelItem from '../ChannelItem';
 import { Input, message, Modal } from 'antd';
 import channelApi from 'api/channelApi';

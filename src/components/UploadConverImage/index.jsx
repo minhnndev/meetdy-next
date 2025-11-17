@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import './style.css';
+
 import { useState } from 'react';
 import { EditOutlined } from '@ant-design/icons';
 

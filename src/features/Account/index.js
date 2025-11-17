@@ -6,7 +6,7 @@ import { Route, Switch, useRouteMatch, useHistory } from 'react-router-dom';
 import ForgotPage from './pages/ForgotPage';
 import LoginPage from './pages/LoginPage';
 import RegistryPage from './pages/RegistryPage';
-import './style.css';
+
 
 function Account(props) {
     const { url } = useRouteMatch();

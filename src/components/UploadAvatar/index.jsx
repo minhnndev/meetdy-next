@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import './style.css';
+
 import { CameraOutlined } from '@ant-design/icons';
 import { useEffect } from 'react';
 

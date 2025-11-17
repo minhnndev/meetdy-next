@@ -7,7 +7,7 @@ import SiderBar from './components/SiderBar';
 import StickerPage from './pages/StickerPage';
 import StickerGroupPage from './pages/StickerGroupPage';
 import UserPage from './pages/UserPage';
-import './style.css';
+
 
 const { Header, Content } = Layout;
 

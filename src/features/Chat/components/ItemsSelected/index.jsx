@@ -3,7 +3,7 @@ import { Avatar, Tooltip } from 'antd';
 import PropTypes from 'prop-types';
 import React from 'react';
 import PersonalIcon from '../PersonalIcon';
-import './style.css';
+
 ItemsSelected.propTypes = {
     items: PropTypes.array,
 };

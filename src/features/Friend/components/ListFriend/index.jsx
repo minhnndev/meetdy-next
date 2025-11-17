@@ -9,7 +9,6 @@ import Scrollbars from 'react-custom-scrollbars';
 import { useDispatch } from 'react-redux';
 import { fetchFriends } from '../../friendSlice';
 import FriendItem from '../FriendItem';
-import './style.css';
 
 ListFriend.propTypes = {
     data: PropTypes.array,

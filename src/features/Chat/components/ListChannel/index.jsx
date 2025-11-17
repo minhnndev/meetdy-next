@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ChannelItem from '../ChannelItem';
 import { useDispatch, useSelector } from 'react-redux';
-import './style.css';
+
 import { fetchListMessages, getLastViewOfMembers, setCurrentChannel } from 'features/Chat/slice/chatSlice';
 import { NumberOutlined } from '@ant-design/icons';
 

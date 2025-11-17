@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import ItemsSelected from '../ItemsSelected';
 import PersonalIcon from '../PersonalIcon';
 import PropTypes from 'prop-types';
-import './style.css';
+
 ModalAddMemberToConver.propTypes = {
     onOk: PropTypes.func,
     loading: PropTypes.bool,

@@ -21,7 +21,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import dateUtils from 'utils/dateUtils';
 import getSummaryName from 'utils/nameHelper';
-import './style.css';
+
 import UserCardStyle from './UserCardStyle';
 UserCard.propTypes = {
     title: PropTypes.string,

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import CheckLink, { replaceConentWithouLink, replaceContentToLink } from 'utils/linkHelper';
 import { LinkPreview } from "@dhaiwat10/react-link-preview";
 import parse from 'html-react-parser'
-import './style.css';
+
 import ReplyMessage from '../ReplyMessage';
 TextMessage.propTypes = {
     content: PropTypes.string,

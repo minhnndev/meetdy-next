@@ -7,7 +7,6 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { socket } from 'utils/socketClient';
 import GroupCard from '../GroupCard';
-import './style.css';
 
 
 ListGroup.propTypes = {

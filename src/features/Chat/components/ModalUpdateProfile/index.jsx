@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
-import './style.css';
+
 
 ModalUpdateProfile.propTypes = {
     isVisible: PropTypes.bool,

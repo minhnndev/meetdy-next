@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Result, Button } from 'antd';
-import './style.css';
+
 
 NotFoundPage.propTypes = {};
 

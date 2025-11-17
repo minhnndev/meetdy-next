@@ -3,7 +3,7 @@ import {
 } from '@ant-design/icons';
 import React from 'react';
 import PropTypes from 'prop-types';
-import './style.css';
+
 
 ThumbnailCustom.propTypes = {
     url: PropTypes.string.isRequired,

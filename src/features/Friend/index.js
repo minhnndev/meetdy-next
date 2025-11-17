@@ -28,7 +28,6 @@ import {
     fetchSuggestFriend,
 } from './friendSlice';
 import FRIEND_STYLE from './friendStyle';
-import './style.css';
 
 Friend.propTypes = {
     socket: PropTypes.object,
@@ -167,7 +166,7 @@ function Friend({ socket }) {
             );
             setSingleConverFilter(single);
             setMutipleConverFilter(mutiple);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     return (
@@ -321,9 +320,8 @@ function Friend({ socket }) {
                                                                 {` ${getValueFromKey(
                                                                     'LEFT',
                                                                     currentFilterLeft
-                                                                )} (${
-                                                                    groupCurrent.length
-                                                                })`}
+                                                                )} (${groupCurrent.length
+                                                                    })`}
                                                             </Button>
                                                         </Dropdown>
                                                     </div>

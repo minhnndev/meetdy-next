@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchListClassify } from '../../slice/chatSlice';
-import './style.css';
+
 ModalClassify.propTypes = {
     isVisible: PropTypes.bool,
     onCancel: PropTypes.func,

@@ -3,14 +3,10 @@ import React, { useState } from 'react';
 import { defaultStyles, FileIcon } from 'react-file-icon';
 import fileHelpers from 'utils/fileHelpers';
 import ModalDetailMessageReply from '../../ModalDetailMessageReply';
-import './style.css';
-
-
 
 ReplyMessage.propTypes = {
     replyMessage: PropTypes.object.isRequired,
 };
-
 
 function ReplyMessage({ replyMessage }) {
 

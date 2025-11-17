@@ -1,7 +1,7 @@
 import { LeftOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 import React from 'react';
-import './style.css';
+
 InfoTitle.propTypes = {
     text: PropTypes.string,
     onBack: PropTypes.func,

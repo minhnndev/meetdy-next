@@ -1,7 +1,7 @@
 import FileItem from 'components/FileItem';
 import PropTypes from 'prop-types';
 import React from 'react';
-import './style.css';
+
 
 ContentTabPaneFile.propTypes = {
     items: PropTypes.array,

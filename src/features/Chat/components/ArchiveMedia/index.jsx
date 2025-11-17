@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import './style.css';
+
 import { CaretDownOutlined } from '@ant-design/icons';
 import ImageItem from '../ImageItem';
 import { Image } from 'antd';

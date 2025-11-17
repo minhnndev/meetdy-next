@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import SuggestCard from '../SuggestCard'
 import { Col, Row } from 'antd';
-import './style.css';
 import UserCard from 'components/UserCard';
 
 SuggestList.propTypes = {

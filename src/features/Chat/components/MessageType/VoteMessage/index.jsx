@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import './style.css';
+
 import { Button, Modal } from 'antd';
 import { CaretRightOutlined } from '@ant-design/icons';
 import ModalDetailVote from '../../ModalDetailVote';

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import './style.css';
+
 import VoteMessage from '../MessageType/VoteMessage';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';

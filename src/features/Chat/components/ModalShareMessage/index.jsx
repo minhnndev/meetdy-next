@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import ConversationAvatar from '../ConversationAvatar';
 import ItemsSelected from '../ItemsSelected';
 import PersonalIcon from '../PersonalIcon';
-import './style.css';
+
 
 ModalShareMessage.propTypes = {
     visible: PropTypes.bool,

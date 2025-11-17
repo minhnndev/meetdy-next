@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { equalsArray } from 'utils/arrayHelper';
 import MODAL_OPTION_STYLE from './ModalViewOptionStyle';
-import './style.css';
+
 
 ModalViewOption.propTypes = {
     isModalVisible: PropTypes.bool,

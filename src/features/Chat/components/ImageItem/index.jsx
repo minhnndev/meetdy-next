@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import IMAGE_ITEM_STYLE from './ImageItemStyle';
 import OverlayImage from 'components/OverlayImage';
 import { fallback } from 'constants/images'
-import './style.css';
+
 
 ImageItem.propTypes = {
     url: PropTypes.string,

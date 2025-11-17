@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import classifyUtils from 'utils/classifyUtils';
 import ConversationAvatar from '../ConversationAvatar';
 import ShortMessage from '../ShortMessage';
-import './style.css';
+
 ConversationSingle.propTypes = {
     conversation: PropTypes.object,
     onClick: PropTypes.func,

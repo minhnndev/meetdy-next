@@ -23,7 +23,7 @@ import {
 import adminApi from 'api/adminApi';
 import { DeleteOutlined } from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
-import './style.css';
+
 
 StickerPage.propTypes = {};
 function StickerPage(props) {
@@ -86,7 +86,7 @@ function StickerPage(props) {
         try {
             const list = await adminApi.getAllGroupSticker();
             return list;
-        } catch (error) {}
+        } catch (error) { }
     };
 
     useEffect(() => {
@@ -105,7 +105,7 @@ function StickerPage(props) {
                 setSticker(result1.stickers);
                 return result1.stickers;
             });
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const handleDeleteSticker = (urlstickers) => {
@@ -123,7 +123,7 @@ function StickerPage(props) {
     const handleGetAll = async () => {
         try {
             console.log('sticker', sticker);
-        } catch (error) {}
+        } catch (error) { }
     };
 
     const { id } = match.params;

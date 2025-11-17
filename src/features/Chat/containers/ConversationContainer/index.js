@@ -16,7 +16,7 @@ import {
     getMembersConversation,
     setTypeOfConversation,
 } from '../../slice/chatSlice';
-import './style.css';
+
 
 ConversationContainer.propTypes = {
     valueClassify: PropTypes.string.isRequired,

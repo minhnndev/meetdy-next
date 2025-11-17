@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './style.css';
+
 import PersonalIcon from '../PersonalIcon';
 import { MessageTwoTone } from '@ant-design/icons';
 import dateUtils from 'utils/dateUtils'

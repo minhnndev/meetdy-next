@@ -10,7 +10,6 @@ import PropTypes from 'prop-types';
 import React, { useRef, useState } from 'react';
 import Scrollbars from 'react-custom-scrollbars';
 import { useDispatch, useSelector } from 'react-redux';
-import './style.css';
 SearchContainer.propTypes = {
     onVisibleFilter: PropTypes.func,
     onSearchChange: PropTypes.func,

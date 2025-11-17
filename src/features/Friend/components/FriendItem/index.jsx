@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './style.css';
 import { DashOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import PersonalIcon from 'features/Chat/components/PersonalIcon';
 import { Menu, Dropdown, Button } from 'antd';

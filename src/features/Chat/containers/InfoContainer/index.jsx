@@ -14,7 +14,7 @@ import Scrollbars from 'react-custom-scrollbars';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import UserCard from 'components/UserCard'
-import './style.css';
+
 import userApi from 'api/userApi';
 InfoContainer.propTypes = {
     socket: PropTypes.object,
