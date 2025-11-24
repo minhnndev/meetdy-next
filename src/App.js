@@ -45,17 +45,13 @@ function App() {
                         path="/jf-link/:conversationId"
                         component={JoinFromLink}
                     />
-
                     <ProtectedRoute path="/chat" component={ChatLayout} />
-
                     <AdminProtectedRoute path="/admin" component={Admin} />
                     <ProtectedRoute
                         path="/call-video/:conversationId"
                         component={CallVideo}
                     />
-
                     <Route path="/account" component={Account} />
-
                     <Route component={NotFoundPage} />
                 </Switch>
             </div>
