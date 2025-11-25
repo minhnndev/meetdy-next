@@ -31,12 +31,12 @@ axiosClient.interceptors.response.use(
         if (error.response.status !== 401) {
             return Promise.reject(error);
         }
-        axios.interceptors.response.eject(axiosClient.interceptors);
+
         return axios
             .post('/auth/refresh-token', {
                 refreshToken,
             })
-            .then((token) => {
+            .then((token: any) => {
                 localStorage.setItem('token', token);
                 error.response.config.headers['Authorization'] =
                     'Bearer ' + token;

@@ -47,7 +47,8 @@
         "fslightbox-react": "^1.6.2-2",
         "husky": "^7.0.4",
         "lint-staged": "^11.2.3",
-        "prettier": "^2.4.1"
+        "prettier": "^2.4.1",
+        "typescript": "^5.9.3"
     },
     "npmConfig": {
         "legacy-peer-deps": true

@@ -1,0 +1,44 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "baseUrl": "./src",
+        "paths": {
+            "api/*": [
+                "api/*"
+            ],
+            "app/*": [
+                "app/*"
+            ],
+            "assets/*": [
+                "assets/*"
+            ],
+            "components/*": [
+                "components/*"
+            ],
+            "constants/*": [
+                "constants/*"
+            ],
+            "customfield/*": [
+                "customfield/*"
+            ],
+            "features/*": [
+                "features/*"
+            ],
+            "hooks/*": [
+                "hooks/*"
+            ],
+            "layout/*": [
+                "layout/*"
+            ],
+            "utils/*": [
+                "utils/*"
+            ]
+        },
+        "allowJs": true,
+        "checkJs": false
+    },
+    "include": [
+        "src/**/*"
+    ]
+}
