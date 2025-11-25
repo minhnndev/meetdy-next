@@ -10,9 +10,8 @@ const dateUtils = {
 
         //  tính năm
         if (nowTempt.getFullYear() - date.getFullYear() > 0)
-            return `${date.getDate()}/${
-                date.getMonth() + 1
-            }/${date.getFullYear()}`;
+            return `${date.getDate()}/${date.getMonth() + 1
+                }/${date.getFullYear()}`;
 
         const dateWasMinus7day = nowTempt.setDate(nowTempt.getDate() - 7);
 
@@ -51,4 +50,4 @@ const dateUtils = {
     },
 };
 
-module.exports = dateUtils;
+export default dateUtils;

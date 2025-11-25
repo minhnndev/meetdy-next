@@ -118,12 +118,12 @@ const callVideoHelpers = {
     replaceTrack(stream, recipientPeer) {
         let sender = recipientPeer.getSenders
             ? recipientPeer
-                  .getSenders()
-                  .find((s) => s.track && s.track.kind === stream.kind)
+                .getSenders()
+                .find((s) => s.track && s.track.kind === stream.kind)
             : false;
 
         if (sender) sender.replaceTrack(stream);
     },
 };
 
-module.exports = callVideoHelpers;
+export default callVideoHelpers;
