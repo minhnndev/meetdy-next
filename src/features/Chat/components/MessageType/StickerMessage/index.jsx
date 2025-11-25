@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { Image } from 'antd';
-import { fallback } from '@/assets/images/fallbackImage';
 
 StickerMessage.propTypes = {
   content: PropTypes.string.isRequired,
@@ -19,7 +18,7 @@ function StickerMessage({ content, dateAt, isSeen }) {
     <>
       <div className="messsage-image-wrapper">
         <div className="message-image--main">
-          <Image src={content} fallback={fallback} preview={false} />
+          <Image src={content} preview={false} />
         </div>
       </div>
 

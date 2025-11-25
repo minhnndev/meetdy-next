@@ -1,29 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Image } from 'antd';
-import { fallback } from '@/assets/images/fallbackImage';
 import MESSAGE_STYLE from '@/constants/MessageStyle/messageStyle';
 import OverlayImage from '@/components/OverlayImage';
-ImageMessage.propTypes = {
-  content: PropTypes.string,
-  dateAt: PropTypes.object,
-  isSeen: PropTypes.bool,
-};
 
-ImageMessage.defaultProps = {
-  content: '',
-  dateAt: null,
-  isSeen: false,
-};
-
-function ImageMessage({ content, children, dateAt, isSeen }) {
+function ImageMessage({
+  content = '',
+  children,
+  dateAt = null,
+  isSeen = false,
+}) {
   return (
     <>
       <div className="messsage-image-wrapper">
         <div className="message-image--main">
           <Image
             src={content}
-            fallback={fallback}
             style={MESSAGE_STYLE.imageStyle}
             preview={{ mask: <OverlayImage /> }}
           />
