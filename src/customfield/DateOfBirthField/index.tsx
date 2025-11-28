@@ -1,5 +1,5 @@
 import { Select } from 'antd';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import dateUtils from '@/utils/dateUtils';
 
 const { Option } = Select;

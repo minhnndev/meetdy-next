@@ -8,7 +8,7 @@ import {
 import { Button, Dropdown, Menu, Popover } from 'antd';
 import UploadFile from '@/customfield/upLoadFile';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BsNewspaper } from 'react-icons/bs';
 import { FcBarChart } from 'react-icons/fc';
 import { IoText } from 'react-icons/io5';

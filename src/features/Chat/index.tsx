@@ -729,7 +729,7 @@ function Chat({ socket, idNewMessage }) {
                     visible={openDrawerInfo}
                     key="right"
                     className="drawer-responsive"
-                    bodyStyle={{ padding: 0 }}
+                    style={{ padding: 0 }}
                     width={`${renderWidthDrawer(width)}%`}
                   >
                     <>

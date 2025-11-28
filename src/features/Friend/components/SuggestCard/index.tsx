@@ -29,7 +29,7 @@ function SuggestCard({ data, onClick }) {
         <PersonalIcon
           avatar={data.avatar}
           name={data.name}
-          demention={90}
+          dimension={90}
           color={data.avatarColor}
         />
       </div>

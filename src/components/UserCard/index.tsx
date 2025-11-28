@@ -147,7 +147,7 @@ function UserCard(props) {
       onCancel={handleOnCancel}
       footer={null}
       width={360}
-      bodyStyle={UserCardStyle.styleModal}
+      style={UserCardStyle.styleModal}
     >
       <div id="user-card">
         <div className="user-card_wrapper">

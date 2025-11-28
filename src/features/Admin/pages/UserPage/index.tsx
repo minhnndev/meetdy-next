@@ -3,7 +3,7 @@ import 'antd/dist/reset.css';
 import adminApi from '@/api/adminApi';
 import { setLoading } from '@/features/Account/accountSlice';
 import UserTable from '@/features/Admin/components/UserTable';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 const { Search } = Input;

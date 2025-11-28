@@ -3,7 +3,7 @@ import { Checkbox, Col, Divider, Input, message, Modal, Row } from 'antd';
 import conversationApi from '@/api/conversationApi';
 import messageApi from '@/api/messageApi';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ConversationAvatar from '../ConversationAvatar';
 import ItemsSelected from '../ItemsSelected';
 import PersonalIcon from '../PersonalIcon';
@@ -190,7 +190,7 @@ function ModalShareMessage({ visible, onCancel, idMessage }) {
                             />
                           ) : (
                             <PersonalIcon
-                              demention={36}
+                              dimension={36}
                               avatar={element.avatar}
                               name={element.name}
                               color={element.avatarColor}

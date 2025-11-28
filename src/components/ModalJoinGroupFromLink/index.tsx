@@ -48,7 +48,7 @@ function ModalJoinGroupFromLink({ isVisible, info, onCancel }) {
       onCancel={handleCancel}
       okText="Tham gia"
       cancelText="Hủy"
-      bodyStyle={MODAL_JOIN_FROM_LINK_STYLE.BODY_MODAL}
+      style={MODAL_JOIN_FROM_LINK_STYLE.BODY_MODAL}
       width={MODAL_JOIN_FROM_LINK_STYLE.WIDTH}
       style={MODAL_JOIN_FROM_LINK_STYLE.STYLE}
     >

@@ -1,253 +1,202 @@
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import {
-  EditOutlined,
-  InfoCircleFilled,
-  SearchOutlined,
-} from '@ant-design/icons';
-import { Checkbox, Col, Divider, Input, Modal, Row } from 'antd';
-import Text from 'antd/lib/typography/Text';
-import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import ItemsSelected from '../ItemsSelected';
-import PersonalIcon from '../PersonalIcon';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-ModalCreateGroup.propTypes = {
-  isVisible: PropTypes.bool,
-  onCancel: PropTypes.func,
-  onOk: PropTypes.func,
-  loading: PropTypes.bool,
+import { EditOutlined, InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
+import PersonalIcon from "../PersonalIcon";
+import ItemsSelected from "../ItemsSelected";
+
+type Props = {
+  isVisible: boolean;
+  onCancel: (v: boolean) => void;
+  onOk: (v: any) => void;
+  loading?: boolean;
 };
 
-ModalCreateGroup.defaultProps = {
-  isVisible: false,
-  onCancel: null,
-  onOk: null,
-  loading: false,
-};
-
-function ModalCreateGroup({ isVisible, onCancel, onOk, loading }) {
-  const [checkList, setCheckList] = useState([]);
-  const [itemSelected, setItemSelected] = useState([]);
-  const { friends } = useSelector((state) => state.chat);
+export default function ModalCreateGroup({
+  isVisible,
+  onCancel,
+  onOk,
+  loading,
+}: Props) {
+  const [checkList, setCheckList] = useState<string[]>([]);
+  const [itemSelected, setItemSelected] = useState<any[]>([]);
   const [isShowError, setIsShowError] = useState(false);
-  const [nameGroup, setNameGroup] = useState('');
-  const [frInput, setFrInput] = useState('');
-  const [initalFriend, setInitalFriend] = useState([]);
+  const [nameGroup, setNameGroup] = useState("");
+  const [frInput, setFrInput] = useState("");
+  const [initalFriend, setInitalFriend] = useState<any[]>([]);
+
+  const { friends } = useSelector((state: any) => state.chat);
 
   useEffect(() => {
     if (isVisible) {
       setInitalFriend(friends);
     } else {
-      setFrInput('');
+      setFrInput("");
       setCheckList([]);
       setItemSelected([]);
-      setNameGroup('');
+      setNameGroup("");
       setIsShowError(false);
     }
   }, [isVisible]);
 
   const handleOk = () => {
     const userIds = itemSelected.map((item) => item._id);
-    if (onOk) {
-      onOk({
-        name: nameGroup,
-        userIds,
-      });
-    }
+    onOk?.({ name: nameGroup, userIds });
   };
 
-  const handleCancel = () => {
-    if (onCancel) {
-      onCancel(false);
-    }
+  const handleChangeName = (e: any) => {
+    setNameGroup(e.target.value);
   };
 
-  const handleRemoveItem = (id) => {
-    let checkListTemp = [...checkList];
-    let itemSelectedTemp = [...itemSelected];
-
-    itemSelectedTemp = itemSelectedTemp.filter((element) => element._id !== id);
-
-    checkListTemp = checkListTemp.filter((element) => element !== id);
-
-    setCheckList(checkListTemp);
-    setItemSelected(itemSelectedTemp);
-
-    setFrInput('');
-    setInitalFriend(friends);
+  const handleOnBlur = () => {
+    setIsShowError(!(nameGroup.length > 0));
   };
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setNameGroup(value);
-  };
-
-  const handleOnBlur = (e) => {
-    !nameGroup.length > 0 ? setIsShowError(true) : setIsShowError(false);
-  };
-
-  const handleChangeFriend = (e) => {
+  const handleChangeFriend = (e: any) => {
     const value = e.target.value;
     setFrInput(value);
 
-    if (!value && isVisible) {
+    if (!value) {
       setInitalFriend(friends);
-    } else {
-      // const tempFriends = [...initalFriend];
-      const realFriends = [];
-      friends.forEach((ele) => {
-        const index = ele.name.search(value);
-        if (index > -1) {
-          realFriends.push(ele);
-        }
-      });
-      setInitalFriend(realFriends);
+      return;
     }
+
+    const filtered = friends.filter((f: any) =>
+      f.name.toLowerCase().includes(value.toLowerCase())
+    );
+    setInitalFriend(filtered);
   };
 
-  const handleChangeCheckBox = (e) => {
-    const value = e.target.value;
+  const handleChangeCheckBox = (id: string) => {
+    const isChecked = checkList.includes(id);
+    let newList = [...checkList];
+    let newItems = [...itemSelected];
 
-    // check xem có trong checklist chưa
-    const index = checkList.findIndex((element) => element === value);
-    let checkListTemp = [...checkList];
-    let itemSelectedTemp = [...itemSelected];
-
-    // nếu như đã có
-    if (index !== -1) {
-      itemSelectedTemp = itemSelectedTemp.filter(
-        (element) => element._id !== value,
-      );
-
-      checkListTemp = checkListTemp.filter((element) => element !== value);
-
-      // chưa có
+    if (isChecked) {
+      newList = newList.filter((v) => v !== id);
+      newItems = newItems.filter((ele) => ele._id !== id);
     } else {
-      checkListTemp.push(value);
-      const index = initalFriend.findIndex((element) => element._id === value);
-
-      if (index !== -1) {
-        itemSelectedTemp.push(initalFriend[index]);
-      }
+      newList.push(id);
+      const user = initalFriend.find((ele) => ele._id === id);
+      if (user) newItems.push(user);
     }
-    setCheckList(checkListTemp);
-    setItemSelected(itemSelectedTemp);
+
+    setCheckList(newList);
+    setItemSelected(newItems);
+  };
+
+  const handleRemoveItem = (id: string) => {
+    setCheckList((p) => p.filter((x) => x !== id));
+    setItemSelected((p) => p.filter((x) => x._id !== id));
   };
 
   return (
-    <Modal
-      title="Tạo nhóm"
-      visible={isVisible}
-      onOk={handleOk}
-      onCancel={handleCancel}
-      centered={true}
-      okText="Tạo nhóm"
-      cancelText="Hủy"
-      okButtonProps={{
-        disabled: !(itemSelected.length > 0 && nameGroup.length > 0),
-      }}
-      confirmLoading={loading}
-    >
-      <div id="modal-create-group">
-        <div className="heading-group">
-          <div className="select-background">
-            <EditOutlined />
-          </div>
-
-          <div className="input-name-group">
+    <Dialog open={isVisible} onOpenChange={(v) => onCancel(v)}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-3">
+            <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full">
+              <EditOutlined />
+            </div>
             <Input
-              size="middle"
               placeholder="Nhập tên nhóm"
-              style={{ width: '100%' }}
-              onBlur={handleOnBlur}
               value={nameGroup}
-              onChange={handleChange}
+              onChange={handleChangeName}
+              onBlur={handleOnBlur}
             />
+          </DialogTitle>
+        </DialogHeader>
 
-            {isShowError && (
-              <Text type="danger">
-                <InfoCircleFilled /> Tên nhóm không được để trống
-              </Text>
-            )}
+        {isShowError && (
+          <div className="text-red-500 flex items-center gap-1 text-sm mt-1">
+            <InfoCircleFilled /> Tên nhóm không được để trống
           </div>
-        </div>
+        )}
 
-        <Divider orientation="left" plain>
-          <span className="divider-title">Thêm bạn vào nhóm</span>
-        </Divider>
-        <div className="search-friend-input">
+        <div className="font-semibold text-sm mt-4 mb-2">Thêm bạn vào nhóm</div>
+
+        <div className="relative">
+          <SearchOutlined className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <Input
-            size="middle"
             placeholder="Nhập tên"
-            style={{ width: '100%' }}
-            prefix={<SearchOutlined />}
-            onChange={handleChangeFriend}
+            className="pl-9"
             value={frInput}
+            onChange={handleChangeFriend}
           />
         </div>
 
-        <Divider />
+        <div className="w-full h-px bg-gray-200 my-4" />
 
-        <div className="list-friend-interact">
+        <div className="flex gap-4">
           <div
-            className={`list-friend-interact--left ${
-              itemSelected.length > 0 ? '' : 'full-container'
+            className={`flex-1 transition-all ${
+              itemSelected.length === 0 ? "w-full" : ""
             }`}
           >
-            <div className="title-list-friend">
-              <span>Danh sách bạn bè</span>
-            </div>
+            <div className="font-medium mb-2">Danh sách bạn bè</div>
 
-            <div className="checkbox-list-friend">
-              <Checkbox.Group
-                style={{ width: '100%' }}
-                // onChange={handleCheckBoxChange}
-                value={checkList}
-              >
-                <Row gutter={[0, 12]}>
-                  {initalFriend.map((element, index) => (
-                    <Col span={24} key={index}>
-                      <Checkbox
-                        value={element._id}
-                        onChange={handleChangeCheckBox}
-                      >
-                        <div className="item-checkbox">
-                          <PersonalIcon
-                            demention={36}
-                            avatar={element.avatar}
-                            name={element.name}
-                            color={element.avatarColor}
-                          />
+            <ScrollArea className="h-60 pr-2">
+              <div className="flex flex-col gap-3">
+                {initalFriend.map((ele) => (
+                  <label
+                    key={ele._id}
+                    className="flex items-center gap-3 cursor-pointer"
+                  >
+                    <Checkbox
+                      checked={checkList.includes(ele._id)}
+                      onCheckedChange={() => handleChangeCheckBox(ele._id)}
+                    />
 
-                          <span className="item-name">{element.name}</span>
-                        </div>
-                      </Checkbox>
-                    </Col>
-                  ))}
-                </Row>
-              </Checkbox.Group>
-            </div>
+                    <PersonalIcon
+                      dimension={36}
+                      avatar={ele.avatar}
+                      name={ele.name}
+                      color={ele.avatarColor}
+                    />
+
+                    <span>{ele.name}</span>
+                  </label>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
 
-          <div
-            className={`list-friend-interact--right ${
-              itemSelected.length > 0 ? '' : 'close'
-            }`}
-          >
-            <div className="title-list-friend-checked">
-              <strong>
-                Đã chọn: {itemSelected.length > 0 && itemSelected.length}
-              </strong>
-            </div>
+          {itemSelected.length > 0 && (
+            <div className="w-1/3">
+              <div className="font-medium mb-2">
+                Đã chọn: {itemSelected.length}
+              </div>
 
-            <div className="checkbox-list-friend">
-              <ItemsSelected items={itemSelected} onRemove={handleRemoveItem} />
+              <ScrollArea className="h-60 pr-2">
+                <ItemsSelected items={itemSelected} onRemove={handleRemoveItem} />
+              </ScrollArea>
             </div>
-          </div>
+          )}
         </div>
-      </div>
-    </Modal>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onCancel(false)}>
+            Hủy
+          </Button>
+          <Button
+            disabled={!(itemSelected.length > 0 && nameGroup.length > 0)}
+            onClick={handleOk}
+          >
+            Tạo nhóm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
-
-export default ModalCreateGroup;

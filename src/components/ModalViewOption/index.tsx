@@ -13,38 +13,30 @@ import {
   Modal,
   Spin,
 } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
+
 import voteApi from '@/api/voteApi';
 import PersonalIcon from '@/features/Chat/components/PersonalIcon';
-import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { equalsArray } from '@/utils/arrayHelper';
-import MODAL_OPTION_STYLE from './ModalViewOptionStyle';
 
-ModalViewOption.propTypes = {
-  isModalVisible: PropTypes.bool,
-  onCancel: PropTypes.func,
-  data: PropTypes.object,
-  onShowDetail: PropTypes.func,
-};
-
-ModalViewOption.defaultProps = {
-  isModalVisible: false,
-  onCancel: null,
-  data: {},
-  onShowDetail: null,
+const BODY_STYLE = {
+  padding: '2rem 1rem',
+  background: '#f4f5f7',
 };
 
 function ModalViewOption({ isModalVisible, onCancel, data, onShowDetail }) {
-  const [form] = Form.useForm();
-  const { memberInConversation } = useSelector((state) => state.chat);
-
-  const [infoVote, setInfoVote] = useState(data);
-  const { user } = useSelector((state) => state.global);
-  const [checkList, setCheckList] = useState([]);
-  const [valueForm, setValueForm] = useState(null);
   const preValue = useRef();
+
+  const { memberInConversation } = useSelector((state) => state.chat);
+  const { user } = useSelector((state) => state.global);
+
+  const [valueForm, setValueForm] = useState(null);
+  const [infoVote, setInfoVote] = useState(data);
+  const [checkList, setCheckList] = useState([]);
   const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const [form] = Form.useForm();
 
   useEffect(() => {
     setInfoVote(data);
@@ -206,12 +198,12 @@ function ModalViewOption({ isModalVisible, onCancel, data, onShowDetail }) {
   return (
     <Modal
       title="Bình chọn"
-      visible={isModalVisible}
+      open={isModalVisible}
       onOk={handleOk}
       onCancel={handleCancel}
       footer={footer}
       centered
-      bodyStyle={MODAL_OPTION_STYLE.BODY_STYLE}
+      style={BODY_STYLE}
     >
       <div className="modal-view-option">
         <div className="modal-view-option_title">
@@ -276,7 +268,7 @@ function ModalViewOption({ isModalVisible, onCancel, data, onShowDetail }) {
                                 key={index}
                                 name={getUserFromConver(ele)?.name}
                                 avatar={getUserFromConver(ele)?.avatar}
-                                demention={32}
+                                dimension={32}
                                 color={getUserFromConver(ele)?.avatarColor}
                               />
                             );
@@ -285,7 +277,7 @@ function ModalViewOption({ isModalVisible, onCancel, data, onShowDetail }) {
                               <PersonalIcon
                                 key={index}
                                 noneUser={true}
-                                demention={32}
+                                dimension={32}
                               />
                             );
                           }

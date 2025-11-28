@@ -1,7 +1,7 @@
 import { CheckCircleFilled, ShareAltOutlined } from '@ant-design/icons';
 import { Image } from 'antd';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import IMAGE_ITEM_STYLE from './ImageItemStyle';
 import OverlayImage from '@/components/OverlayImage';
 import { fallback } from '@/constants/images';

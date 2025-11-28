@@ -4,7 +4,7 @@ import ClassifyApi from '@/api/classifyApi';
 import { fetchListClassify } from '@/features/Chat/slice/chatSlice';
 import ModalClassify from '@/features/Chat/components/ModalClassify';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 SubMenuClassify.propTypes = {

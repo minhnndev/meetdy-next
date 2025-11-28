@@ -1,7 +1,7 @@
 import { Col, Row, Select } from 'antd';
 import RangeCalendarCustom from '@/components/RangeCalendarCustom';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import fileHelpers from '@/utils/fileHelpers';
 import PersonalIcon from '../PersonalIcon';
 
@@ -82,7 +82,7 @@ function TabPaneMedia(props) {
                 <div className="option-item">
                   <div className="icon-user-item">
                     <PersonalIcon
-                      demention={24}
+                      dimension={24}
                       avatar={memberEle.avatar}
                       name={memberEle.name}
                     />

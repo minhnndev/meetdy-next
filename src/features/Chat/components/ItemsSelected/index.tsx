@@ -1,22 +1,21 @@
-import { CloseCircleFilled, UsergroupAddOutlined } from '@ant-design/icons';
-import { Avatar, Tooltip } from 'antd';
-import PropTypes from 'prop-types';
-import React from 'react';
+import { XCircle, Users } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  HoverCard,
+  HoverCardTrigger,
+  HoverCardContent,
+} from '@/components/ui/hover-card';
+
 import PersonalIcon from '../PersonalIcon';
 
-ItemsSelected.propTypes = {
-  items: PropTypes.array,
+type Props = {
+  items: any[],
+  onRemove?: (id: string) => void,
 };
 
-ItemsSelected.defaultProps = {
-  items: [],
-};
-
-function ItemsSelected({ items, onRemove }) {
-  const handleRemoveSelect = (id) => {
-    if (onRemove) {
-      onRemove(id);
-    }
+export default function ItemsSelected({ items = [], onRemove }: Props) {
+  const handleRemoveSelect = (id: string) => {
+    onRemove?.(id);
   };
 
   return (
@@ -24,12 +23,15 @@ function ItemsSelected({ items, onRemove }) {
       {items &&
         items.length > 0 &&
         items.map((item, index) => (
-          <div className="item-selected_wrapper">
-            <div className="item-selected--text" key={index}>
-              <div className="item-selected-avatar">
+          <div
+            key={index}
+            className="flex items-center justify-between w-full py-1 px-2 rounded-md bg-neutral-100 dark:bg-neutral-800"
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5">
                 {!item.type && (
                   <PersonalIcon
-                    demention={20}
+                    dimension={20}
                     avatar={item.avatar}
                     name={item.name}
                     color={item.avatarColor}
@@ -38,7 +40,7 @@ function ItemsSelected({ items, onRemove }) {
 
                 {item.type && typeof item.avatar === 'string' && (
                   <PersonalIcon
-                    demention={20}
+                    dimension={20}
                     avatar={item.avatar}
                     name={item.name}
                     color={item.avatarColor}
@@ -46,31 +48,34 @@ function ItemsSelected({ items, onRemove }) {
                 )}
 
                 {item.type && typeof item.avatar === 'object' && (
-                  <Tooltip>
-                    <Avatar
-                      style={{ backgroundColor: '#f56a00' }}
-                      icon={<UsergroupAddOutlined />}
-                      size={20}
-                    />
-                  </Tooltip>
+                  <HoverCard>
+                    <HoverCardTrigger>
+                      <Avatar className="w-5 h-5 bg-orange-500 text-white flex items-center justify-center">
+                        <AvatarFallback className="p-0">
+                          <Users className="w-3 h-3" />
+                        </AvatarFallback>
+                      </Avatar>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-auto text-sm">
+                      Nhóm
+                    </HoverCardContent>
+                  </HoverCard>
                 )}
               </div>
 
-              <div className="item-selected-name">
-                <span>{item.name}</span>
+              <div>
+                <span className="text-sm">{item.name}</span>
               </div>
             </div>
 
             <div
-              className="item-selected-remove"
+              className="cursor-pointer text-neutral-500 hover:text-red-500"
               onClick={() => handleRemoveSelect(item._id)}
             >
-              <CloseCircleFilled />
+              <XCircle className="w-4 h-4" />
             </div>
           </div>
         ))}
     </>
   );
 }
-
-export default ItemsSelected;

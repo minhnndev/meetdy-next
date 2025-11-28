@@ -339,7 +339,7 @@ function FooterChatContainer({
                         >
                           <div className="icon-user-item">
                             <PersonalIcon
-                              demention={24}
+                              dimension={24}
                               avatar={ele.avatar}
                               name={ele.name}
                             />

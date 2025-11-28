@@ -4,7 +4,7 @@ import pinMessageApi from '@/api/pinMessageApi';
 import TypeMessagePin from '@/features/Chat/components/TypeMessagePin';
 import { fetchPinMessages } from '@/features/Chat/slice/chatSlice';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 ModalChangePinMessage.propTypes = {

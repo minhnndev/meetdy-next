@@ -1,7 +1,7 @@
 import { CaretDownOutlined } from '@ant-design/icons';
 import FileItem from '@/components/FileItem';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 ArchiveFile.propTypes = {
   viewMediaClick: PropTypes.func,

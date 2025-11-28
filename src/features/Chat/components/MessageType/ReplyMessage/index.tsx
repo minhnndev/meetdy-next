@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { defaultStyles, FileIcon } from 'react-file-icon';
 import fileHelpers from '@/utils/fileHelpers';
 import ModalDetailMessageReply from '../../ModalDetailMessageReply';

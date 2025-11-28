@@ -8,7 +8,7 @@ import GenderRadioField from '@/customfield/GenderRadioField';
 import InputFieldNotTitle from '@/customfield/InputFieldNotTitle';
 import { FastField, Form, Formik } from 'formik';
 import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 
@@ -124,7 +124,7 @@ function ModalUpdateProfile({ isVisible, onCancel, onOk, loading }) {
       onOk={handleOke}
       onCancel={handleCancel}
       width={400}
-      bodyStyle={{ padding: 0 }}
+      style={{ padding: 0 }}
       okText="Cập nhật"
       cancelText="Hủy"
       centered

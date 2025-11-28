@@ -39,7 +39,7 @@ function DrawerPinMessage({ isOpen, onClose, message }) {
           closable={false}
           getContainer={() => myElem.current}
           style={{ position: 'absolute', overflow: 'hidden' }}
-          bodyStyle={DrawerPinMessageStyle.WRAPPER_STYLE}
+          style={DrawerPinMessageStyle.WRAPPER_STYLE}
         >
           <div className="drawer-header">
             <div className="drawer-header-title">

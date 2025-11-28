@@ -118,7 +118,7 @@ function TabPaneFile(props) {
             >
               <div className="option-item">
                 <div className="icon-user-item">
-                  <PersonalIcon demention={24} />
+                  <PersonalIcon dimension={24} />
                 </div>
 
                 <div className="name-user-item">Hoàng Hạ Xuyên</div>

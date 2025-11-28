@@ -10,7 +10,7 @@ import ModalChangePinMessage from '@/components/ModalChangePinMessage';
 import MESSAGE_STYLE from '@/constants/MessageStyle/messageStyle';
 import PersonalIcon from '@/features/Chat/components/PersonalIcon';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BiDotsHorizontalRounded } from 'react-icons/bi';
 import { FaReplyAll } from 'react-icons/fa';
 import { MdQuestionAnswer } from 'react-icons/md';
@@ -251,7 +251,7 @@ function UserMessage({
               <div className={`avatar-user ${isSameUser ? 'hidden' : ''}`}>
                 <PersonalIcon
                   isHost={isLeader}
-                  demention={40}
+                  dimension={40}
                   avatar={avatar}
                   name={user.name}
                   color={avatarColor}

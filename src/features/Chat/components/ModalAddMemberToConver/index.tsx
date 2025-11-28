@@ -1,54 +1,47 @@
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import {
-  EditOutlined,
-  InfoCircleFilled,
-  SearchOutlined,
-} from '@ant-design/icons';
-import { Checkbox, Col, Divider, Input, Modal, Row } from 'antd';
-import Text from 'antd/lib/typography/Text';
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import ItemsSelected from '../ItemsSelected';
-import PersonalIcon from '../PersonalIcon';
-import PropTypes from 'prop-types';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-ModalAddMemberToConver.propTypes = {
-  onOk: PropTypes.func,
-  loading: PropTypes.bool,
-  onCancel: PropTypes.func,
-  isVisible: PropTypes.bool.isRequired,
-  typeModal: PropTypes.number.isRequired,
-};
+import { EditOutlined, InfoCircleFilled, SearchOutlined } from "@ant-design/icons";
+import PersonalIcon from "../PersonalIcon";
+import ItemsSelected from "../ItemsSelected";
 
-ModalAddMemberToConver.defaultProps = {
-  onOk: null,
-  loading: false,
-  onCancel: null,
-};
-
-function ModalAddMemberToConver({
+export default function ModalAddMemberToConver({
   loading,
   onOk,
   onCancel,
   isVisible,
   typeModal,
 }) {
-  const [itemSelected, setItemSelected] = useState([]);
-  const { friends, memberInConversation } = useSelector((state) => state.chat);
-  const [frInput, setFrInput] = useState('');
+  const [itemSelected, setItemSelected] = useState<any[]>([]);
+  const { friends, memberInConversation } = useSelector(
+    (state: any) => state.chat
+  );
+  const [frInput, setFrInput] = useState("");
   const initialValue = memberInConversation.map((ele) => ele._id);
-  const [checkList, setCheckList] = useState([]);
-  const [nameGroup, setNameGroup] = useState('');
+  const [checkList, setCheckList] = useState<string[]>([]);
+  const [nameGroup, setNameGroup] = useState("");
   const [isShowError, setIsShowError] = useState(false);
-  const [initalFriend, setInitalFriend] = useState([]);
+  const [initalFriend, setInitalFriend] = useState<any[]>([]);
 
   useEffect(() => {
     if (isVisible) {
       setInitalFriend(friends);
     } else {
-      setFrInput('');
+      setFrInput("");
       setCheckList([]);
       setItemSelected([]);
-      setNameGroup('');
+      setNameGroup("");
       setIsShowError(false);
     }
   }, [isVisible]);
@@ -56,223 +49,175 @@ function ModalAddMemberToConver({
   const handleOk = () => {
     const userIds = itemSelected.map((ele) => ele._id);
 
-    if (onOk) {
-      if (typeModal === 1) {
-        onOk([...checkList], nameGroup);
-      } else {
-        onOk(userIds);
-      }
+    if (typeModal === 1) {
+      onOk?.([...checkList], nameGroup);
+    } else {
+      onOk?.(userIds);
     }
   };
 
-  const handleCancel = () => {
-    if (onCancel) {
-      onCancel(false);
-    }
-  };
-
-  const handleSearch = (e) => {
+  const handleSearch = (e: any) => {
     const value = e.target.value;
     setFrInput(value);
-    console.log('value', value);
 
-    if (!value && isVisible) {
+    if (!value) {
       setInitalFriend(friends);
     } else {
-      // const tempFriends = [...initalFriend];
-      const realFriends = [];
-      // console.log('friends', friends);
-
-      friends.forEach((ele) => {
-        const index = ele.name.search(value);
-
-        if (index > -1) {
-          realFriends.push(ele);
-        }
-      });
-      setInitalFriend(realFriends);
-    }
-  };
-
-  const handleChangeCheckBox = (e) => {
-    const value = e.target.value;
-
-    // check xem có trong checklist chưa
-    const index = checkList.findIndex((element) => element === value);
-    let checkListTemp = [...checkList];
-    let itemSelectedTemp = [...itemSelected];
-
-    // nếu như đã có
-    if (index !== -1) {
-      itemSelectedTemp = itemSelectedTemp.filter(
-        (element) => element._id !== value,
+      const result = friends.filter((ele) =>
+        ele.name.toLowerCase().includes(value.toLowerCase())
       );
-
-      checkListTemp = checkListTemp.filter((element) => element !== value);
-
-      // chưa có
-    } else {
-      checkListTemp.push(value);
-      const index = initalFriend.findIndex((element) => element._id === value);
-
-      if (index !== -1) {
-        itemSelectedTemp.push(initalFriend[index]);
-      }
+      setInitalFriend(result);
     }
-    setCheckList(checkListTemp);
-    setItemSelected(itemSelectedTemp);
   };
 
-  const handleRemoveItem = (id) => {
-    let checkListTemp = [...checkList];
-    let itemSelectedTemp = [...itemSelected];
+  const handleChangeCheckBox = (value: string) => {
+    const exists = checkList.includes(value);
+    let newCheck = [...checkList];
+    let newItems = [...itemSelected];
 
-    itemSelectedTemp = itemSelectedTemp.filter((element) => element._id !== id);
+    if (exists) {
+      newCheck = newCheck.filter((ele) => ele !== value);
+      newItems = newItems.filter((ele) => ele._id !== value);
+    } else {
+      newCheck.push(value);
+      const user = initalFriend.find((ele) => ele._id === value);
+      if (user) newItems.push(user);
+    }
 
-    checkListTemp = checkListTemp.filter((element) => element !== id);
+    setCheckList(newCheck);
+    setItemSelected(newItems);
+  };
 
-    setCheckList(checkListTemp);
-    setItemSelected(itemSelectedTemp);
-
-    setFrInput('');
+  const handleRemoveItem = (id: string) => {
+    setCheckList((prev) => prev.filter((ele) => ele !== id));
+    setItemSelected((prev) => prev.filter((ele) => ele._id !== id));
+    setFrInput("");
     setInitalFriend(friends);
   };
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setNameGroup(value);
-  };
-
-  const handleOnBlur = (e) => {
-    !nameGroup.length > 0 ? setIsShowError(true) : setIsShowError(false);
-  };
-
-  // kiểm tra người có trong nhóm và disable những đối tượng đó
-  const checkInitialValue = (value) => {
-    const index = initialValue.findIndex((ele) => ele === value);
-    return index > -1;
+  const checkInitialValue = (id: string) => {
+    return initialValue.includes(id);
   };
 
   return (
-    <Modal
-      title={typeModal === 2 ? 'Thêm thành viên' : 'Tạo nhóm'}
-      visible={isVisible}
-      onOk={handleOk}
-      onCancel={handleCancel}
-      centered={true}
-      okText="Xác nhận"
-      cancelText="Hủy"
-      okButtonProps={{
-        disabled:
-          (!nameGroup.trim().length > 0 && typeModal === 1) ||
-          checkList.length < 1,
-      }}
-      confirmLoading={loading}
-    >
-      <div id="modal-add-member-to-conver">
-        {typeModal === 1 && (
-          <>
-            <div className="heading-group">
-              <div className="select-background">
-                <EditOutlined />
+    <Dialog open={isVisible} onOpenChange={(v) => onCancel(v)}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>
+            {typeModal === 2 ? "Thêm thành viên" : "Tạo nhóm"}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div id="modal-add-member-to-conver" className="space-y-4">
+          {typeModal === 1 && (
+            <>
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                  <EditOutlined />
+                </div>
+
+                <div className="flex-1">
+                  <Input
+                    placeholder="Nhập tên nhóm"
+                    value={nameGroup}
+                    onChange={(e) => setNameGroup(e.target.value)}
+                    onBlur={() =>
+                      setIsShowError(!(nameGroup.trim().length > 0))
+                    }
+                  />
+                  {isShowError && (
+                    <div className="text-sm text-red-500 flex items-center gap-1 mt-1">
+                      <InfoCircleFilled /> Tên nhóm không được để trống
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div className="input-name-group">
-                <Input
-                  size="middle"
-                  placeholder="Nhập tên nhóm"
-                  style={{ width: '100%' }}
-                  onBlur={handleOnBlur}
-                  value={nameGroup}
-                  onChange={handleChange}
-                />
+              <div className="text-sm font-medium">Thêm bạn vào nhóm</div>
+            </>
+          )}
 
-                {isShowError && (
-                  <Text type="danger">
-                    <InfoCircleFilled /> Tên nhóm không được để trống
-                  </Text>
-                )}
-              </div>
-            </div>
-            <Divider orientation="left" plain>
-              <span className="divider-title">Thêm bạn vào nhóm</span>
-            </Divider>
-          </>
-        )}
+          <div className="relative">
+            <SearchOutlined className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="Nhập tên bạn muốn tìm kiếm"
+              value={frInput}
+              onChange={handleSearch}
+              className="pl-10"
+            />
+          </div>
 
-        <div className="search-friend-input">
-          <Input
-            size="middle"
-            placeholder="Nhập tên bạn muốn tìm kiếm"
-            style={{ width: '100%' }}
-            prefix={<SearchOutlined />}
-            onChange={handleSearch}
-            value={frInput}
-          />
-        </div>
+          <div className="w-full h-px bg-gray-200" />
 
-        <Divider />
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <div className="font-medium mb-2">Danh sách bạn bè</div>
 
-        <div className="list-friend-interact">
-          {/* ${itemSelected.length > 0 ? '' : 'full-container'} */}
-          <div className={`list-friend-interact--left `}>
-            <div className="title-list-friend">
-              <span>Danh sách bạn bè</span>
-            </div>
-
-            <div className="checkbox-list-friend">
-              <Checkbox.Group
-                style={{ width: '100%' }}
-                // onChange={handleCheckBoxChange}
-                value={checkList}
-              >
-                <Row gutter={[0, 12]}>
-                  {initalFriend.map((element, index) => (
-                    <Col span={24} key={index}>
+              <ScrollArea className="h-64 pr-2">
+                <div className="flex flex-col gap-3">
+                  {initalFriend.map((ele) => (
+                    <label
+                      key={ele._id}
+                      className={`flex items-center gap-3 ${
+                        checkInitialValue(ele._id)
+                          ? "opacity-50 cursor-not-allowed"
+                          : "cursor-pointer"
+                      }`}
+                    >
                       <Checkbox
-                        disabled={checkInitialValue(element._id)}
-                        value={element._id}
-                        onChange={handleChangeCheckBox}
-                      >
-                        <div className="item-checkbox">
-                          <PersonalIcon
-                            demention={36}
-                            avatar={element.avatar}
-                            name={element.name}
-                            color={element.avatarColor}
-                          />
+                        disabled={checkInitialValue(ele._id)}
+                        checked={checkList.includes(ele._id)}
+                        onCheckedChange={() =>
+                          handleChangeCheckBox(ele._id)
+                        }
+                      />
 
-                          <span className="item-name">{element.name}</span>
-                        </div>
-                      </Checkbox>
-                    </Col>
+                      <PersonalIcon
+                        dimension={36}
+                        avatar={ele.avatar}
+                        name={ele.name}
+                        color={ele.avatarColor}
+                      />
+
+                      <span>{ele.name}</span>
+                    </label>
                   ))}
-                </Row>
-              </Checkbox.Group>
-            </div>
-          </div>
-
-          {/* ${itemSelected.length > 0 ? '' : 'close'} */}
-
-          <div
-            className={`list-friend-interact--right ${
-              itemSelected.length > 0 ? '' : 'close'
-            } `}
-          >
-            <div className="title-list-friend-checked">
-              <strong>
-                Đã chọn: {itemSelected.length > 0 && itemSelected.length}
-              </strong>
+                </div>
+              </ScrollArea>
             </div>
 
-            <div className="checkbox-list-friend">
-              <ItemsSelected items={itemSelected} onRemove={handleRemoveItem} />
-            </div>
+            {itemSelected.length > 0 && (
+              <div className="w-1/3">
+                <div className="font-medium mb-2">
+                  Đã chọn: {itemSelected.length}
+                </div>
+
+                <ScrollArea className="h-64 pr-2">
+                  <ItemsSelected
+                    items={itemSelected}
+                    onRemove={handleRemoveItem}
+                  />
+                </ScrollArea>
+              </div>
+            )}
           </div>
         </div>
-      </div>
-    </Modal>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onCancel(false)}>
+            Hủy
+          </Button>
+          <Button
+            disabled={
+              (typeModal === 1 && !nameGroup.trim().length) ||
+              checkList.length < 1
+            }
+            onClick={handleOk}
+          >
+            Xác nhận
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
-
-export default ModalAddMemberToConver;

@@ -22,13 +22,12 @@ import {
   Upload,
 } from 'antd';
 import adminApi from '@/api/adminApi';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const { Search } = Input;
-StickerGroupPage.propTypes = {};
 
-function StickerGroupPage(props) {
+function StickerGroupPage() {
   const [temp, setTemp] = useState('');
   const [tempName, setName] = useState('');
   const [tempDescription, setDescription] = useState('');
@@ -39,8 +38,6 @@ function StickerGroupPage(props) {
   const [dataSource, setDataSource] = useState([]);
   const [dataTemp, setDataTemp] = useState([]);
   const [file, setFile] = useState([]);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(6);
 
   const onSearch = (value) => {
     const filterTable = dataSource.filter((username) =>
@@ -237,8 +234,8 @@ function StickerGroupPage(props) {
         title="Tạo group sticker"
         width={720}
         onClose={onClose1}
-        visible={visible1}
-        bodyStyle={{ paddingBottom: 80 }}
+        open={visible1}
+        style={{ paddingBottom: 80 }}
         extra={
           <Space>
             <Button onClick={onClose1}>Cancel</Button>
@@ -295,8 +292,8 @@ function StickerGroupPage(props) {
         title="Update group sticker"
         width={720}
         onClose={onClose1}
-        visible={visible2}
-        bodyStyle={{ paddingBottom: 80 }}
+        open={visible2}
+        style={{ paddingBottom: 80 }}
         extra={
           <Space>
             <Button onClick={onClose1}>Cancel</Button>
@@ -358,7 +355,7 @@ function StickerGroupPage(props) {
         width={720}
         onClose={onClose1}
         visible={visible3}
-        bodyStyle={{ paddingBottom: 80 }}
+        style={{ paddingBottom: 80 }}
         extra={
           <Space>
             <Button onClick={onClose1}>Cancel</Button>

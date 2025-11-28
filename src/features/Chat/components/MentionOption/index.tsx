@@ -19,7 +19,7 @@ function MentionOption({ value }) {
     <Option value={value}>
       <div className="mention-option">
         <div className="icon-user-item">
-          <PersonalIcon demention={24} avatar={user.avatar} name={user.name} />
+          <PersonalIcon dimension={24} avatar={user.avatar} name={user.name} />
         </div>
 
         <div className="name-user-item">{user.name}</div>

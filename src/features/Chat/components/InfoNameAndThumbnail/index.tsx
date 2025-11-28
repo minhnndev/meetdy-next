@@ -1,7 +1,7 @@
 import { EditOutlined } from '@ant-design/icons';
 import { Modal, Input, message } from 'antd';
 import PropTypes from 'prop-types';
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ConversationAvatar from '../ConversationAvatar';
 import { useDispatch, useSelector } from 'react-redux';
 

@@ -182,7 +182,7 @@ function InfoFriendSearch(props) {
                       <div className="info_friend-item-leftside-avatar">
                         <PersonalIcon
                           avatar={ele.avatar}
-                          demention={40}
+                          dimension={40}
                           name={ele.name}
                           color={ele.avatarColor}
                           isHost={

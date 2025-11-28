@@ -1,74 +1,82 @@
-import { KeyOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Badge } from 'antd';
+import { Key, User } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import getSummaryName from '@/utils/nameHelper';
 
-PersonalIcon.defaultProps = {
-  avatar: '',
-  isActive: false,
-  demention: 48,
-  common: true,
-  isHost: false,
-  name: '',
-  color: '',
-  noneUser: false,
+type Props = {
+  avatar?: string,
+  isActive?: boolean,
+  dimension?: number,
+  common?: boolean,
+  isHost?: boolean,
+  name?: string,
+  color?: string,
+  noneUser?: boolean,
 };
 
-function PersonalIcon(props) {
-  const { avatar, isActive, demention, common, isHost, name, color, noneUser } =
-    props;
+export default function PersonalIcon({
+  avatar = '',
+  isActive = false,
+  dimension = 48,
+  common = true,
+  isHost = false,
+  name = '',
+  color = '',
+  noneUser = false,
+}: Props) {
+  const wrapClass =
+    isActive && common
+      ? 'user-icon common'
+      : !isActive && common
+      ? 'user-icon no-online common'
+      : isActive && !common
+      ? 'user-icon'
+      : 'user-icon no-online';
+
   return (
-    <div
-      className={
-        isActive && common
-          ? 'user-icon common'
-          : !isActive && common
-          ? 'user-icon no-online common'
-          : isActive && !common
-          ? 'user-icon'
-          : 'user-icon no-online'
-      }
-    >
-      <Badge
-        dot={isActive}
-        offset={!isHost ? [-5, 40] : [-5, 32]}
-        color="green"
-        count={
-          isHost ? (
-            <KeyOutlined
-              style={{
-                backgroundColor: 'rgba(0,0,0,0.3)',
-                padding: '0.24rem',
-                borderRadius: '50%',
-                color: 'yellow',
-                fontSize: '1.2rem',
-              }}
-            />
-          ) : (
-            ''
-          )
-        }
-      >
+    <div className={wrapClass}>
+      <div className="relative inline-block">
+        {isActive && (
+          <span className="absolute w-2 h-2 bg-green-500 rounded-full bottom-0 right-0"></span>
+        )}
+
+        {isHost && (
+          <span className="absolute -right-1 -bottom-1 bg-black/30 p-1 rounded-full">
+            <Key className="w-3 h-3 text-yellow-300" />
+          </span>
+        )}
+
         {noneUser ? (
           <Avatar
-            style={{
-              backgroundColor: '#87d068',
-            }}
-            size={demention}
-            icon={<UserOutlined />}
-          />
+            style={{ width: dimension, height: dimension }}
+            className="bg-green-300"
+          >
+            <AvatarFallback className="flex items-center justify-center">
+              <User className="w-4 h-4" />
+            </AvatarFallback>
+          </Avatar>
         ) : avatar ? (
-          <Avatar size={demention} src={avatar} />
+          <Avatar style={{ width: dimension, height: dimension }}>
+            <AvatarImage src={avatar} />
+            <AvatarFallback>{getSummaryName(name)}</AvatarFallback>
+          </Avatar>
         ) : (
           <Avatar
-            size={demention}
-            style={{ backgroundColor: color ? color : '#4c92ff' }}
+            style={{ width: dimension, height: dimension }}
+            className="flex items-center justify-center"
           >
-            {getSummaryName(name)}
+            <AvatarFallback
+              className="text-white font-medium"
+              style={{
+                backgroundColor: color || '#4c92ff',
+                width: dimension,
+                height: dimension,
+              }}
+            >
+              {getSummaryName(name)}
+            </AvatarFallback>
           </Avatar>
         )}
-      </Badge>
+      </div>
     </div>
   );
 }
-
-export default PersonalIcon;

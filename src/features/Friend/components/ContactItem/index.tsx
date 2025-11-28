@@ -33,7 +33,7 @@ function ContactItem({ data }) {
     <div className="contact-card">
       <div className="contact-card_info-user" onClick={handleViewDetail}>
         <div className="contact-card_avatar">
-          <PersonalIcon avatar={data.avatar} demention={72} name={data.name} />
+          <PersonalIcon avatar={data.avatar} dimension={72} name={data.name} />
         </div>
         <div className="contact-card_info">
           <div className="contact-card_name">{data.name}</div>

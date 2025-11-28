@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useRef, useState } from 'react';
+import { createRef, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import io from 'socket.io-client';
 import h from '@/utils/callVideoHelpers';

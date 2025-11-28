@@ -44,7 +44,7 @@ function FriendCard({ isMyRequest, data, onAccept, onDeny, onCancel }) {
         <div className="friend-card_avatar">
           <PersonalIcon
             avatar={data.avatar}
-            demention={72}
+            dimension={72}
             name={data.name}
             color={data.avatarColor}
           />

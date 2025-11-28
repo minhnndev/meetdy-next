@@ -9,7 +9,7 @@ import InfoNameAndThumbnail from '@/features/Chat/components/InfoNameAndThumbnai
 import InfoTitle from '@/features/Chat/components/InfoTitle';
 import { fetchAllMedia } from '@/features/Chat/slice/mediaSlice';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Scrollbars from 'react-custom-scrollbars-2';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';

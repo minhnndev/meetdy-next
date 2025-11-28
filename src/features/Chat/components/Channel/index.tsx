@@ -1,5 +1,5 @@
 import { CaretDownOutlined, NumberOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import ChannelItem from '../ChannelItem';
