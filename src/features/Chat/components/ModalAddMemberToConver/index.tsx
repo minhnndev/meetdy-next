@@ -108,7 +108,7 @@ export default function ModalAddMemberToConver({
           </DialogTitle>
         </DialogHeader>
 
-        <div id="modal-add-member-to-conver" className="space-y-4">
+        <div className="space-y-4">
           {typeModal === 1 && (
             <>
               <div className="flex items-center gap-4">

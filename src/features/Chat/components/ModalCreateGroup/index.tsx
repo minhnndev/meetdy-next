@@ -105,7 +105,13 @@ export default function ModalCreateGroup({
     <Dialog open={isVisible} onOpenChange={(v) => onCancel(v)}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
+          <DialogTitle>
+            Tạo nhóm
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
             <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full">
               <EditOutlined />
             </div>
@@ -115,8 +121,8 @@ export default function ModalCreateGroup({
               onChange={handleChangeName}
               onBlur={handleOnBlur}
             />
-          </DialogTitle>
-        </DialogHeader>
+          </div>
+        </div>
 
         {isShowError && (
           <div className="text-red-500 flex items-center gap-1 text-sm mt-1">
@@ -124,7 +130,7 @@ export default function ModalCreateGroup({
           </div>
         )}
 
-        <div className="font-semibold text-sm mt-4 mb-2">Thêm bạn vào nhóm</div>
+        <div className="font-semibold text-sm mt-2 mb-2">Thêm bạn vào nhóm</div>
 
         <div className="relative">
           <SearchOutlined className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -157,14 +163,12 @@ export default function ModalCreateGroup({
                       checked={checkList.includes(ele._id)}
                       onCheckedChange={() => handleChangeCheckBox(ele._id)}
                     />
-
                     <PersonalIcon
                       dimension={36}
                       avatar={ele.avatar}
                       name={ele.name}
                       color={ele.avatarColor}
                     />
-
                     <span>{ele.name}</span>
                   </label>
                 ))}
@@ -177,7 +181,6 @@ export default function ModalCreateGroup({
               <div className="font-medium mb-2">
                 Đã chọn: {itemSelected.length}
               </div>
-
               <ScrollArea className="h-60 pr-2">
                 <ItemsSelected items={itemSelected} onRemove={handleRemoveItem} />
               </ScrollArea>

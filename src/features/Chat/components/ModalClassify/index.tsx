@@ -1,10 +1,6 @@
 import {
-  DeleteOutlined,
-  EditOutlined,
   ExclamationCircleOutlined,
-  InfoCircleFilled,
   LeftOutlined,
-  PlusOutlined,
   TagTwoTone,
 } from '@ant-design/icons';
 import { Button, Input, message, Modal, Popover } from 'antd';
@@ -14,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ServiceClassify from '@/api/classifyApi';
 
 import { fetchListClassify } from '../../slice/chatSlice';
+import { Edit, Plus, Tag, Trash } from 'lucide-react';
 
 function ModalClassify({ isVisible, onCancel, onOpen }) {
   const dispatch = useDispatch();
@@ -173,50 +170,45 @@ function ModalClassify({ isVisible, onCancel, onOpen }) {
   return (
     <>
       <Modal
-        visible={isVisible}
+        open={isVisible}
         title="Quản lý thẻ phân loại"
         onCancel={handleCancel}
         footer={null}
       >
-        <div className="modal-classify_wrapper">
-          <span className="modal-classify_title">Danh sách thẻ phân loại</span>
-
-          <div className="modal-classify_list-classify">
-            {classifies.map((ele, index) => (
-              <div className="modal-classify-item" key={index}>
-                <div className="modal-classify-item--left">
-                  <div className="classify-item-tag">
-                    <TagTwoTone twoToneColor={ele.color.code} />
-                  </div>
-
-                  <div className="classify-item-name">{ele.name}</div>
-                </div>
-
-                <div className="modal-classify-item--right">
-                  <div
-                    className="classify-item-edit icon-classify"
-                    onClick={() => handleEditClasify(ele)}
-                  >
-                    <EditOutlined />
-                  </div>
-
-                  <div
-                    className="classify-item-remove icon-classify"
-                    onClick={() => confirm(ele)}
-                  >
-                    <DeleteOutlined />
-                  </div>
-                </div>
-
-                <div className="modal-classify-item-amount">2</div>
+        <div className="space-y-2">
+          {classifies.map((ele, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
+            >
+              <div className="flex items-center gap-2">
+                <TagTwoTone twoToneColor={ele.color.code} />
+                <div className="text-sm font-medium">{ele.name}</div>
               </div>
-            ))}
-          </div>
 
-          <div className="modal-classify_add" onClick={handleShowModalAdd}>
-            <PlusOutlined />
-            &nbsp;Thêm phân loại
-          </div>
+              <div className="flex items-center gap-2">
+                <button
+                  className="p-1 hover:bg-gray-200 rounded"
+                  onClick={() => handleEditClasify(ele)}
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
+                <button
+                  className="p-1 hover:bg-gray-200 rounded"
+                  onClick={() => confirm(ele)}
+                >
+                  <Trash className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+
+          <button
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600"
+            onClick={handleShowModalAdd}
+          >
+            <Plus className="w-4 h-4" /> Thêm phân loại
+          </button>
         </div>
       </Modal>
 
@@ -231,7 +223,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }) {
             </span>
           </div>
         }
-        visible={isShowModalAdd}
+        open={isShowModalAdd}
         onOk={handleCreateClassify}
         onCancel={handleCancelModalAdd}
         okButtonProps={{

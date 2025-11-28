@@ -9,6 +9,7 @@ import { useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 
 import userApi from "@/api/userApi"
+import ModalClassify from "../../components/ModalClassify"
 import ModalAddFriend from "@/components/ModalAddFriend"
 import UserCard from "@/components/UserCard"
 import ModalCreateGroup from "@/features/Chat/components/ModalCreateGroup"
@@ -44,6 +45,7 @@ export default function SearchContainer({
   const [isShowModalAddFriend, setShowModalAddFriend] = useState(false)
   const [userIsFind, setUserIsFind] = useState<any>({})
   const [visibleUserCard, setVisbleUserCard] = useState(false)
+  const [isModalClassify, setIsModalClassify] = useState(false)
 
   const handleOnChangeClassify = (value: string) => {
     onFilterClasify?.(value)
@@ -83,6 +85,9 @@ export default function SearchContainer({
     }, 400)
   }
 
+  const handleOpenModalClassify = () => setIsModalClassify(true)
+  const handleCancelModalClassify = () => setIsModalClassify(false)
+
   return (
     <div className="w-full">
       <div className="p-3 border-b bg-white">
@@ -120,7 +125,7 @@ export default function SearchContainer({
                 <span>Phân loại</span>
               </div>
 
-              <button className="p-2 hover:bg-gray-100 rounded-md">
+              <button className="p-2 hover:bg-gray-100 rounded-md" onClick={handleOpenModalClassify}>
                 <AppstoreAddOutlined />
               </button>
             </div>
@@ -164,6 +169,12 @@ export default function SearchContainer({
         onCancel={handleCancelAddFriend}
         onSearch={handFindUser}
         onEnter={handFindUser}
+      />
+
+      <ModalClassify
+        isVisible={isModalClassify}
+        onCancel={handleCancelModalClassify}
+        onOpen={handleOpenModalClassify}
       />
 
       <UserCard
