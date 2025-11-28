@@ -1,3 +1,6 @@
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useResolvedPath, useLocation } from 'react-router-dom';
 import { DoubleLeftOutlined, DownOutlined } from '@ant-design/icons';
 import {
   Col,
@@ -7,17 +10,14 @@ import {
   Row,
   Spin,
 } from 'antd';
-import conversationApi from '@/api/conversationApi';
+
 import { setJoinChatLayout } from '@/app/globalSlice';
+import conversationApi from '@/api/conversationApi';
 import FilterContainer from '@/components/FilterContainer';
 import ModalJoinGroupFromLink from '@/components/ModalJoinGroupFromLink';
 import Slider from '@/components/Slider';
 import useWindowDimensions from '@/hooks/useWindowDimensions';
-import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useResolvedPath, useLocation } from 'react-router-dom';
-import renderWidthDrawer from '@/utils/DrawerResponsive';
+
 import DrawerPinMessage from './components/DrawerPinMessage';
 import GroupNews from './components/GroupNews';
 import NutshellPinMessage from './components/NutshellPinMessage/NutshellPinMessage';
@@ -56,15 +56,7 @@ import {
   updateVoteMessage,
 } from './slice/chatSlice';
 
-Chat.propTypes = {
-  socket: PropTypes.object,
-  idNewMessage: PropTypes.string,
-};
-
-Chat.defaultProps = {
-  socket: {},
-  idNewMessage: '',
-};
+import renderWidthDrawer from '@/utils/DrawerResponsive';
 
 function Chat({ socket, idNewMessage }) {
   const dispatch = useDispatch();
@@ -76,26 +68,28 @@ function Chat({ socket, idNewMessage }) {
     currentChannel,
     channels,
   } = useSelector((state) => state.chat);
-  const { path } = useResolvedPath();
-  const [scrollId, setScrollId] = useState('');
+  const path = useResolvedPath('').pathname;
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const refCurrentConversation = useRef(null);
+  const refConversations = useRef(null);
+  const refCurrentChannel = useRef(null);
+
+  const { isJoinChatLayout, user } = useSelector((state) => state.global);
+
   // const [idNewMessage, setIdNewMessage] = useState('')
+  const [scrollId, setScrollId] = useState('');
   const [isShow, setIsShow] = useState(false);
   const [isScroll, setIsScroll] = useState(false);
   const [hasMessage, setHasMessage] = useState('');
   const [usersTyping, setUsersTyping] = useState([]);
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
-  const { isJoinChatLayout, isJoinFriendLayout, user } = useSelector(
-    (state) => state.global,
-  );
   const [visibleNews, setVisibleNews] = useState(false);
   const [tabActiveInNews, setTabActiveNews] = useState(0);
-  const location = useLocation();
-  const navigate = useNavigate();
   const [isVisibleModalJoinGroup, setIsVisibleJoinGroup] = useState(false);
   const [summaryGroup, setSummary] = useState({});
-  const refCurrentConversation = useRef();
-  const refConversations = useRef();
-  const refCurrentChannel = useRef();
   const [replyMessage, setReplyMessage] = useState({});
   const [userMention, setUserMention] = useState({});
 
@@ -114,10 +108,6 @@ function Chat({ socket, idNewMessage }) {
       setOpenDrawerInfo(false);
     }
   }, [width]);
-
-  //
-
-  //Get Clientwidth
 
   useEffect(() => {
     refCurrentConversation.current = currentConversation;
@@ -582,7 +572,7 @@ function Chat({ socket, idNewMessage }) {
                 />
               </div>
 
-              {visibleFilter ? (
+              {/* {visibleFilter ? (
                 <FilterContainer
                   dataSingle={singleConverFilter}
                   dataMutiple={mutipleConverFilter}
@@ -598,7 +588,7 @@ function Chat({ socket, idNewMessage }) {
                     <ConversationContainer valueClassify={valueClassify} />
                   </div>
                 </>
-              )}
+              )} */}
             </div>
           </Col>
           {path === '/chat' && currentConversation ? (
@@ -661,8 +651,6 @@ function Chat({ socket, idNewMessage }) {
                             />
                           </div>
                         )}
-
-                      {/* {FriendUtils.checkIsFriend()} */}
 
                       <div
                         id="back-top-button"

@@ -1,9 +1,16 @@
 import { Col, Row } from 'antd';
-import conversationApi from '@/api/conversationApi';
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Route, Routes } from 'react-router-dom';
+
 import { setTabActive } from '@/app/globalSlice';
+import conversationApi from '@/api/conversationApi';
 import NotFoundPage from '@/components/NotFoundPage';
+
 import Chat from '@/features/Chat';
+import Friend from '@/features/Friend';
 import NavbarContainer from '@/features/Chat/containers/NavbarContainer';
+
 import {
   addMessage,
   addMessageInChannel,
@@ -15,7 +22,6 @@ import {
   updateAvatarWhenUpdateMember,
   updateFriendChat,
 } from '@/features/Chat/slice/chatSlice';
-import Friend from '@/features/Friend';
 import {
   fetchFriends,
   fetchListGroup,
@@ -32,9 +38,6 @@ import {
 import { fetchInfoWebs } from '@/features/Home/homeSlice';
 import useWindowUnloadEffect from '@/hooks/useWindowUnloadEffect';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Route, Routes } from 'react-router-dom';
 import { init, socket } from '@/utils/socketClient';
 
 init();
@@ -205,7 +208,7 @@ function ChatLayout(props) {
           sm={{ span: 3 }}
           xs={{ span: 4 }}
         >
-          <NavbarContainer onSaveCodeRevoke={handleSetCodeRevoke} />
+          {/* <NavbarContainer onSaveCodeRevoke={handleSetCodeRevoke} /> */}
         </Col>
 
         <Col
@@ -219,18 +222,9 @@ function ChatLayout(props) {
           <Routes>
             <Route
               index
-              element={
-                <Chat
-                  socket={socket}
-                  authed={true}
-                  idNewMessage={idNewMessage}
-                />
-              }
+              element={<Chat socket={socket} idNewMessage={idNewMessage} />}
             />
-            <Route
-              path="friends"
-              element={<Friend socket={socket} authed={true} />}
-            />
+            <Route path="friends" element={<Friend socket={socket} />} />
             {/* 404 */}
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

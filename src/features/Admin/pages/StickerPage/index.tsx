@@ -1,28 +1,9 @@
-import PropTypes from 'prop-types';
 import { useResolvedPath, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  Table,
-  Breadcrumb,
-  Divider,
-  Form,
-  Col,
-  Row,
-  Input,
-  Select,
-  DatePicker,
-  Space,
-  Tag,
-  Button,
-  Drawer,
-  Tooltip,
-  message,
-  Upload,
-  Popconfirm,
-} from 'antd';
-import adminApi from '@/api/adminApi';
+import { Table, Breadcrumb, Divider, Space, message, Popconfirm } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import adminApi from '@/api/adminApi';
 
 StickerPage.propTypes = {};
 function StickerPage(props) {
@@ -32,7 +13,7 @@ function StickerPage(props) {
   const [sticker, setSticker] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(4);
-  const match = useResolvedPath();
+  const path = useResolvedPath('').pathname;
 
   function cancel(e) {
     console.log(e);
@@ -125,7 +106,8 @@ function StickerPage(props) {
     } catch (error) {}
   };
 
-  const { id } = match.params;
+  const { id } = path.params;
+
   return (
     <>
       <div className="ant-col-xs-8">

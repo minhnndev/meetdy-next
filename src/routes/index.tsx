@@ -6,11 +6,13 @@ import AdminProtectedRoute from '@/routes/AdminProtected';
 import JoinFromLink from '@/components/JoinFromLink';
 import NotFoundPage from '@/components/NotFoundPage';
 import ProtectedRoute from '@/components/ProtectedRoute';
+
 import Account from '@/features/Account';
 import Admin from '@/features/Admin';
 import CallVideo from '@/features/CallVideo';
 import Home from '@/features/Home';
-import ChatLayout from '@/layout/ChatLayout';
+
+import ChatLayout from '@/features';
 
 import { fetchUserProfile } from '@/app/globalSlice';
 import { fetchInfoWebs } from '@/features/Home/homeSlice';
@@ -47,18 +49,15 @@ function App() {
     <BrowserRouter>
       <div className="App">
         <Routes>
-          {/* Public */}
           <Route path="/" element={<Home />} />
           <Route path="/jf-link/:conversationId" element={<JoinFromLink />} />
           <Route path="/account/*" element={<Account />} />
 
-          {/* Protected */}
-          <Route element={<ProtectedRoute isAuth={isAuth} />}>
+          <Route element={<ProtectedRoute />}>
             <Route path="/chat/*" element={<ChatLayout />} />
             <Route path="/call-video/:conversationId" element={<CallVideo />} />
           </Route>
 
-          {/* Admin */}
           <Route element={<AdminProtectedRoute isAdmin={isAdmin} />}>
             <Route path="/admin/*" element={<Admin />} />
           </Route>
