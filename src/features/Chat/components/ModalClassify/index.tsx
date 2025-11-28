@@ -8,35 +8,23 @@ import {
   TagTwoTone,
 } from '@ant-design/icons';
 import { Button, Input, message, Modal, Popover } from 'antd';
-import Text from 'antd/lib/typography/Text';
-import ClassifyApi from '@/api/ClassifyApi';
-import PropTypes from 'prop-types';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+
+import ServiceClassify from '@/api/classifyApi';
+
 import { fetchListClassify } from '../../slice/chatSlice';
 
-ModalClassify.propTypes = {
-  isVisible: PropTypes.bool,
-  onCancel: PropTypes.func,
-  onOpen: PropTypes.func,
-};
-
-ModalClassify.defaultProps = {
-  isVisible: false,
-  onCancel: null,
-  onOpen: null,
-};
-
 function ModalClassify({ isVisible, onCancel, onOpen }) {
+  const dispatch = useDispatch();
+  const previousName = useRef(null);
   const { classifies, colors } = useSelector((state) => state.chat);
+
   const [isShowModalAdd, setIsShowModalAdd] = useState(false);
   const [nameTag, setNameTag] = useState('');
   const [color, setColor] = useState({});
   const [isShowError, setIsShowError] = useState(false);
   const [isModalEdit, setIsModalEdit] = useState(false);
-  const dispatch = useDispatch();
-  const previousName = useRef();
-  // const [isVisiblePopup, setIsVisblePopup] = useState(false);
 
   useEffect(() => {
     if (colors.length > 0) {
@@ -103,7 +91,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }) {
   const handleCreateClassify = async () => {
     if (isModalEdit) {
       try {
-        await ClassifyApi.updateClassify(
+        await ServiceClassify.updateClassify(
           previousName.current._id,
           nameTag,
           color._id,
@@ -119,7 +107,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }) {
       }
     } else {
       try {
-        await ClassifyApi.addClassify(nameTag, color._id);
+        await ServiceClassify.addClassify(nameTag, color._id);
         message.success('Thêm thành công');
         setIsShowModalAdd(false);
         dispatch(fetchListClassify());
@@ -161,7 +149,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }) {
 
   const handleDeleteClasify = async (value) => {
     try {
-      await ClassifyApi.deleteClassify(value._id);
+      await ServiceClassify.deleteClassify(value._id);
       message.success('Xóa thành công');
       dispatch(fetchListClassify());
     } catch (error) {
@@ -252,7 +240,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }) {
             isShowError ||
             !(
               previousName.current?.name !== nameTag ||
-              previousName.current?.color._id !== color._id
+              previousName.current?.color._id !== color?._id
             ),
         }}
         okText={isModalEdit ? 'Cập nhật' : 'Thêm phân loại'}
@@ -273,7 +261,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }) {
                   <Popover content={content} trigger="click">
                     <Button
                       type="text"
-                      icon={<TagTwoTone twoToneColor={color.code} />}
+                      icon={<TagTwoTone twoToneColor={color?.code} />}
                     />
                   </Popover>
                 </div>
@@ -283,10 +271,10 @@ function ModalClassify({ isVisible, onCancel, onOpen }) {
 
           <div className="check-name-classify">
             {isShowError && (
-              <Text type="danger">
+              <h4 style={{ color: 'red' }}>
                 <InfoCircleFilled />
                 Tên phân loại đã tồn tại
-              </Text>
+              </h4>
             )}
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { TagFilled } from '@ant-design/icons';
 import { Divider, Menu } from 'antd';
-import ClassifyApi from '@/api/ClassifyApi';
+import ClassifyApi from '@/api/classifyApi';
 import { fetchListClassify } from '@/features/Chat/slice/chatSlice';
 import ModalClassify from '@/features/Chat/components/ModalClassify';
 import PropTypes from 'prop-types';

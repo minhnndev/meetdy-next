@@ -208,7 +208,7 @@ function ChatLayout(props) {
           sm={{ span: 3 }}
           xs={{ span: 4 }}
         >
-          {/* <NavbarContainer onSaveCodeRevoke={handleSetCodeRevoke} /> */}
+          <NavbarContainer onSaveCodeRevoke={handleSetCodeRevoke} />
         </Col>
 
         <Col

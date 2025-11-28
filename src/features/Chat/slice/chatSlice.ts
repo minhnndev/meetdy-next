@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import channelApi from '@/api/channelApi';
-import ClassifyApi from '@/api/ClassifyApi';
+import classifyApi from '@/api/classifyApi';
 import conversationApi from '@/api/conversationApi';
 import friendApi from '@/api/friendApi';
 import messageApi from '@/api/messageApi';
@@ -16,7 +16,7 @@ const KEY = 'chat';
 export const fetchListColor = createAsyncThunk(
   `${KEY}/fetchListColor`,
   async (params, thunkApi) => {
-    const colors = await ClassifyApi.getColors();
+    const colors = await classifyApi.getColors();
     return colors;
   },
 );
@@ -24,7 +24,7 @@ export const fetchListColor = createAsyncThunk(
 export const fetchListClassify = createAsyncThunk(
   `${KEY}/fetchListClassify`,
   async (params, thunkApi) => {
-    const classifies = await ClassifyApi.getClassifies();
+    const classifies = await classifyApi.getClassifies();
     return classifies;
   },
 );

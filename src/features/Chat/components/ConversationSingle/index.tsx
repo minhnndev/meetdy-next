@@ -1,17 +1,17 @@
-import { TagFilled } from '@ant-design/icons';
-import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Tag } from 'lucide-react';
+
 import classifyUtils from '@/utils/classifyUtils';
 import ConversationAvatar from '../ConversationAvatar';
 import ShortMessage from '../ShortMessage';
 
-ConversationSingle.propTypes = {
-  conversation: PropTypes.object,
-  onClick: PropTypes.func,
+type Props = {
+  conversation: any;
+  onClick?: (id: string) => void;
 };
 
-function ConversationSingle({ conversation, onClick }) {
+export default function ConversationSingle({ conversation, onClick }: Props) {
   const {
     _id,
     name,
@@ -21,13 +21,14 @@ function ConversationSingle({ conversation, onClick }) {
     totalMembers,
     avatarColor,
   } = conversation;
-  const { type, createdAt } = lastMessage;
 
-  const { classifies, conversations } = useSelector((state) => state.chat);
-  const [classify, setClassify] = useState(null);
+  const { createdAt } = lastMessage;
+  const { classifies, conversations } = useSelector((state: any) => state.chat);
+
+  const [classify, setClassify] = useState<any>(null);
 
   useEffect(() => {
-    if (classifies.length > 0) {
+    if (classifies) {
       const temp = classifyUtils.getClassifyOfObject(_id, classifies);
       if (temp) {
         setClassify(temp);
@@ -61,7 +62,11 @@ function ConversationSingle({ conversation, onClick }) {
             <div className="lastest-message">
               {classify && (
                 <span className="tag-classify">
-                  <TagFilled style={{ color: `${classify.color?.code}` }} />
+                  <Tag
+                    className="inline-block w-3 h-3"
+                    style={{ color: classify.color?.code }}
+                    fill={classify.color?.code}
+                  />
                 </span>
               )}
 
@@ -71,7 +76,6 @@ function ConversationSingle({ conversation, onClick }) {
 
           <div className="right-side-box">
             <span className="lastest-time">{createdAt}</span>
-
             <span className="message-count">{numberUnread}</span>
           </div>
         </>
@@ -81,5 +85,3 @@ function ConversationSingle({ conversation, onClick }) {
     </div>
   );
 }
-
-export default ConversationSingle;

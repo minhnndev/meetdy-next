@@ -547,7 +547,7 @@ function Chat({ socket, idNewMessage }) {
         />
       )}
 
-      <div id="main-chat-wrapper">
+      <div>
         <Row gutter={[0, 0]}>
           <Col
             span={5}
@@ -564,15 +564,15 @@ function Chat({ socket, idNewMessage }) {
                 }`}
               >
                 <SearchContainer
-                  onSearchChange={handleOnSearchChange}
                   valueText={valueInput}
+                  onSearchChange={handleOnSearchChange}
                   onSubmitSearch={handleOnSubmitSearch}
                   onFilterClasify={handleOnFilterClassfiy}
                   valueClassify={valueClassify}
                 />
               </div>
 
-              {/* {visibleFilter ? (
+              {visibleFilter ? (
                 <FilterContainer
                   dataSingle={singleConverFilter}
                   dataMutiple={mutipleConverFilter}
@@ -584,11 +584,11 @@ function Chat({ socket, idNewMessage }) {
                     <div />
                   </div>
 
-                  <div className="main-conversation_list-conversation">
+                  <div className="">
                     <ConversationContainer valueClassify={valueClassify} />
                   </div>
                 </>
-              )} */}
+              )}
             </div>
           </Col>
           {path === '/chat' && currentConversation ? (

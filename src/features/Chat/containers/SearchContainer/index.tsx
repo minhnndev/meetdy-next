@@ -6,35 +6,16 @@ import {
   UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { Input, message, Radio } from 'antd';
+import { useRef, useState } from 'react';
+import Scrollbars from 'react-custom-scrollbars-2';
+import { useDispatch, useSelector } from 'react-redux';
+
 import userApi from '@/api/userApi';
 import ModalAddFriend from '@/components/ModalAddFriend';
 import UserCard from '@/components/UserCard';
 import ModalClassify from '@/features/Chat/components/ModalClassify';
 import ModalCreateGroup from '@/features/Chat/components/ModalCreateGroup';
 import { createGroup } from '@/features/Chat/slice/chatSlice';
-import PropTypes from 'prop-types';
-import React, { useRef, useState } from 'react';
-import Scrollbars from 'react-custom-scrollbars-2';
-import { useDispatch, useSelector } from 'react-redux';
-
-SearchContainer.propTypes = {
-  onVisibleFilter: PropTypes.func,
-  onSearchChange: PropTypes.func,
-  valueText: PropTypes.string,
-  onSubmitSearch: PropTypes.func,
-  isFriendPage: PropTypes.bool,
-  onFilterClasify: PropTypes.func,
-  valueClassify: PropTypes.string.isRequired,
-};
-
-SearchContainer.defaultProps = {
-  onVisibleFilter: null,
-  valueText: '',
-  onSearchChange: null,
-  onSubmitSearch: null,
-  isFriendPage: false,
-  onFilterClasify: null,
-};
 
 function SearchContainer({
   valueText,
@@ -44,18 +25,16 @@ function SearchContainer({
   onFilterClasify,
   valueClassify,
 }) {
-  const [isModalCreateGroupVisible, setIsModalCreateGroupVisible] =
-    useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
+  const refDebounce = useRef(null);
+  const dispatch = useDispatch();
   const { classifies } = useSelector((state) => state.chat);
+
+  const [isModalCreateGroup, setIsModalCreateGroup] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
   const [isShowModalClasify, setIsShowModalClasify] = useState(false);
   const [isShowModalAddFriend, setShowModalAddFriend] = useState(false);
   const [userIsFind, setUserIsFind] = useState({});
   const [visibleUserCard, setVisbleUserCard] = useState(false);
-  const refDebounce = useRef(null);
-  const dispatch = useDispatch();
-
-  // -----  HANDLE MODAL CLASSIFY
 
   const handleCreateClasify = () => {
     setIsShowModalClasify(true);
@@ -69,8 +48,6 @@ function SearchContainer({
     setIsShowModalClasify(true);
   };
 
-  // ------
-
   const handleOnChange = (e) => {
     const value = e.target.value;
     console.log('value', value);
@@ -79,26 +56,20 @@ function SearchContainer({
     }
   };
 
-  // --- HANDLE CREATE GROUP
-
   const handleCreateGroup = () => {
-    setIsModalCreateGroupVisible(true);
+    setIsModalCreateGroup(true);
   };
 
   const handleCancelModalCreatGroup = (value) => {
-    setIsModalCreateGroupVisible(value);
+    setIsModalCreateGroup(value);
   };
 
   const handleOklModalCreatGroup = (value) => {
     setConfirmLoading(true);
     dispatch(createGroup(value));
     setConfirmLoading(false);
-    setIsModalCreateGroupVisible(false);
+    setIsModalCreateGroup(false);
   };
-
-  // -----
-
-  // HANDLE ADD FRIEND
 
   const handleOpenModalAddFriend = () => {
     setShowModalAddFriend(true);
@@ -125,8 +96,6 @@ function SearchContainer({
   const handleOnEnter = (value) => {
     handFindUser(value);
   };
-
-  // ------------
 
   const handleCancelModalUserCard = () => {
     setVisbleUserCard(false);
@@ -176,7 +145,7 @@ function SearchContainer({
           </div>
         </div>
 
-        {!isFriendPage && (
+        {/* {!isFriendPage && (
           <>
             {!(valueText.trim().length > 0) && (
               <div className="search-bottom">
@@ -213,21 +182,21 @@ function SearchContainer({
               </div>
             )}
           </>
-        )}
+        )} */}
       </div>
 
       <ModalCreateGroup
-        isVisible={isModalCreateGroupVisible}
+        isVisible={isModalCreateGroup}
         onCancel={handleCancelModalCreatGroup}
         onOk={handleOklModalCreatGroup}
         loading={confirmLoading}
       />
 
-      <ModalClassify
+      {/* <ModalClassify
         isVisible={isShowModalClasify}
         onCancel={handleCancelClassifyModal}
         onOpen={handleOpenModalClassify}
-      />
+      /> */}
 
       <ModalAddFriend
         isVisible={isShowModalAddFriend}

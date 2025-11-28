@@ -1,22 +1,13 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import { Empty } from '../ui/empty';
+import { useDispatch } from 'react-redux';
 
 import ConversationAvatar from '@/features/Chat/components/ConversationAvatar';
-import { Empty } from 'antd';
-import { useDispatch } from 'react-redux';
+
 import {
   fetchListMessages,
   setCurrentConversation,
 } from '@/features/Chat/slice/chatSlice';
 import { useNavigate } from 'react-router-dom';
-
-ConverMutipleSearch.propTypes = {
-  data: PropTypes.array,
-};
-
-ConverMutipleSearch.defaultProps = {
-  data: [],
-};
 
 function ConverMutipleSearch({ data }) {
   const dispatch = useDispatch();

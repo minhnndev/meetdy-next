@@ -1,5 +1,7 @@
 import { DeleteFilled, ExclamationCircleOutlined } from '@ant-design/icons';
 import { Dropdown, Menu, message, Modal } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+
 import conversationApi from '@/api/conversationApi';
 import SubMenuClassify from '@/components/SubMenuClassify';
 import ConversationSingle from '@/features/Chat/components/ConversationSingle';
@@ -9,28 +11,18 @@ import {
   getLastViewOfMembers,
   setCurrentChannel,
 } from '@/features/Chat/slice/chatSlice';
-import PropTypes from 'prop-types';
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   getMembersConversation,
   setTypeOfConversation,
 } from '../../slice/chatSlice';
 
-ConversationContainer.propTypes = {
-  valueClassify: PropTypes.string.isRequired,
-};
-
-ConversationContainer.defaultProps = {
-  valueClassify: '',
-};
-
-function ConversationContainer({ valueClassify, onClickConver }) {
+function ConversationContainer({ valueClassify }) {
   const dispatch = useDispatch();
   const { conversations, classifies } = useSelector((state) => state.chat);
   const { user } = useSelector((state) => state.global);
 
-  const tempClassify = classifies.find((ele) => ele._id === valueClassify) || 0;
+  const tempClassify =
+    classifies?.find((ele) => ele._id === valueClassify) || 0;
 
   const checkConverInClassify = (idMember) => {
     if (tempClassify === 0) return true;
@@ -94,46 +86,42 @@ function ConversationContainer({ valueClassify, onClickConver }) {
       <div id="conversation-main">
         <ul className="list_conversation">
           {converFilter.map((conversationEle, index) => {
-            if (true) {
-              const { numberUnread } = conversationEle;
-              if (conversationEle.lastMessage) {
-                return (
-                  <Dropdown
-                    key={index}
-                    overlay={
-                      <Menu
-                        onClick={(e) =>
-                          handleOnClickItem(e, conversationEle._id)
-                        }
-                      >
-                        <SubMenuClassify
-                          data={classifies}
-                          idConver={conversationEle._id}
-                        />
-
-                        {user._id === conversationEle.leaderId && (
-                          <Menu.Item danger key="1" icon={<DeleteFilled />}>
-                            Xoá hội thoại
-                          </Menu.Item>
-                        )}
-                      </Menu>
-                    }
-                    trigger={['contextMenu']}
-                  >
-                    <li
-                      key={index}
-                      className={`conversation-item ${
-                        numberUnread === 0 ? '' : 'arrived-message'
-                      } `}
+            const { numberUnread } = conversationEle;
+            if (conversationEle.lastMessage) {
+              return (
+                <Dropdown
+                  key={index}
+                  overlay={
+                    <Menu
+                      onClick={(e) => handleOnClickItem(e, conversationEle._id)}
                     >
-                      <ConversationSingle
-                        conversation={conversationEle}
-                        onClick={handleConversationClick}
+                      <SubMenuClassify
+                        data={classifies}
+                        idConver={conversationEle._id}
                       />
-                    </li>
-                  </Dropdown>
-                );
-              }
+
+                      {user._id === conversationEle.leaderId && (
+                        <Menu.Item danger key="1" icon={<DeleteFilled />}>
+                          Xoá hội thoại
+                        </Menu.Item>
+                      )}
+                    </Menu>
+                  }
+                  trigger={['contextMenu']}
+                >
+                  <li
+                    key={index}
+                    className={`conversation-item ${
+                      numberUnread === 0 ? '' : 'arrived-message'
+                    } `}
+                  >
+                    <ConversationSingle
+                      conversation={conversationEle}
+                      onClick={handleConversationClick}
+                    />
+                  </li>
+                </Dropdown>
+              );
             }
           })}
         </ul>

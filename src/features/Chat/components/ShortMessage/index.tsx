@@ -1,52 +1,35 @@
 import {
-  EditOutlined,
-  FileImageOutlined,
-  FileOutlined,
-  KeyOutlined,
-  NumberOutlined,
-  PlaySquareOutlined,
-  PushpinOutlined,
-  SmileOutlined,
-  UserAddOutlined,
-  UserDeleteOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import PropTypes from 'prop-types';
-import React from 'react';
+  Image,
+  File,
+  PlaySquare,
+  Pin,
+  UserPlus,
+  UserMinus,
+  User,
+  Edit,
+  Hash,
+  Key,
+  Smile,
+} from 'lucide-react';
 import { FcBarChart } from 'react-icons/fc';
 import { useSelector } from 'react-redux';
 
-ShortMessage.propTypes = {
-  message: PropTypes.object,
-  type: PropTypes.bool,
+type ShortMessageProps = {
+  message: any;
+  type?: boolean;
 };
 
-ShortMessage.defaultProps = {
-  message: {},
-  type: PropTypes.bool,
-};
-
-function ShortMessage({ message, type }) {
-  const { user } = useSelector((state) => state.global);
+export default function ShortMessage({ message, type }: ShortMessageProps) {
+  const { user } = useSelector((state: any) => state.global);
   const { content, isDeleted } = message;
-
-  // useEffect(() => {
-  //     if(isDeleted)Ơ
-  // }, [message])
 
   const renderName = () => {
     if (type) {
-      if (message.user._id === user._id) {
-        return 'Bạn: ';
-      } else {
-        return message.user.name + ': ';
-      }
+      if (message.user._id === user._id) return 'Bạn: ';
+      return message.user.name + ': ';
     } else {
-      if (message.user._id === user._id) {
-        return 'Bạn: ';
-      } else {
-        return '';
-      }
+      if (message.user._id === user._id) return 'Bạn: ';
+      return '';
     }
   };
 
@@ -70,7 +53,7 @@ function ShortMessage({ message, type }) {
           {message.type === 'IMAGE' && (
             <span>
               {renderName()}
-              <FileImageOutlined />
+              <Image className="inline-block w-4 h-4" />
               &nbsp;đã gửi một hình ảnh
             </span>
           )}
@@ -78,7 +61,7 @@ function ShortMessage({ message, type }) {
           {message.type === 'VIDEO' && (
             <span>
               {renderName()}
-              <PlaySquareOutlined />
+              <PlaySquare className="inline-block w-4 h-4" />
               &nbsp;đã gửi một Video
             </span>
           )}
@@ -86,139 +69,129 @@ function ShortMessage({ message, type }) {
           {message.type === 'FILE' && (
             <span>
               {renderName()}
-              <FileOutlined />
+              <File className="inline-block w-4 h-4" />
               &nbsp;đã gửi một tệp
             </span>
           )}
 
-          {message.type === 'NOTIFY' && message.content === 'PIN_MESSAGE' && (
+          {message.type === 'NOTIFY' && content === 'PIN_MESSAGE' && (
             <span>
               {renderName()}
-              <PushpinOutlined />
+              <Pin className="inline-block w-4 h-4" />
               &nbsp;đã ghim một tin nhắn
             </span>
           )}
 
-          {message.type === 'NOTIFY' &&
-            message.content === 'NOT_PIN_MESSAGE' && (
-              <span>
-                {renderName()}
-                <PushpinOutlined />
-                &nbsp;đã ghim bỏ ghim một tin nhắn
-              </span>
-            )}
+          {message.type === 'NOTIFY' && content === 'NOT_PIN_MESSAGE' && (
+            <span>
+              {renderName()}
+              <Pin className="inline-block w-4 h-4" />
+              &nbsp;đã bỏ ghim một tin nhắn
+            </span>
+          )}
+
+          {message.type === 'NOTIFY' && content === 'Đã thêm vào nhóm' && (
+            <span>
+              {renderName()}
+              <UserPlus className="inline-block w-4 h-4" />
+              &nbsp;đã thêm thành viên vào nhóm
+            </span>
+          )}
+
+          {message.type === 'NOTIFY' && content === 'Đã xóa ra khỏi nhóm' && (
+            <span>
+              {renderName()}
+              <UserMinus className="inline-block w-4 h-4" />
+              &nbsp;đã xóa thành viên ra khỏi nhóm
+            </span>
+          )}
+
+          {message.type === 'NOTIFY' && content === 'Đã rời khỏi nhóm' && (
+            <span>{renderName()}đã rời khỏi nhóm</span>
+          )}
 
           {message.type === 'NOTIFY' &&
-            message.content === 'Đã thêm vào nhóm' && (
+            content.startsWith('Đã đổi tên nhóm thành') && (
               <span>
                 {renderName()}
-                <UserAddOutlined />
-                &nbsp;đã thêm thành viên vào nhóm
-              </span>
-            )}
-
-          {message.type === 'NOTIFY' &&
-            message.content === 'Đã xóa ra khỏi nhóm' && (
-              <span>
-                {renderName()}
-                <UserDeleteOutlined />
-                &nbsp;đã xóa thành viên ra khỏi nhóm
-              </span>
-            )}
-
-          {message.type === 'NOTIFY' &&
-            message.content === 'Đã rời khỏi nhóm' && (
-              <span>{renderName()}đã rời khỏi nhóm</span>
-            )}
-
-          {message.type === 'NOTIFY' &&
-            message.content.startsWith('Đã đổi tên nhóm thành') && (
-              <span>
-                {renderName()}
-                <EditOutlined />
+                <Edit className="inline-block w-4 h-4" />
                 &nbsp;đã đổi tên nhóm thành
               </span>
             )}
 
-          {message.type === 'NOTIFY' &&
-            message.content.startsWith('Đã là bạn bè') && (
-              <span>
-                {renderName()}
-                <UserOutlined />
-                &nbsp;đã trở thành bạn bè
-              </span>
-            )}
+          {message.type === 'NOTIFY' && content.startsWith('Đã là bạn bè') && (
+            <span>
+              {renderName()}
+              <User className="inline-block w-4 h-4" />
+              &nbsp;đã trở thành bạn bè
+            </span>
+          )}
 
-          {message.type === 'NOTIFY' &&
-            message.content === 'UPDATE_CHANNEL' && (
-              <span>
-                {renderName()}
-                <NumberOutlined />
-                &nbsp;đã đổi tên Channel
-              </span>
-            )}
+          {message.type === 'NOTIFY' && content === 'UPDATE_CHANNEL' && (
+            <span>
+              {renderName()}
+              <Hash className="inline-block w-4 h-4" />
+              &nbsp;đã đổi tên Channel
+            </span>
+          )}
 
-          {message.type === 'NOTIFY' &&
-            message.content === 'DELETE_CHANNEL' && (
-              <span>
-                {renderName()}
-                <NumberOutlined />
-                &nbsp;đã xóa Channel
-              </span>
-            )}
+          {message.type === 'NOTIFY' && content === 'DELETE_CHANNEL' && (
+            <span>
+              {renderName()}
+              <Hash className="inline-block w-4 h-4" />
+              &nbsp;đã xóa Channel
+            </span>
+          )}
 
-          {message.type === 'NOTIFY' &&
-            message.content === 'CREATE_CHANNEL' && (
-              <span>
-                {renderName()}
-                <NumberOutlined />
-                &nbsp;đã tạo Channel
-              </span>
-            )}
+          {message.type === 'NOTIFY' && content === 'CREATE_CHANNEL' && (
+            <span>
+              {renderName()}
+              <Hash className="inline-block w-4 h-4" />
+              &nbsp;đã tạo Channel
+            </span>
+          )}
 
-          {message.type === 'NOTIFY' &&
-            message.content === 'Tham gia từ link' && (
-              <span>{renderName()} đã tham gia nhóm </span>
-            )}
+          {message.type === 'NOTIFY' && content === 'Tham gia từ link' && (
+            <span>{renderName()} đã tham gia nhóm</span>
+          )}
 
           {message.type === 'STICKER' && (
             <span>
               {renderName()}
-              <SmileOutlined />
+              <Smile className="inline-block w-4 h-4" />
               &nbsp;đã gửi một sticker
             </span>
           )}
 
           {message.type === 'NOTIFY' &&
-            message.content === 'Ảnh đại diện nhóm đã thay đổi' && (
+            content === 'Ảnh đại diện nhóm đã thay đổi' && (
               <span>
                 {renderName()}
-                <EditOutlined />
+                <Edit className="inline-block w-4 h-4" />
                 &nbsp;đã đổi ảnh nhóm
               </span>
             )}
 
-          {message.type === 'NOTIFY' && message.content === 'ADD_MANAGERS' && (
+          {message.type === 'NOTIFY' && content === 'ADD_MANAGERS' && (
             <span>
               {renderName()}
-              <KeyOutlined />
+              <Key className="inline-block w-4 h-4" />
               &nbsp;đã thêm phó nhóm
             </span>
           )}
 
-          {message.type === 'NOTIFY' &&
-            message.content === 'DELETE_MANAGERS' && (
-              <span>
-                {renderName()}
-                <KeyOutlined />
-                &nbsp;đã xóa phó nhóm
-              </span>
-            )}
+          {message.type === 'NOTIFY' && content === 'DELETE_MANAGERS' && (
+            <span>
+              {renderName()}
+              <Key className="inline-block w-4 h-4" />
+              &nbsp;đã xóa phó nhóm
+            </span>
+          )}
 
           {message.type === 'VOTE' && (
             <span>
               {renderName()}
-              <FcBarChart />
+              <FcBarChart className="inline-block" />
               &nbsp;bình chọn
             </span>
           )}
@@ -227,5 +200,3 @@ function ShortMessage({ message, type }) {
     </>
   );
 }
-
-export default ShortMessage;
