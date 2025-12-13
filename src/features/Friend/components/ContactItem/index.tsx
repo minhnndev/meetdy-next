@@ -1,32 +1,23 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import { useState } from 'react';
 import { Button, Tag } from 'antd';
+
+import userApi from '@/api/userApi';
 import PersonalIcon from '@/features/Chat/components/PersonalIcon';
 import UserCard from '@/components/UserCard';
-import { useState } from 'react';
-import userApi from '@/api/userApi';
-
-ContactItem.propTypes = {
-  data: PropTypes.object,
-};
-
-ContactItem.defaultProps = {
-  data: {},
-};
 
 function ContactItem({ data }) {
   const [userIsFind, setUserIsFind] = useState({});
-  const [visibleUserCard, setVisbleUserCard] = useState(false);
+  const [visibleUserCard, setVisibleUserCard] = useState(false);
 
   const handleViewDetail = async () => {
-    const user = await userApi.fetchUser(data.username);
+    const user = await userApi.getUser(data.username);
     console.log(user);
     setUserIsFind(user);
-    setVisbleUserCard(true);
+    setVisibleUserCard(true);
   };
 
   const handleCancelModalUserCard = () => {
-    setVisbleUserCard(false);
+    setVisibleUserCard(false);
   };
 
   return (

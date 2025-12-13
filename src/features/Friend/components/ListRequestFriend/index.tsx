@@ -1,4 +1,6 @@
-import { message } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'sonner';
+
 import friendApi from '@/api/friendApi';
 import { fetchListFriends } from '@/features/Chat/slice/chatSlice';
 import {
@@ -6,26 +8,17 @@ import {
   fetchListRequestFriend,
   setAmountNotify,
 } from '@/features/Friend/friendSlice';
-import PropTypes from 'prop-types';
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+
 import FriendCard from '../FriendCard';
 
-ListRequestFriend.propTypes = {
-  data: PropTypes.array,
-};
-
-ListRequestFriend.defaultProps = {
-  data: [],
-};
-
-function ListRequestFriend({ data }) {
+function ListRequestFriend({ data = [] }) {
   const dispatch = useDispatch();
 
-  const { amountNotify } = useSelector((state) => state.friend);
+  const { amountNotify } = useSelector((state: any) => state.friend);
 
-  const handeDenyRequest = async (value) => {
+  const handleRequestDeny = async (value) => {
     await friendApi.deleteRequestFriend(value._id);
+
     dispatch(setAmountNotify(amountNotify - 1));
     dispatch(fetchListRequestFriend());
   };
@@ -36,19 +29,22 @@ function ListRequestFriend({ data }) {
     dispatch(fetchFriends({ name: '' }));
     dispatch(fetchListFriends({ name: '' }));
     dispatch(setAmountNotify(amountNotify - 1));
-    message.success('Thêm bạn thành công');
+
+    toast.success('Thêm bạn thành công');
   };
 
   return (
-    <div id="list-friend-card">
+    <div>
       {data &&
         data.length > 0 &&
         data.map((ele, index) => (
           <FriendCard
             key={index}
             data={ele}
-            onDeny={handeDenyRequest}
+            isMyRequest={false}
+            onDeny={handleRequestDeny}
             onAccept={handleOnAccept}
+            onCancel={() => {}}
           />
         ))}
     </div>

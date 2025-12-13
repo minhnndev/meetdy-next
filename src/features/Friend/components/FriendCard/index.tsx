@@ -1,23 +1,5 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import PersonalIcon from '@/features/Chat/components/PersonalIcon';
 import { Button } from 'antd';
-
-FriendCard.propTypes = {
-  isMyRequest: PropTypes.bool,
-  data: PropTypes.object,
-  onAccept: PropTypes.func,
-  onDeny: PropTypes.func,
-  onCancel: PropTypes.func,
-};
-
-FriendCard.defaultProps = {
-  isMyRequest: false,
-  data: {},
-  onAccept: null,
-  onDeny: null,
-  onCancel: null,
-};
+import PersonalIcon from '@/features/Chat/components/PersonalIcon';
 
 function FriendCard({ isMyRequest, data, onAccept, onDeny, onCancel }) {
   const handleRemoveMyRequest = () => {

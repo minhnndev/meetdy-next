@@ -1,26 +1,16 @@
-import { message, Upload } from 'antd';
+import { Upload } from 'antd';
 import messageApi from '@/api/messageApi';
 import ACCEPT_FILE from '@/constants/acceptFile';
-import PropTypes from 'prop-types';
-import React from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'sonner';
 
-UploadFile.propTypes = {
-  typeOfFile: PropTypes.string,
-};
-
-UploadFile.defaultProp = {
-  typeOfFile: '',
-};
-
-function UploadFile(props) {
-  const { typeOfFile } = props;
+const UploadFile = ({ typeOfFile = 'file', children }) => {
   const { currentConversation, currentChannel } = useSelector(
-    (state) => state.chat,
+    (state: any) => state.chat,
   );
 
   const handleCustomRequest = async ({ file }) => {
-    const fmData = new FormData();
+    const formData = new FormData();
     let typeFile;
 
     if (typeOfFile === 'media') {
@@ -28,7 +18,7 @@ function UploadFile(props) {
     } else {
       typeFile = 'FILE';
     }
-    fmData.append('file', file);
+    formData.append('file', file);
 
     const attachInfo = {
       type: typeFile,
@@ -41,15 +31,15 @@ function UploadFile(props) {
 
     try {
       await messageApi.sendFileThroughMessage(
-        fmData,
+        formData,
         attachInfo,
         (percentCompleted) => {
           console.log('value', percentCompleted);
         },
       );
-      message.success(`Đã tải lên ${file.name}`);
+      toast.success(`Đã tải lên ${file.name}`);
     } catch (e) {
-      message.error(`Tải lên ${file.name} thất bại.`);
+      toast.error(`Tải lên ${file.name} thất bại.`);
     }
   };
 
@@ -59,13 +49,13 @@ function UploadFile(props) {
         typeOfFile === 'media' ? ACCEPT_FILE.IMAGE_VIDEO : ACCEPT_FILE.FILE
       }
       multiple={true}
-      progress
       customRequest={handleCustomRequest}
       showUploadList={false}
+      progress={{ strokeWidth: 2, showInfo: false }}
     >
-      {props.children}
+      {children}
     </Upload>
   );
-}
+};
 
 export default UploadFile;

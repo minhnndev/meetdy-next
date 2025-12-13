@@ -1,32 +1,40 @@
-import { Radio } from 'antd';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-function GenderRadioField({ field }) {
-  const { name, value } = field;
+interface IGenderRadioFieldProps {
+  field: {
+    name: string;
+    value: number;
+    onChange: (e: any) => void;
+  };
+}
 
-  const handleChange = (e) => {
-    const selectedValue = e.target.value;
+export default function GenderRadioField({ field }: IGenderRadioFieldProps) {
+  const { name, value, onChange } = field;
 
-    const changeEvent = {
+  const handleSelect = (selected: string) => {
+    onChange({
       target: {
-        name: name,
-        value: selectedValue,
+        name,
+        value: Number(selected),
       },
-    };
-
-    field.onChange(changeEvent);
+    });
   };
 
   return (
-    <Radio.Group value={value} onChange={handleChange}>
-      <Radio key={0} value={0}>
-        Nam
-      </Radio>
+    <RadioGroup
+      value={String(value)}
+      onValueChange={handleSelect}
+      className="flex items-center gap-5"
+    >
+      <label className="flex items-center gap-2 cursor-pointer select-none">
+        <RadioGroupItem value="0" id="male" />
+        <span className="text-sm text-foreground">Nam</span>
+      </label>
 
-      <Radio key={1} value={1}>
-        Nữ
-      </Radio>
-    </Radio.Group>
+      <label className="flex items-center gap-2 cursor-pointer select-none">
+        <RadioGroupItem value="1" id="female" />
+        <span className="text-sm text-foreground">Nữ</span>
+      </label>
+    </RadioGroup>
   );
 }
-
-export default GenderRadioField;

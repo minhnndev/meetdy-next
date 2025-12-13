@@ -41,14 +41,16 @@ import { init, socket } from '@/utils/socketClient';
 
 init();
 
-function ChatLayout(props) {
+function ChatLayout() {
   const dispatch = useDispatch();
+
+  const codeRevokeRef = useRef(null);
+
   const { conversations } = useSelector((state) => state.chat);
   const { isJoinChatLayout, user } = useSelector((state) => state.global);
   const { amountNotify } = useSelector((state) => state.friend);
   const [idNewMessage, setIdNewMessage] = useState('');
   const [codeRevoke, setCodeRevoke] = useState('');
-  const codeRevokeRef = useRef();
 
   useEffect(() => {
     return () => {
@@ -57,6 +59,8 @@ function ChatLayout(props) {
   }, []);
 
   useEffect(() => {
+    dispatch(setTabActive(1));
+
     dispatch(fetchListRequestFriend());
     dispatch(fetchListMyRequestFriend());
     dispatch(
@@ -74,7 +78,6 @@ function ChatLayout(props) {
     dispatch(fetchListColor());
     dispatch(fetchListConversations({}));
     dispatch(fetchAllSticker());
-    dispatch(setTabActive(1));
     dispatch(fetchInfoWebs());
   }, []);
 
@@ -197,22 +200,24 @@ function ChatLayout(props) {
   };
 
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-24 gap-0">
-        <div className="col-span-1 md:col-span-2 sm:col-span-3 xs:col-span-4">
+    <div className="w-full h-full">
+      <div className="grid grid-cols-[64px_1fr] sm:grid-cols-[80px_1fr] md:grid-cols-[200px_1fr] min-h-screen">
+        {/* Sidebar */}
+        <aside>
           <NavbarContainer onSaveCodeRevoke={handleSetCodeRevoke} />
-        </div>
+        </aside>
 
-        <div className="col-span-23 md:col-span-22 sm:col-span-21 xs:col-span-20">
+        {/* Content */}
+        <main className="overflow-hidden h-full">
           <Routes>
             <Route
               index
               element={<Chat socket={socket} idNewMessage={idNewMessage} />}
             />
-            <Route path="friends" element={<Friend socket={socket} />} />
+            <Route path="friends" element={<Friend />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
-        </div>
+        </main>
       </div>
     </div>
   );

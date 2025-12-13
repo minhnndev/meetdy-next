@@ -1,46 +1,52 @@
 import { useState } from 'react';
-import { Col, Row } from 'antd';
-
 import SuggestCard from '../SuggestCard';
 import UserCard from '@/components/UserCard';
 
-function SuggestList({ data = [] }) {
-  const [visible, setVisible] = useState(false);
-  const [user, setUser] = useState({});
+interface SuggestListProps {
+  data?: Array<any>;
+}
 
-  const handleOnClick = (value) => {
-    setUser(value);
-    setVisible(true);
+export default function SuggestList({ data = [] }: SuggestListProps) {
+  const [isUserCardVisible, setIsUserCardVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>({});
+
+  const handleSelectUser = (user: any) => {
+    setSelectedUser(user);
+    setIsUserCardVisible(true);
   };
 
-  const handleCancel = () => {
-    setVisible(false);
+  const handleCloseUserCard = () => {
+    setIsUserCardVisible(false);
   };
+
+  const filteredData = data.filter((u) => u.status === 'NOT_FRIEND');
 
   return (
     <div id="suggest_list">
-      <UserCard user={user} isVisible={visible} onCancel={handleCancel} />
+      <UserCard
+        user={selectedUser}
+        isVisible={isUserCardVisible}
+        onCancel={handleCloseUserCard}
+      />
 
-      <Row gutter={[16, 16]}>
-        {data.map((ele, index) => {
-          if (ele.status === 'NOT_FRIEND') {
-            return (
-              <Col
-                span={6}
-                xl={{ span: 6 }}
-                lg={{ span: 8 }}
-                md={{ span: 12 }}
-                sm={{ span: 12 }}
-                xs={{ span: 24 }}
-              >
-                <SuggestCard data={ele} key={index} onClick={handleOnClick} />
-              </Col>
-            );
-          }
-        })}
-      </Row>
+      <div
+        className="
+        grid gap-4
+        grid-cols-1
+        sm:grid-cols-2
+        md:grid-cols-2
+        lg:grid-cols-3
+        xl:grid-cols-4
+      "
+      >
+        {filteredData.map((item, index) => (
+          <SuggestCard
+            key={item.id || index}
+            data={item}
+            onClick={handleSelectUser}
+          />
+        ))}
+      </div>
     </div>
   );
 }
-
-export default SuggestList;

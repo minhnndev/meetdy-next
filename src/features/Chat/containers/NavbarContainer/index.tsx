@@ -82,7 +82,7 @@ export default function NavbarContainer({ onSaveCodeRevoke }) {
 
   return (
     <div className="h-full w-full">
-      <div className="flex flex-col items-center justify-between h-full py-4 bg-white border-r">
+      <div className="flex flex-col items-center justify-between h-full py-4">
         <ul className="flex flex-col gap-4">
           <li>
             <Popover>

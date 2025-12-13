@@ -1,20 +1,4 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import PersonalIcon from '@/features/Chat/components/PersonalIcon';
-// import { Button, message } from 'antd';
-// import friendApi from '@/api/friendApi';
-// import { useDispatch, useSelector } from 'react-redux';
-// import { updateSuggestFriend } from '../../friendSlice';
-
-SuggestCard.propTypes = {
-  data: PropTypes.object,
-  onClick: PropTypes.func,
-};
-
-SuggestCard.defaultProps = {
-  data: {},
-  onClick: null,
-};
 
 function SuggestCard({ data, onClick }) {
   const handleOnClick = () => {

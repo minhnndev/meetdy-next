@@ -2,9 +2,9 @@ import { useState } from 'react';
 import Scrollbars from 'react-custom-scrollbars-2';
 import { useDispatch } from 'react-redux';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Modal } from 'antd';
-
 import { toast } from 'sonner';
+
+import { Modal } from 'antd';
 
 import friendApi from '@/api/friendApi';
 import userApi from '@/api/userApi';
@@ -70,7 +70,7 @@ function ListFriend({ data }) {
       autoHide={true}
       autoHideTimeout={1000}
       autoHideDuration={200}
-      style={{ height: '100%', width: '100%' }}
+      style={{ height: '500px', width: '100%' }}
     >
       {data.length > 0 &&
         data.map((e, index) => {
@@ -79,11 +79,11 @@ function ListFriend({ data }) {
           );
         })}
 
-      <UserCard
+      {/* <UserCard
         user={userIsFind}
         isVisible={isVisible}
         onCancel={handleCancelModalUserCard}
-      />
+      /> */}
     </Scrollbars>
   );
 }
