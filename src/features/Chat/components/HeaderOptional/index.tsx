@@ -1,13 +1,13 @@
-import {
-  LeftOutlined,
-  NumberOutlined,
-  RollbackOutlined,
-  SplitCellsOutlined,
-  UsergroupAddOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  ArrowLeft,
+  Hash,
+  RotateCcw,
+  Grid,
+  UserPlus,
+  User as UserIcon,
+} from 'lucide-react';
 
 import conversationApi from '@/api/conversationApi';
 import {
@@ -18,46 +18,50 @@ import {
   setCurrentConversation,
 } from '@/features/Chat/slice/chatSlice';
 import useWindowDimensions from '@/hooks/useWindowDimensions';
-
 import dateUtils from '@/utils/dateUtils';
 import ConversationAvatar from '../ConversationAvatar';
 import ModalAddMemberToConver from '../ModalAddMemberToConver';
+import type { RootState, AppDispatch } from '@/store';
 
-HeaderOptional.defaultProps = {
-  totalMembers: 0,
-  name: '',
-  isLogin: false,
-  lastLogin: null,
-  avatarColor: '',
-  onPopUpInfo: null,
-  onOpenDrawer: null,
+type Props = {
+  avatar?: string | null;
+  totalMembers?: number;
+  name?: string;
+  typeConver?: boolean;
+  isLogin?: boolean;
+  lastLogin?: string | null;
+  avatarColor?: string;
+  onPopUpInfo?: () => void;
+  onOpenDrawer?: () => void;
 };
 
-function HeaderOptional(props) {
+const HeaderOptional: React.FC<Props> = (props) => {
   const {
-    avatar,
-    totalMembers,
-    name,
-    typeConver,
-    isLogin,
-    lastLogin,
-    avatarColor,
+    avatar = null,
+    totalMembers = 0,
+    name = '',
+    typeConver = false,
+    isLogin = false,
+    lastLogin = null,
+    avatarColor = '',
     onPopUpInfo,
     onOpenDrawer,
   } = props;
-  const type = typeof avatar;
+
   const { currentConversation, currentChannel, channels } = useSelector(
-    (state) => state.chat,
+    (state: RootState) => state.chat,
   );
-  const [isVisible, setIsvisible] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [typeModal, setTypeModal] = useState(1);
-  const dispatch = useDispatch();
+
+  const dispatch = useDispatch<AppDispatch>();
   const { width } = useWindowDimensions();
 
-  const handleCutText = (text) => {
+  const [isVisible, setIsvisible] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [typeModal, setTypeModal] = useState<number>(1);
+
+  const handleCutText = (text: string) => {
     if (width < 577) {
-      return text.slice(0, 14) + '...';
+      return text?.slice(0, 14) + '...';
     }
     return text;
   };
@@ -68,7 +72,6 @@ function HeaderOptional(props) {
     }
   };
 
-  // false đơn, true là nhóm
   const handleAddMemberToGroup = () => {
     setIsvisible(true);
     if (typeConver) {
@@ -78,18 +81,17 @@ function HeaderOptional(props) {
     }
   };
 
-  const handleOk = async (userIds, name) => {
+  const handleOk = async (userIds: string[], groupName?: string) => {
     if (typeModal === 1) {
       setConfirmLoading(true);
-      dispatch(
+      await dispatch(
         createGroup({
-          name,
+          name: groupName ?? '',
           userIds,
         }),
       );
       setConfirmLoading(false);
     } else {
-      // socket (đối với user đc add): io.emit('added-group', conversationId).
       setConfirmLoading(true);
       await conversationApi.addMembersToConver(userIds, currentConversation);
       setConfirmLoading(false);
@@ -98,22 +100,17 @@ function HeaderOptional(props) {
     setIsvisible(false);
   };
 
-  const hanleOnCancel = (value) => {
+  const hanleOnCancel = (value: boolean) => {
     setIsvisible(value);
   };
 
   const checkTime = () => {
-    if (lastLogin) {
-      const time = dateUtils.toTime(lastLogin);
-      if (
-        lastLogin.indexOf('ngày') ||
-        lastLogin.indexOf('giờ') ||
-        lastLogin.indexOf('phút')
-      ) {
-        return true;
-      }
-      return false;
-    }
+    if (!lastLogin) return false;
+    return (
+      lastLogin.includes('ngày') ||
+      lastLogin.includes('giờ') ||
+      lastLogin.includes('phút')
+    );
   };
 
   const handleViewGeneralChannel = () => {
@@ -134,102 +131,100 @@ function HeaderOptional(props) {
     dispatch(setCurrentConversation(''));
   };
 
+  const currentChannelName =
+    channels.find((ele) => ele._id === currentChannel)?.name ?? '';
+
   return (
-    <div id="header-optional">
-      <div className="header_wrapper">
-        <div className="header_leftside">
-          <div
-            className="icon-header back-list"
+    <div id="header-optional" className="w-full border-b bg-white">
+      <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center gap-3">
+          <button
             onClick={handleBackToListConver}
+            aria-label="Back to conversations"
+            className="p-2 rounded-md hover:bg-gray-100 transition"
           >
-            <LeftOutlined />
-          </div>
-          <div className="icon_user">
-            {
-              <ConversationAvatar
-                avatar={avatar}
-                totalMembers={totalMembers}
-                type={typeConver}
-                name={name}
-                isActived={isLogin}
-                avatarColor={avatarColor}
-              />
-            }
+            <ArrowLeft className="w-5 h-5 text-gray-700" />
+          </button>
+
+          <div className="flex items-center">
+            <ConversationAvatar
+              avatar={avatar}
+              totalMembers={totalMembers}
+              type={typeConver}
+              name={name}
+              isActived={isLogin}
+              avatarColor={avatarColor}
+            />
           </div>
 
-          <div className="info_user">
-            <div className="info_user-name">
+          <div className="flex flex-col min-w-0">
+            <div className="truncate font-medium text-sm text-slate-900">
               <span>{handleCutText(name)}</span>
             </div>
 
             {currentChannel ? (
-              <div className="channel_info">
-                <div className="channel-icon">
-                  <NumberOutlined />
-                </div>
-
-                <div className="channel-name">
-                  {channels.find((ele) => ele._id === currentChannel).name}
-                </div>
+              <div className="flex items-center text-sm text-gray-500 mt-1">
+                <Hash className="w-4 h-4 mr-2 text-gray-400" />
+                <div className="truncate">{currentChannelName}</div>
               </div>
             ) : (
-              <div className="lastime-access">
+              <div className="text-sm text-gray-500 mt-1">
                 {typeConver ? (
-                  <div className="member-hover">
-                    <UserOutlined />
-                    &nbsp;{totalMembers}
-                    <span>&nbsp;Thành viên</span>
+                  <div className="flex items-center gap-2">
+                    <UserIcon className="w-4 h-4 text-gray-400" />
+                    <span>
+                      {totalMembers}{' '}
+                      <span className="text-gray-400">Thành viên</span>
+                    </span>
                   </div>
+                ) : isLogin ? (
+                  <span className="text-green-500">Đang hoạt động</span>
                 ) : (
-                  <>
-                    {isLogin ? (
-                      <span>Đang hoạt động</span>
-                    ) : (
-                      <>
-                        {lastLogin && (
-                          <span>
-                            {`Truy cập ${dateUtils
-                              .toTime(lastLogin)
-                              .toLowerCase()}`}{' '}
-                            {`${checkTime() ? 'trước' : ''}`}
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </>
+                  lastLogin && (
+                    <span>
+                      {`Truy cập ${dateUtils.toTime(lastLogin).toLowerCase()}`}{' '}
+                      {checkTime() ? 'trước' : ''}
+                    </span>
+                  )
                 )}
               </div>
             )}
           </div>
         </div>
 
-        <div className="header_rightside">
+        <div className="flex items-center gap-2">
           {currentChannel ? (
-            <div
+            <button
               title="Trở lại kênh chính"
-              className="icon-header back-channel"
               onClick={handleViewGeneralChannel}
+              className="p-2 rounded-md hover:bg-gray-100 transition"
             >
-              <RollbackOutlined />
-            </div>
+              <RotateCcw className="w-5 h-5 text-gray-700" />
+            </button>
           ) : (
-            <>
-              <div
-                className="icon-header create-group"
-                onClick={handleAddMemberToGroup}
-              >
-                <UsergroupAddOutlined />
-              </div>
-            </>
+            <button
+              onClick={handleAddMemberToGroup}
+              className="p-2 rounded-md hover:bg-gray-100 transition"
+            >
+              <UserPlus className="w-5 h-5 text-gray-700" />
+            </button>
           )}
 
-          <div className="icon-header pop-up-layout">
-            <SplitCellsOutlined onClick={handlePopUpInfo} />
-          </div>
+          <button
+            onClick={handlePopUpInfo}
+            className="hidden sm:inline-flex p-2 rounded-md hover:bg-gray-100 transition"
+            aria-label="Open info"
+          >
+            <Grid className="w-5 h-5 text-gray-700" />
+          </button>
 
-          <div className="icon-header pop-up-responsive">
-            <SplitCellsOutlined onClick={handleOpenDraweer} />
-          </div>
+          <button
+            onClick={handleOpenDraweer}
+            className="sm:hidden p-2 rounded-md hover:bg-gray-100 transition"
+            aria-label="Open drawer"
+          >
+            <Grid className="w-5 h-5 text-gray-700" />
+          </button>
         </div>
       </div>
 
@@ -242,6 +237,6 @@ function HeaderOptional(props) {
       />
     </div>
   );
-}
+};
 
 export default HeaderOptional;

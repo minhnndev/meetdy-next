@@ -1,15 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useResolvedPath, useLocation } from 'react-router-dom';
-import { DoubleLeftOutlined, DownOutlined } from '@ant-design/icons';
-import {
-  Col,
-  Drawer,
-  message as messageNotify,
-  notification,
-  Row,
-  Spin,
-} from 'antd';
+import { ChevronsLeft, ChevronDown } from 'lucide-react';
 
 import { setJoinChatLayout } from '@/app/globalSlice';
 import conversationApi from '@/api/conversationApi';
@@ -58,44 +50,77 @@ import {
 
 import renderWidthDrawer from '@/utils/DrawerResponsive';
 
-function Chat({ socket, idNewMessage }) {
+function ensureToastContainer() {
+  let container = document.getElementById('global-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'global-toast-container';
+    container.className = 'fixed top-4 right-4 z-[9999] flex flex-col gap-2';
+    document.body.appendChild(container);
+  }
+  return container;
+}
+
+function showToast(message: string, variant: 'info' | 'warning' = 'info') {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(message);
+    return;
+  }
+  const container = ensureToastContainer();
+  const el = document.createElement('div');
+  el.className =
+    'max-w-sm px-4 py-2 rounded-md shadow-md text-sm animate-slide-in ' +
+    (variant === 'warning'
+      ? 'bg-yellow-50 text-yellow-800'
+      : 'bg-white text-slate-900');
+  el.style.boxShadow = '0 4px 14px rgba(0,0,0,0.08)';
+  el.textContent = message;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('opacity-0', 'transition', 'duration-300');
+    setTimeout(() => el.remove(), 300);
+  }, 4000);
+}
+
+function Chat({ socket, idNewMessage }: { socket: any; idNewMessage?: any }) {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const path = useResolvedPath('').pathname;
 
   const {
-    conversations,
+    conversations = [],
     currentConversation,
-    pinMessages,
+    pinMessages = [],
     isLoading,
     currentChannel,
-    channels,
-  } = useSelector((state) => state.chat);
-  const { isJoinChatLayout, user } = useSelector((state) => state.global);
+    channels = [],
+  } = useSelector((state: any) => state.chat || {});
+  const { isJoinChatLayout, user } = useSelector(
+    (state: any) => state.global || {},
+  );
 
-  const refCurrentConversation = useRef(null);
-  const refConversations = useRef(null);
-  const refCurrentChannel = useRef(null);
+  const refCurrentConversation = useRef<string | null>(null);
+  const refConversations = useRef<any[]>([]);
+  const refCurrentChannel = useRef<string | null>(null);
 
   const [scrollId, setScrollId] = useState('');
   const [isShow, setIsShow] = useState(false);
   const [isScroll, setIsScroll] = useState(false);
   const [hasMessage, setHasMessage] = useState('');
-  const [usersTyping, setUsersTyping] = useState([]);
+  const [usersTyping, setUsersTyping] = useState<any[]>([]);
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [visibleNews, setVisibleNews] = useState(false);
   const [tabActiveInNews, setTabActiveNews] = useState(0);
   const [isVisibleModalJoinGroup, setIsVisibleJoinGroup] = useState(false);
-  const [summaryGroup, setSummary] = useState({});
-  const [replyMessage, setReplyMessage] = useState({});
-  const [userMention, setUserMention] = useState({});
+  const [summaryGroup, setSummary] = useState<any>({});
+  const [replyMessage, setReplyMessage] = useState<any>({});
+  const [userMention, setUserMention] = useState<any>({});
 
-  // filter search
   const [visibleFilter, setVisbleFilter] = useState(false);
   const [valueInput, setValueInput] = useState('');
-  const [singleConverFilter, setSingleConverFilter] = useState([]);
-  const [mutipleConverFilter, setMultiConverFilter] = useState([]);
+  const [singleConverFilter, setSingleConverFilter] = useState<any[]>([]);
+  const [mutipleConverFilter, setMultiConverFilter] = useState<any[]>([]);
   const [valueClassify, setValueClassify] = useState('0');
   const [isOpenInfo, setIsOpenInfo] = useState(true);
   const [openDrawerInfo, setOpenDrawerInfo] = useState(false);
@@ -121,7 +146,7 @@ function Chat({ socket, idNewMessage }) {
 
   useEffect(() => {
     setUsersTyping([]);
-    setReplyMessage(null);
+    setReplyMessage(null as any);
     setUserMention({});
   }, [currentConversation]);
 
@@ -129,22 +154,25 @@ function Chat({ socket, idNewMessage }) {
     if (currentConversation) {
       dispatch(setTotalChannelNotify());
     }
-  }, [currentConversation, channels, conversations]);
+  }, [currentConversation, channels, conversations, dispatch]);
 
   useEffect(() => {
     const openModalJoinFromLink = async () => {
-      if (location.state && location.state.conversationId) {
+      if ((location as any).state && (location as any).state.conversationId) {
         const data = await conversationApi.fetchListConversations();
-        const tempId = location.state.conversationId;
+        const tempId = (location as any).state.conversationId;
 
-        if (data.findIndex((ele) => ele._id === tempId) < 0) {
+        if (data.findIndex((ele: any) => ele._id === tempId) < 0) {
           try {
-            const data = await conversationApi.getSummaryInfoGroup(tempId);
-            setSummary(data);
+            const dataSummary = await conversationApi.getSummaryInfoGroup(
+              tempId,
+            );
+            setSummary(dataSummary);
             setIsVisibleJoinGroup(true);
           } catch (error) {
-            messageNotify.warning(
+            showToast(
               'Trưởng nhóm đã tắt tính năng tham gia nhóm bằng liên kết',
+              'warning',
             );
           }
         } else {
@@ -162,7 +190,7 @@ function Chat({ socket, idNewMessage }) {
       }
     };
     openModalJoinFromLink();
-  }, []);
+  }, [location, navigate, dispatch]);
 
   useEffect(() => {
     dispatch(
@@ -170,101 +198,77 @@ function Chat({ socket, idNewMessage }) {
         name: '',
       }),
     );
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (
       currentConversation &&
-      conversations.find((ele) => ele._id === currentConversation).type
+      conversations.find((ele: any) => ele._id === currentConversation)?.type
     ) {
       dispatch(fetchPinMessages({ conversationId: currentConversation }));
     }
-  }, [currentConversation]);
+  }, [currentConversation, conversations, dispatch]);
 
   useEffect(() => {
     if (!isJoinChatLayout) {
-      socket.on('delete-conversation', (conversationId) => {
+      socket.on('delete-conversation', (conversationId: string) => {
         const conver = refConversations.current.find(
           (ele) => ele._id === conversationId,
         );
-        if (conver.leaderId !== user._id) {
-          notification.info({
-            placement: 'topRight',
-            bottom: 50,
-            duration: 3,
-            rtl: true,
-            message: (
-              <span>
-                Nhóm <strong>{conver.name}</strong> đã giải tán
-              </span>
-            ),
-          });
+        if (conver?.leaderId !== user?._id) {
+          showToast(`Nhóm ${conver?.name} đã giải tán`, 'info');
         }
-
         dispatch(removeConversation(conversationId));
       });
 
-      socket.on('delete-message', ({ conversationId, channelId, id }) => {
+      socket.on('delete-message', ({ conversationId, channelId, id }: any) => {
         handleDeleteMessage(conversationId, channelId, id);
       });
 
-      socket.on('added-group', (conversationId) => {
+      socket.on('added-group', (conversationId: string) => {
         dispatch(fetchConversationById({ conversationId }));
       });
 
       socket.on(
         'add-reaction',
-        ({ conversationId, channelId, messageId, user, type }) => {
+        ({ conversationId, channelId, messageId, user: u, type }: any) => {
           if (
             refCurrentConversation.current === conversationId &&
             refCurrentChannel.current === channelId
           ) {
-            dispatch(setReactionMessage({ messageId, user, type }));
+            dispatch(setReactionMessage({ messageId, user: u, type }));
           }
-
           if (!channelId && refCurrentConversation.current === conversationId) {
-            dispatch(setReactionMessage({ messageId, user, type }));
+            dispatch(setReactionMessage({ messageId, user: u, type }));
           }
         },
       );
 
-      socket.on('typing', (conversationId, user) => {
+      socket.on('typing', (conversationId: string, userTyping: any) => {
         if (conversationId === refCurrentConversation.current) {
-          const index = usersTyping.findIndex((ele) => ele._id === user._id);
-
-          if (usersTyping.length === 0 || index < 0) {
-            setUsersTyping([...usersTyping, user]);
-          }
+          setUsersTyping((prev) => {
+            const index = prev.findIndex((ele) => ele._id === userTyping._id);
+            if (prev.length === 0 || index < 0) {
+              return [...prev, userTyping];
+            }
+            return prev;
+          });
         }
       });
 
-      socket.on('not-typing', (conversationId, user) => {
+      socket.on('not-typing', (conversationId: string, userTyping: any) => {
         if (conversationId === refCurrentConversation.current) {
-          const index = usersTyping.findIndex((ele) => ele._id === user._id);
-          const newUserTyping = usersTyping.filter(
-            (ele) => ele._id !== user._id,
+          setUsersTyping((prev) =>
+            prev.filter((ele) => ele._id !== userTyping._id),
           );
-
-          setUsersTyping(newUserTyping);
         }
       });
 
-      socket.on('deleted-group', (conversationId) => {
+      socket.on('deleted-group', (conversationId: string) => {
         const conversation = refConversations.current.find(
           (ele) => ele._id === conversationId,
         );
-
-        notification.info({
-          placement: 'topRight',
-          bottom: 50,
-          duration: 3,
-          rtl: true,
-          message: (
-            <span>
-              Bạn đã bị xóa khỏi nhóm <strong>{conversation.name}</strong>
-            </span>
-          ),
-        });
+        showToast(`Bạn đã bị xóa khỏi nhóm ${conversation?.name}`, 'info');
         if (conversationId === refCurrentConversation.current) {
           dispatch(setCurrentConversation(''));
         }
@@ -272,7 +276,7 @@ function Chat({ socket, idNewMessage }) {
         socket.emit('leave-conversation', conversationId);
       });
 
-      socket.on('action-pin-message', (conversationId) => {
+      socket.on('action-pin-message', (conversationId: string) => {
         if (conversationId === refCurrentConversation.current) {
           dispatch(fetchPinMessages({ conversationId }));
         }
@@ -280,7 +284,7 @@ function Chat({ socket, idNewMessage }) {
 
       socket.on(
         'rename-conversation',
-        (conversationId, conversationName, message) => {
+        (conversationId: string, conversationName: string, message: any) => {
           dispatch(updateNameOfConver({ conversationId, conversationName }));
           dispatch(addMessage(message));
         },
@@ -288,8 +292,8 @@ function Chat({ socket, idNewMessage }) {
 
       socket.on(
         'user-last-view',
-        ({ conversationId, userId, lastView, channelId }) => {
-          if (userId !== user._id) {
+        ({ conversationId, userId, lastView, channelId }: any) => {
+          if (userId !== user?._id) {
             dispatch(
               updateLastViewOfMembers({
                 conversationId,
@@ -302,7 +306,7 @@ function Chat({ socket, idNewMessage }) {
         },
       );
 
-      socket.on('update-member', async (conversationId) => {
+      socket.on('update-member', async (conversationId: string) => {
         if (conversationId === refCurrentConversation.current) {
           await dispatch(getLastViewOfMembers({ conversationId }));
           const newMember = await conversationApi.getMemberInConversation(
@@ -312,35 +316,41 @@ function Chat({ socket, idNewMessage }) {
         }
       });
 
-      socket.on('new-channel', ({ _id, name, conversationId, createdAt }) => {
-        if (conversationId === refCurrentConversation.current) {
-          dispatch(updateChannel({ _id, name, createdAt }));
-        }
-      });
+      socket.on(
+        'new-channel',
+        ({ _id, name, conversationId, createdAt }: any) => {
+          if (conversationId === refCurrentConversation.current) {
+            dispatch(updateChannel({ _id, name, createdAt }));
+          }
+        },
+      );
 
-      socket.on('delete-channel', async ({ conversationId, channelId }) => {
-        const actionAfterDelete = async () => {
-          await dispatch(setCurrentChannel(''));
-          dispatch(
-            fetchListMessages({
-              conversationId: refCurrentConversation.current,
-              size: 10,
-            }),
-          );
-          dispatch(
-            getLastViewOfMembers({
-              conversationId: refCurrentConversation.current,
-            }),
-          );
-        };
-        await actionAfterDelete();
+      socket.on(
+        'delete-channel',
+        async ({ conversationId, channelId }: any) => {
+          const actionAfterDelete = async () => {
+            await dispatch(setCurrentChannel(''));
+            dispatch(
+              fetchListMessages({
+                conversationId: refCurrentConversation.current,
+                size: 10,
+              }),
+            );
+            dispatch(
+              getLastViewOfMembers({
+                conversationId: refCurrentConversation.current,
+              }),
+            );
+          };
+          await actionAfterDelete();
 
-        if (refCurrentConversation.current === conversationId) {
-          dispatch(removeChannel({ channelId }));
-        }
-      });
+          if (refCurrentConversation.current === conversationId) {
+            dispatch(removeChannel({ channelId }));
+          }
+        },
+      );
 
-      socket.on('update-channel', ({ _id, name, conversationId }) => {
+      socket.on('update-channel', ({ _id, name, conversationId }: any) => {
         if (refCurrentConversation.current === conversationId) {
           dispatch(updateNameChannel({ channelId: _id, name }));
         }
@@ -348,63 +358,55 @@ function Chat({ socket, idNewMessage }) {
 
       socket.on(
         'update-avatar-conversation',
-        (conversationId, conversationAvatar, message) => {
+        (conversationId: string, conversationAvatar: string, message: any) => {
           if (refCurrentConversation.current === conversationId) {
             dispatch(
-              updateAvavarConver({
-                conversationId,
-                conversationAvatar,
-              }),
+              updateAvavarConver({ conversationId, conversationAvatar }),
             );
           }
         },
       );
 
-      socket.on('update-vote-message', (conversationId, voteMessage) => {
-        if (refCurrentConversation.current === conversationId) {
-          dispatch(
-            updateVoteMessage({
-              voteMessage,
-            }),
-          );
-        }
+      socket.on(
+        'update-vote-message',
+        (conversationId: string, voteMessage: any) => {
+          if (refCurrentConversation.current === conversationId) {
+            dispatch(updateVoteMessage({ voteMessage }));
+          }
+        },
+      );
+
+      socket.on('add-managers', ({ conversationId, managerIds }: any) => {
+        dispatch(addManagers({ conversationId, managerIds }));
       });
 
-      socket.on('add-managers', ({ conversationId, managerIds }) => {
-        dispatch(
-          addManagers({
-            conversationId,
-            managerIds,
-          }),
-        );
-      });
-
-      socket.on('delete-managers', ({ conversationId, managerIds }) => {
-        dispatch(
-          deleteManager({
-            conversationId,
-            managerIds,
-          }),
-        );
+      socket.on('delete-managers', ({ conversationId, managerIds }: any) => {
+        dispatch(deleteManager({ conversationId, managerIds }));
       });
     }
     dispatch(setJoinChatLayout(true));
-  }, []);
+  }, [socket, dispatch, isJoinChatLayout, user]);
 
-  const emitUserOnline = (currentConver) => {
+  const emitUserOnline = (currentConver: string | null) => {
     if (currentConver) {
-      const conver = conversations.find((ele) => ele._id === currentConver);
-      if (!conver.type) {
+      const conver = conversations.find(
+        (ele: any) => ele._id === currentConver,
+      );
+      if (conver && !conver.type) {
         const userId = conver.userId;
-        socket.emit('get-user-online', userId, ({ isOnline, lastLogin }) => {
-          dispatch(
-            updateTimeForConver({
-              id: currentConver,
-              isOnline,
-              lastLogin,
-            }),
-          );
-        });
+        socket.emit(
+          'get-user-online',
+          userId,
+          ({ isOnline, lastLogin }: any) => {
+            dispatch(
+              updateTimeForConver({
+                id: currentConver,
+                isOnline,
+                lastLogin,
+              }),
+            );
+          },
+        );
       }
     }
   };
@@ -421,9 +423,13 @@ function Chat({ socket, idNewMessage }) {
     return () => {
       clearInterval(intervalCall);
     };
-  }, [currentConversation]);
+  }, [currentConversation, conversations]);
 
-  const handleDeleteMessage = (conversationId, channelId, id) => {
+  const handleDeleteMessage = (
+    conversationId: string,
+    channelId: string | null,
+    id: string,
+  ) => {
     if (
       refCurrentConversation.current === conversationId &&
       refCurrentChannel.current === channelId
@@ -435,7 +441,7 @@ function Chat({ socket, idNewMessage }) {
     }
   };
 
-  const handleScrollWhenSent = (value) => {
+  const handleScrollWhenSent = (value: string) => {
     setScrollId(value);
   };
 
@@ -443,7 +449,7 @@ function Chat({ socket, idNewMessage }) {
     setIsScroll(true);
   };
 
-  const handleBackToBottom = (value, message) => {
+  const handleBackToBottom = (value: boolean, message?: string) => {
     if (message) {
       setHasMessage(message);
     } else {
@@ -452,7 +458,7 @@ function Chat({ socket, idNewMessage }) {
     setIsShow(value);
   };
 
-  const hanldeResetScrollButton = (value) => {
+  const hanldeResetScrollButton = (value: boolean) => {
     setIsScroll(value);
   };
 
@@ -481,11 +487,11 @@ function Chat({ socket, idNewMessage }) {
     setTabActiveNews(1);
   };
 
-  const handleChangeActiveKey = (key) => {
+  const handleChangeActiveKey = (key: number) => {
     setTabActiveNews(key);
   };
 
-  const handleOnReply = (mes) => {
+  const handleOnReply = (mes: any) => {
     setReplyMessage(mes);
   };
 
@@ -493,8 +499,8 @@ function Chat({ socket, idNewMessage }) {
     setReplyMessage({});
   };
 
-  const handleOnMention = (userMent) => {
-    if (user._id !== userMent._id) {
+  const handleOnMention = (userMent: any) => {
+    if (user && user._id !== userMent._id) {
       setUserMention(userMent);
     }
   };
@@ -503,7 +509,7 @@ function Chat({ socket, idNewMessage }) {
     setUserMention({});
   };
 
-  const handleOnVisibleFilter = (value) => {
+  const handleOnVisibleFilter = (value: string) => {
     if (value.trim().length > 0) {
       setVisbleFilter(true);
     } else {
@@ -511,7 +517,7 @@ function Chat({ socket, idNewMessage }) {
     }
   };
 
-  const handleOnSearchChange = (value) => {
+  const handleOnSearchChange = (value: string) => {
     setValueInput(value);
     handleOnVisibleFilter(value);
   };
@@ -531,13 +537,40 @@ function Chat({ socket, idNewMessage }) {
     } catch (error) {}
   };
 
-  const handleOnFilterClassfiy = (value) => {
+  const handleOnFilterClassfiy = (value: string) => {
     setValueClassify(value);
   };
 
+  const currentConverObj =
+    conversations.find((ele: any) => ele._id === currentConversation) || {};
+
   return (
-    <Spin spinning={isLoading}>
-      {Object.keys(summaryGroup).length > 0 && (
+    <>
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60">
+          <svg
+            className="w-10 h-10 animate-spin text-slate-700"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            ></path>
+          </svg>
+        </div>
+      )}
+
+      {Object.keys(summaryGroup || {}).length > 0 && (
         <ModalJoinGroupFromLink
           isVisible={isVisibleModalJoinGroup}
           info={summaryGroup}
@@ -545,15 +578,15 @@ function Chat({ socket, idNewMessage }) {
         />
       )}
 
-      <div>
-        <Row gutter={[0, 0]}>
-          <Col
-            span={5}
-            xl={{ span: 5 }}
-            lg={{ span: 6 }}
-            md={{ span: 7 }}
-            sm={{ span: currentConversation ? 0 : 24 }}
-            xs={{ span: currentConversation ? 0 : 24 }}
+      <div className="min-h-screen">
+        <div className="flex w-full">
+          <div
+            className={`${
+              currentConversation ? 'hidden sm:block' : 'block'
+            } sm:flex-shrink-0 bg-transparent`}
+            style={{
+              width: currentConversation ? (width >= 1200 ? 240 : 0) : '100%',
+            }}
           >
             <div className="main-conversation">
               <div
@@ -582,22 +615,20 @@ function Chat({ socket, idNewMessage }) {
                     <div />
                   </div>
 
-                  <div className="">
+                  <div>
                     <ConversationContainer valueClassify={valueClassify} />
                   </div>
                 </>
               )}
             </div>
-          </Col>
+          </div>
+
           {path === '/chat' && currentConversation ? (
             <>
-              <Col
-                span={isOpenInfo ? 13 : 19}
-                xl={{ span: isOpenInfo ? 13 : 19 }}
-                lg={{ span: 18 }}
-                md={{ span: 17 }}
-                sm={{ span: currentConversation ? 24 : 0 }}
-                xs={{ span: currentConversation ? 24 : 0 }}
+              <div
+                className={`flex-1 ${
+                  isOpenInfo ? 'xl:max-w-[55%]' : 'xl:max-w-[80%]'
+                } w-full`}
               >
                 <div className="main_chat">
                   <div className="main_chat-header">
@@ -620,9 +651,7 @@ function Chat({ socket, idNewMessage }) {
                       />
 
                       {pinMessages.length > 1 &&
-                        conversations.find(
-                          (ele) => ele._id === currentConversation,
-                        ).type &&
+                        (currentConverObj as any).type &&
                         !currentChannel && (
                           <div className="pin-message">
                             <DrawerPinMessage
@@ -634,9 +663,7 @@ function Chat({ socket, idNewMessage }) {
                         )}
 
                       {pinMessages.length > 0 &&
-                        conversations.find(
-                          (ele) => ele._id === currentConversation,
-                        ).type &&
+                        (currentConverObj as any).type &&
                         !currentChannel && (
                           <div className="nutshell-pin-message">
                             <NutshellPinMessage
@@ -658,21 +685,21 @@ function Chat({ socket, idNewMessage }) {
                         onClick={handleOnClickScroll}
                       >
                         {hasMessage ? (
-                          <div className="db-arrow-new-message">
+                          <div className="db-arrow-new-message flex items-center gap-2">
                             <span className="arrow">
-                              <DoubleLeftOutlined />
+                              <ChevronsLeft className="w-4 h-4" />
                             </span>
-                            <span>&nbsp;{hasMessage}</span>
+                            <span>{hasMessage}</span>
                           </div>
                         ) : (
-                          <DownOutlined />
+                          <ChevronDown className="w-5 h-5" />
                         )}
                       </div>
 
                       {usersTyping.length > 0 && !refCurrentChannel.current && (
                         <div className="typing-message">
                           {usersTyping.map((ele, index) => (
-                            <span>
+                            <span key={ele._id || index}>
                               {index < 3 && (
                                 <>
                                   {index === usersTyping.length - 1
@@ -690,9 +717,9 @@ function Chat({ socket, idNewMessage }) {
                           <span>&nbsp;đang nhập</span>
 
                           <div className="dynamic-dot">
-                            <div className="dot"></div>
-                            <div className="dot"></div>
-                            <div className="dot"></div>
+                            <div className="dot" />
+                            <div className="dot" />
+                            <div className="dot" />
                           </div>
                         </div>
                       )}
@@ -712,42 +739,48 @@ function Chat({ socket, idNewMessage }) {
                     </div>
                   </div>
                 </div>
-              </Col>
-              <Col
-                span={isOpenInfo ? 6 : 0}
-                xl={{ span: isOpenInfo ? 6 : 0 }}
-                lg={{ span: 0 }}
-                md={{ span: 0 }}
-                sm={{ span: 0 }}
-                xs={{ span: 0 }}
+              </div>
+
+              <div
+                className={`${
+                  isOpenInfo ? 'block' : 'hidden'
+                } hidden lg:block lg:flex-shrink-0`}
+                style={{ width: isOpenInfo ? 320 : 0 }}
               >
                 <div className="main-info">
-                  <Drawer
-                    placement="right"
-                    closable={false}
-                    onClose={() => setOpenDrawerInfo(false)}
-                    visible={openDrawerInfo}
-                    key="right"
-                    className="drawer-responsive"
-                    style={{ padding: 0 }}
-                    width={`${renderWidthDrawer(width)}%`}
-                  >
-                    <>
-                      {visibleNews ? (
-                        <GroupNews
-                          tabActive={tabActiveInNews}
-                          onBack={handleOnBack}
-                          onChange={handleChangeActiveKey}
-                        />
-                      ) : (
-                        <InfoContainer
-                          onViewChannel={handleChangeViewChannel}
-                          socket={socket}
-                          onOpenInfoBlock={() => setIsOpenInfo(true)}
-                        />
-                      )}
-                    </>
-                  </Drawer>
+                  {openDrawerInfo && (
+                    <div
+                      className="fixed top-0 right-0 h-full bg-white shadow-lg z-50 transition-transform"
+                      style={{
+                        width: `${renderWidthDrawer(width)}%`,
+                        transform: openDrawerInfo
+                          ? 'translateX(0)'
+                          : 'translateX(100%)',
+                      }}
+                    >
+                      <div className="h-full overflow-auto">
+                        {visibleNews ? (
+                          <GroupNews
+                            tabActive={tabActiveInNews}
+                            onBack={handleOnBack}
+                            onChange={handleChangeActiveKey}
+                          />
+                        ) : (
+                          <InfoContainer
+                            onViewChannel={handleChangeViewChannel}
+                            socket={socket}
+                            onOpenInfoBlock={() => setIsOpenInfo(true)}
+                          />
+                        )}
+                      </div>
+                      <button
+                        onClick={() => setOpenDrawerInfo(false)}
+                        className="absolute top-3 left-3 p-2 rounded-md hover:bg-slate-100"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  )}
 
                   {visibleNews ? (
                     <GroupNews
@@ -763,26 +796,19 @@ function Chat({ socket, idNewMessage }) {
                     />
                   )}
                 </div>
-              </Col>
+              </div>
             </>
           ) : (
-            <Col
-              span={18}
-              xl={{ span: 18 }}
-              lg={{ span: 18 }}
-              md={{ span: 17 }}
-              sm={{ span: 0 }}
-              xs={{ span: 0 }}
-            >
-              <div className="landing-app">
-                <div className="title-welcome">
-                  <div className="title-welcome-heading">
+            <div className="flex-1">
+              <div className="landing-app p-8">
+                <div className="title-welcome text-center">
+                  <div className="title-welcome-heading text-2xl font-semibold mb-2">
                     <span>
                       Chào mừng đến với <b>Meetdy.com</b>
                     </span>
                   </div>
 
-                  <div className="title-welcome-detail">
+                  <div className="title-welcome-detail text-slate-600">
                     <span>
                       Khám phá những tiện ích hỗ trợ làm việc và trò chuyện cùng
                       người thân, bạn bè được tối ưu hoá cho máy tính của bạn.
@@ -790,15 +816,15 @@ function Chat({ socket, idNewMessage }) {
                   </div>
                 </div>
 
-                <div className="carousel-slider">
+                <div className="carousel-slider mt-6">
                   <Slider />
                 </div>
               </div>
-            </Col>
+            </div>
           )}
-        </Row>
+        </div>
       </div>
-    </Spin>
+    </>
   );
 }
 

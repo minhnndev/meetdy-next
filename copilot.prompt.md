@@ -7,7 +7,11 @@ from **Ant Design (antd)** to **shadcn/ui** with **Tailwind CSS**.
 
 - Replace Ant Design components with shadcn/ui equivalents
 - Keep UI clean, minimal, and modern
+- Refactor code to use Tailwind CSS utility classes (remove className existed and refer UI design app Chat for styles)
 - Do NOT introduce unnecessary abstractions
+- Maintain or improve code readability
+- Ensure full TypeScript type safety
+- Follow best practices for React and modern frontend development
 - Code must be production-ready
 - Suitable for **live coding / video recording**
 
