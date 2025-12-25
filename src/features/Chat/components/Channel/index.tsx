@@ -1,38 +1,33 @@
-import { CaretDownOutlined, NumberOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { ChevronDown, Hash, Plus } from 'lucide-react';
+import { toast } from 'sonner';
 
 import ChannelItem from '../ChannelItem';
-import { Input, message, Modal } from 'antd';
 import channelApi from '@/api/channelApi';
-import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchListMessages,
   getLastViewOfMembers,
   setCurrentChannel,
 } from '@/features/Chat/slice/chatSlice';
 
-Channel.propTypes = {
-  onViewChannel: PropTypes.func,
-  data: PropTypes.array,
-  onOpenInfoBlock: PropTypes.func,
-};
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
-Channel.defaultProps = {
-  onViewChannel: null,
-  data: [],
-  onOpenInfoBlock: null,
-};
+interface ChannelProps {
+  onViewChannel?: () => void;
+  data?: any[];
+  onOpenInfoBlock?: () => void;
+}
 
-const styleIconDrop = {
-  transform: 'rotate(-90deg)',
-};
-
-const styleInteract = {
-  maxHeight: '0px',
-};
-
-function Channel({ onViewChannel, data, onOpenInfoBlock }) {
+function Channel({ onViewChannel, data = [], onOpenInfoBlock }: ChannelProps) {
   const [isDrop, setIsDrop] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const [valueInput, setValueInput] = useState('');
@@ -41,23 +36,18 @@ function Channel({ onViewChannel, data, onOpenInfoBlock }) {
     currentChannel,
     conversations,
     totalChannelNotify,
-  } = useSelector((state) => state.chat);
+  } = useSelector((state: any) => state.chat);
   const dispatch = useDispatch();
-
-  const handleViewChannel = () => {};
 
   const handleOnClick = () => {
     setIsDrop(!isDrop);
   };
 
   const handleViewAll = () => {
-    if (onViewChannel) {
-      onViewChannel();
-    }
-    if (onOpenInfoBlock) {
-      onOpenInfoBlock();
-    }
+    onViewChannel?.();
+    onOpenInfoBlock?.();
   };
+
   const handleAddChannel = () => {
     setIsVisible(true);
   };
@@ -65,10 +55,12 @@ function Channel({ onViewChannel, data, onOpenInfoBlock }) {
   const handleOk = async () => {
     try {
       await channelApi.addChannel(valueInput, currentConversation);
-      message.success('Tạo channel thành công');
+      toast.success('Tạo channel thành công');
       setIsVisible(false);
+      setValueInput('');
     } catch (error) {
       console.log(error);
+      toast.error('Tạo channel thất bại');
     }
   };
 
@@ -77,102 +69,109 @@ function Channel({ onViewChannel, data, onOpenInfoBlock }) {
     setValueInput('');
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValueInput(e.target.value);
   };
 
   const handleViewGeneralChannel = () => {
     dispatch(setCurrentChannel(''));
     dispatch(
-      fetchListMessages({ conversationId: currentConversation, size: 10 }),
+      fetchListMessages({ conversationId: currentConversation, size: 10 }) as any,
     );
-    dispatch(getLastViewOfMembers({ conversationId: currentConversation }));
+    dispatch(getLastViewOfMembers({ conversationId: currentConversation }) as any);
   };
 
+  const currentConvo = conversations.find((ele: any) => ele._id === currentConversation);
+
   return (
-    <div className="channel">
-      <div className="channel-header" onClick={handleOnClick}>
-        <div className="channel-header-title">
-          Kênh
+    <div className="py-2">
+      <button
+        onClick={handleOnClick}
+        className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <span>Kênh</span>
           {totalChannelNotify > 0 && (
-            <span className="total-channel-notify">
+            <span className="text-xs text-primary">
               ({totalChannelNotify} kênh có tin nhắn)
             </span>
           )}
         </div>
-
-        <div
-          className="channel-header-icon"
-          style={isDrop ? {} : styleIconDrop}
-        >
-          <CaretDownOutlined />
-        </div>
-      </div>
-
-      <div className="channel-interact" style={isDrop ? {} : styleInteract}>
-        <div
-          className={`channel-interact-amount ${
-            currentChannel ? '' : 'active'
-          }`}
-          onClick={handleViewGeneralChannel}
-        >
-          <div className="channel-interact-amount-icon">
-            <NumberOutlined />
-          </div>
-
-          <div className="channel-interact-amount-text">
-            <span>Kênh chung</span>
-          </div>
-
-          {conversations.find((ele) => ele._id === currentConversation)
-            .numberUnread > 0 && (
-            <div className="notify-amount">
-              {
-                conversations.find((ele) => ele._id === currentConversation)
-                  .numberUnread
-              }
-            </div>
-          )}
-        </div>
-
-        {data.map((ele, index) => {
-          if (index < 3) {
-            return (
-              <ChannelItem
-                key={index}
-                data={ele}
-                isActive={currentChannel === ele._id ? true : false}
-              />
-            );
-          }
-        })}
-
-        <div className="channel-interact-button">
-          <button onClick={handleAddChannel}>Thêm Channel</button>
-        </div>
-
-        <div className="channel-interact-button">
-          <button onClick={handleViewAll}>Xem Tất cả</button>
-        </div>
-      </div>
-
-      <Modal
-        title="Thêm Channel"
-        visible={isVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        okText="Tạo"
-        cancelText="Hủy"
-        okButtonProps={{ disabled: valueInput.trim().length === 0 }}
-      >
-        <Input
-          placeholder="Nhập tên channel"
-          allowClear
-          value={valueInput}
-          onChange={handleInputChange}
-          onEnter={handleOk}
+        <ChevronDown
+          className={`h-4 w-4 transition-transform ${!isDrop ? '-rotate-90' : ''}`}
         />
-      </Modal>
+      </button>
+
+      <div
+        className={`overflow-hidden transition-all ${isDrop ? 'max-h-96' : 'max-h-0'}`}
+      >
+        <button
+          onClick={handleViewGeneralChannel}
+          className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted/50 transition-colors ${
+            !currentChannel ? 'bg-primary/10 text-primary' : ''
+          }`}
+        >
+          <Hash className="h-4 w-4" />
+          <span>Kênh chung</span>
+          {currentConvo?.numberUnread > 0 && (
+            <span className="ml-auto bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full">
+              {currentConvo.numberUnread}
+            </span>
+          )}
+        </button>
+
+        {data.slice(0, 3).map((ele, index) => (
+          <ChannelItem
+            key={index}
+            data={ele}
+            isActive={currentChannel === ele._id}
+          />
+        ))}
+
+        <div className="px-3 py-2 space-y-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start text-muted-foreground"
+            onClick={handleAddChannel}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Thêm Channel
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start text-muted-foreground"
+            onClick={handleViewAll}
+          >
+            Xem tất cả
+          </Button>
+        </div>
+      </div>
+
+      <Dialog open={isVisible} onOpenChange={(open) => !open && handleCancel()}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Thêm Channel</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              placeholder="Nhập tên channel"
+              value={valueInput}
+              onChange={handleInputChange}
+              onKeyDown={(e) => e.key === 'Enter' && valueInput.trim() && handleOk()}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancel}>
+              Hủy
+            </Button>
+            <Button onClick={handleOk} disabled={valueInput.trim().length === 0}>
+              Tạo
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

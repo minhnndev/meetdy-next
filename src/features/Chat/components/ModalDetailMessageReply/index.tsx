@@ -1,33 +1,35 @@
-import { DownloadOutlined } from '@ant-design/icons';
-import { Image, Modal } from 'antd';
 import { useState } from 'react';
+import { Download } from 'lucide-react';
 import { defaultStyles, FileIcon } from 'react-file-icon';
 import parse from 'html-react-parser';
 
 import ModalVideoCustom from '@/components/ModalVideoCustom';
-import OverlayImage from '@/components/OverlayImage';
 import fileHelpers from '@/utils/fileHelpers';
 import PersonalIcon from '../PersonalIcon';
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
-ModalDetailMessageReply.defaultProps = {
-  onCancel: null,
-  data: null,
-};
+const VIDEO_LOGO = '/video-placeholder.png';
 
-function ModalDetailMessageReply({ visible, onCancel, data }) {
-  const { content, user, type, createdAt } = data;
+interface ModalDetailMessageReplyProps {
+  visible: boolean;
+  onCancel?: () => void;
+  data: any;
+}
+
+function ModalDetailMessageReply({ visible, onCancel, data }: ModalDetailMessageReplyProps) {
+  const { content, user, type, createdAt } = data || {};
   const [modalVisible, setModalVisible] = useState(false);
   const time = new Date(createdAt);
 
   const fileName = type === 'FILE' ? fileHelpers.getFileName(content) : '';
-  const fileExtension =
-    type === 'FILE' ? fileHelpers.getFileExtension(fileName) : '';
+  const fileExtension = type === 'FILE' ? fileHelpers.getFileExtension(fileName) : '';
 
   const handleCancel = () => {
-    console.log('asdfsdafas');
-    if (onCancel) {
-      onCancel();
-    }
+    onCancel?.();
   };
 
   const handleOnClickDownLoad = () => {
@@ -35,88 +37,86 @@ function ModalDetailMessageReply({ visible, onCancel, data }) {
   };
 
   return (
-    <Modal
-      visible={visible}
-      footer={null}
-      onCancel={handleCancel}
-      closable={false}
-    >
-      <div className="modal-detail-reply">
-        <div className="reply-info">
-          <PersonalIcon avatar={user?.avatar} name={user?.name} />
-
-          <div className="time-user">
-            <div className="reply-name">
-              Tên: <span>{user?.name}</span>
-            </div>
-
-            <div className="reply-time">
-              Gửi lúc:&nbsp;
-              <span>
-                {`0${time.getHours()}`.slice(-2)}:
-                {`0${time.getMinutes()}`.slice(-2)}
-              </span>
-              &nbsp;
-              <span>
-                {`0${time.getDate()}`.slice(-2)}/
-                {`0${time.getMonth()}`.slice(-2)}/{`${time.getFullYear()}`}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {type === 'TEXT' && <div className="reply-item">{content}</div>}
-
-        {type === 'IMAGE' && (
-          <div className="reply-item">
-            <Image src={content} preview={{ mask: <OverlayImage /> }} />
-          </div>
-        )}
-
-        {type === 'STICKER' && (
-          <div className="reply-item center">
-            <Image src={content} preview={{ mask: null, visible: false }} />
-          </div>
-        )}
-
-        {type === 'VIDEO' && (
-          <div className="reply-item smoker video">
-            <Image
-              src={VIDEO_LOGO}
-              preview={{ mask: null, visible: false }}
-              onClick={() => setModalVisible(true)}
-            />
-
-            <ModalVideoCustom
-              isVisible={modalVisible}
-              url={content}
-              onClose={() => setModalVisible(false)}
-            />
-          </div>
-        )}
-
-        {type === 'FILE' && (
-          <div className="file_info-wrapper-reply">
-            <div className="file_info">
-              <div className="file_info-icon">
-                <FileIcon
-                  extension={fileExtension}
-                  {...defaultStyles[fileExtension]}
-                />
+    <Dialog open={visible} onOpenChange={(open) => !open && handleCancel()}>
+      <DialogContent className="max-w-md">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <PersonalIcon avatar={user?.avatar} name={user?.name} dimension={48} />
+            <div>
+              <div className="font-medium">
+                Tên: <span>{user?.name}</span>
               </div>
-
-              <div className="file_info-name">{fileName}</div>
-            </div>
-
-            <div className="icon-download" onClick={handleOnClickDownLoad}>
-              <DownloadOutlined />
+              <div className="text-sm text-muted-foreground">
+                Gửi lúc:{' '}
+                <span>
+                  {`0${time.getHours()}`.slice(-2)}:
+                  {`0${time.getMinutes()}`.slice(-2)}
+                </span>{' '}
+                <span>
+                  {`0${time.getDate()}`.slice(-2)}/
+                  {`0${time.getMonth() + 1}`.slice(-2)}/{time.getFullYear()}
+                </span>
+              </div>
             </div>
           </div>
-        )}
 
-        {type === 'HTML' && <div className="reply-item">{parse(content)}</div>}
-      </div>
-    </Modal>
+          {type === 'TEXT' && (
+            <div className="p-3 bg-muted rounded-lg">{content}</div>
+          )}
+
+          {type === 'IMAGE' && (
+            <div className="rounded-lg overflow-hidden">
+              <img src={content} alt="" className="w-full h-auto" />
+            </div>
+          )}
+
+          {type === 'STICKER' && (
+            <div className="flex justify-center">
+              <img src={content} alt="" className="max-w-32" />
+            </div>
+          )}
+
+          {type === 'VIDEO' && (
+            <div className="relative">
+              <img
+                src={VIDEO_LOGO}
+                alt=""
+                className="w-full cursor-pointer opacity-50"
+                onClick={() => setModalVisible(true)}
+              />
+              <ModalVideoCustom
+                isVisible={modalVisible}
+                url={content}
+                onClose={() => setModalVisible(false)}
+              />
+            </div>
+          )}
+
+          {type === 'FILE' && (
+            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10">
+                  <FileIcon
+                    extension={fileExtension}
+                    {...(defaultStyles as any)[fileExtension]}
+                  />
+                </div>
+                <span className="text-sm truncate max-w-48">{fileName}</span>
+              </div>
+              <Button variant="ghost" size="icon" onClick={handleOnClickDownLoad}>
+                <Download className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+
+          {type === 'HTML' && (
+            <div className="p-3 bg-muted rounded-lg prose prose-sm max-w-none">
+              {parse(content)}
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

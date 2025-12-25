@@ -1,50 +1,37 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-
-import { Tabs } from 'antd';
-import { GiftOutlined, SmileOutlined } from '@ant-design/icons';
+import { Gift, Smile } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ListSticker from '../ListSticker';
 
-Sticker.propTypes = {
-  data: PropTypes.array,
-  onClose: PropTypes.func,
-  onScroll: PropTypes.func,
-};
+interface StickerProps {
+  data?: any[];
+  onClose?: () => void;
+  onScroll?: () => void;
+}
 
-Sticker.defaultProps = {
-  data: [],
-  onClose: null,
-  onScroll: null,
-};
-
-function Sticker({ data, onClose, onScroll }) {
+function Sticker({ data = [], onClose, onScroll }: StickerProps) {
   const handleOnClose = () => {
-    if (onClose) {
-      onClose();
-    }
+    onClose?.();
   };
 
-  const { TabPane } = Tabs;
-
-  function handleOnChange() {}
-
   return (
-    <div id="sticker">
-      <Tabs defaultActiveKey="1" onChange={handleOnChange}>
-        <TabPane
-          tab={
-            <span className="menu-item">
-              <GiftOutlined /> STICKER
-            </span>
-          }
-          key="1"
-        >
+    <div className="w-80 bg-background rounded-lg border shadow-lg">
+      <Tabs defaultValue="sticker" className="w-full">
+        <TabsList className="w-full rounded-none border-b bg-transparent h-auto p-0">
+          <TabsTrigger
+            value="sticker"
+            className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent py-3"
+          >
+            <Gift className="h-4 w-4 mr-2" />
+            STICKER
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="sticker" className="p-0 m-0">
           <ListSticker
             data={data}
             onClose={handleOnClose}
             onScroll={onScroll}
           />
-        </TabPane>
+        </TabsContent>
       </Tabs>
     </div>
   );

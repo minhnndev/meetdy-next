@@ -1,14 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { EditOutlined } from '@ant-design/icons';
-import { Modal, Input, message } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { Pencil } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'sonner';
 
 import ConversationAvatar from '../ConversationAvatar';
 import UploadAvatar from '@/components/UploadAvatar';
 import conversationApi from '@/api/conversationApi';
 import { updateNameOfConver } from '@/features/Chat/slice/chatSlice';
 
-import type { RootState, AppDispatch } from '@/store';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 type Props = {
   conversation?: {
@@ -22,8 +30,8 @@ type Props = {
 };
 
 export default function InfoNameAndThumbnail({ conversation = {} }: Props) {
-  const dispatch = useDispatch<AppDispatch>();
-  const { currentConversation } = useSelector((state: RootState) => state.chat);
+  const dispatch = useDispatch();
+  const { currentConversation } = useSelector((state: any) => state.chat);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [value, setValue] = useState<string>('');
@@ -44,7 +52,6 @@ export default function InfoNameAndThumbnail({ conversation = {} }: Props) {
     if (isModalVisible) {
       setIsClear(false);
     }
-    // reset file when conversation changes
     setFile(null);
   }, [conversation, isModalVisible]);
 
@@ -69,12 +76,8 @@ export default function InfoNameAndThumbnail({ conversation = {} }: Props) {
   const handleOk = async () => {
     setConfirmLoading(true);
     try {
-      // change name if changed
       if (refInitValue.current !== value && value.trim().length > 0) {
-        await conversationApi.changeNameConversation(
-          currentConversation,
-          value,
-        );
+        await conversationApi.changeNameConversation(currentConversation, value);
         dispatch(
           updateNameOfConver({
             conversationId: currentConversation,
@@ -83,63 +86,57 @@ export default function InfoNameAndThumbnail({ conversation = {} }: Props) {
         );
       }
 
-      // change avatar if present
       if (file) {
         const frmData = new FormData();
         frmData.append('file', file);
         await conversationApi.changeAvatarGroup(currentConversation, frmData);
       }
 
-      message.success('Cập nhật thông tin thành công');
+      toast.success('Cập nhật thông tin thành công');
     } catch (error) {
-      // silent fail as before
+      toast.error('Đã có lỗi xảy ra');
     } finally {
       setConfirmLoading(false);
       setIsModalVisible(false);
     }
   };
 
+  const isButtonDisabled =
+    (refInitValue?.current === value && !file) || value.trim().length === 0;
+
   return (
-    <div className="info_name-and-thumbnail">
-      <Modal
-        title="Cập nhật cuộc trò chuyện"
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        okText="Thay đổi"
-        cancelText="Hủy"
-        closable={false}
-        confirmLoading={confirmLoading}
-        okButtonProps={{
-          disabled:
-            (refInitValue?.current === value && !file) ||
-            value.trim().length === 0,
-        }}
-      >
-        <div className="update-profile_wrapper">
-          <div className="update-profile_upload">
+    <div className="flex flex-col items-center py-6 px-4">
+      <Dialog open={isModalVisible} onOpenChange={(open) => !open && handleCancel()}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Cập nhật cuộc trò chuyện</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-4">
             <UploadAvatar
               avatar={
-                typeof conversation?.avatar === 'string'
-                  ? conversation?.avatar
-                  : ''
+                typeof conversation?.avatar === 'string' ? conversation?.avatar : ''
               }
               getFile={handleGetfile}
               isClear={isClear}
             />
-          </div>
-
-          <div className="update-profile_input">
             <Input
               placeholder="Nhập tên mới"
               onChange={handleInputChange}
               value={value}
             />
           </div>
-        </div>
-      </Modal>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancel}>
+              Hủy
+            </Button>
+            <Button onClick={handleOk} disabled={isButtonDisabled || confirmLoading}>
+              {confirmLoading ? 'Đang cập nhật...' : 'Thay đổi'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-      <div className="info-thumbnail">
+      <div className="mb-3">
         <ConversationAvatar
           isGroupCard={true}
           totalMembers={conversation?.totalMembers}
@@ -150,15 +147,17 @@ export default function InfoNameAndThumbnail({ conversation = {} }: Props) {
         />
       </div>
 
-      <div className="info-name-and-button">
-        <div className="info-name">
-          <span>{conversation?.name}</span>
-        </div>
-
+      <div className="flex items-center gap-2">
+        <span className="font-semibold text-lg">{conversation?.name}</span>
         {conversation?.type && (
-          <div className="info-button">
-            <EditOutlined onClick={handleOnClick} />
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={handleOnClick}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
         )}
       </div>
     </div>

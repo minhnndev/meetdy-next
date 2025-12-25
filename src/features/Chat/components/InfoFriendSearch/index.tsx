@@ -1,148 +1,88 @@
-import {
-  ExclamationCircleOutlined,
-  KeyOutlined,
-  UserDeleteOutlined,
-  UserSwitchOutlined,
-} from '@ant-design/icons';
-import { Dropdown, Menu, message, Modal, Tag } from 'antd';
-import conversationApi from '@/api/conversationApi';
-import PropTypes from 'prop-types';
-import React from 'react';
-import Scrollbars from 'react-custom-scrollbars-2';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Key, UserMinus, UserCog } from 'lucide-react';
+import { toast } from 'sonner';
+import Scrollbars from 'react-custom-scrollbars-2';
+
+import conversationApi from '@/api/conversationApi';
 import InfoTitle from '../InfoTitle';
 import PersonalIcon from '../PersonalIcon';
 
-InfoFriendSearch.propTypes = {
-  onBack: PropTypes.func,
-  members: PropTypes.array,
-  onChoseUser: PropTypes.func,
-};
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 
-InfoFriendSearch.defaultProps = {
-  onBack: null,
-  members: [],
-  onChoseUser: null,
-};
+interface InfoFriendSearchProps {
+  onBack?: (value?: any) => void;
+  members?: any[];
+  onChoseUser?: (user: any) => void;
+}
 
-function InfoFriendSearch(props) {
-  const { onBack, members, onChoseUser } = props;
-  const { user } = useSelector((state) => state.global);
-  const { currentConversation, conversations } = useSelector(
-    (state) => state.chat,
-  );
-  const { confirm } = Modal;
+function InfoFriendSearch({ onBack, members = [], onChoseUser }: InfoFriendSearchProps) {
+  const { user } = useSelector((state: any) => state.global);
+  const { currentConversation, conversations } = useSelector((state: any) => state.chat);
   const dispatch = useDispatch();
-  const converData = conversations.find(
-    (ele) => ele._id === currentConversation,
-  );
-  const { managerIds, leaderId } = converData;
+  const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
 
-  const handleOnBack = (value) => {
-    if (onBack) {
-      onBack(value);
-    }
+  const converData = conversations.find((ele: any) => ele._id === currentConversation);
+  const { managerIds, leaderId } = converData || { managerIds: [], leaderId: '' };
+
+  const handleOnBack = (value?: any) => {
+    onBack?.(value);
   };
 
-  const handleClickUser = (ele) => {
-    if (onChoseUser) {
-      onChoseUser(ele);
-    }
+  const handleClickUser = (ele: any) => {
+    onChoseUser?.(ele);
   };
 
-  // confirm xóa thành viên
-
-  function showConfirm(value) {
-    confirm({
-      title: 'Cảnh báo',
-      icon: <ExclamationCircleOutlined />,
-      content: (
-        <span>
-          Bạn có thực sự muốn xóa <b>{value.name}</b> khỏi nhóm{' '}
-        </span>
-      ),
-      okText: 'Đồng ý',
-      cancelText: 'Hủy',
-      onOk() {
-        removeMember(value._id);
-      },
-    });
-  }
-
-  // Call api xóa thành viên
-
-  async function removeMember(idMember) {
+  const removeMember = async (idMember: string) => {
     try {
       await conversationApi.deleteMember(currentConversation, idMember);
-      message.success('Xóa thành công');
+      toast.success('Xóa thành công');
     } catch (error) {
-      message.error('Xóa thất bại');
+      toast.error('Xóa thất bại');
     }
-  }
-
-  const handleInteractMember = async ({ _, key }, value) => {
-    if (key === '1') {
-      console.log('values', value);
-      showConfirm(value);
-    }
-    if (key === '2') {
-      handleAddLeader(value._id);
-    }
-
-    if (key === '3') {
-      handleDeleteLeader(value._id);
-    }
+    setDeleteConfirm(null);
   };
 
-  const handleAddLeader = async (id) => {
+  const handleAddLeader = async (id: string) => {
     try {
       await conversationApi.addManagerGroup(currentConversation, [id]);
-      message.success('Thêm thành công');
+      toast.success('Thêm thành công');
     } catch (error) {
-      message.error('Thêm thất bại');
+      toast.error('Thêm thất bại');
     }
   };
 
-  const handleDeleteLeader = async (id) => {
+  const handleDeleteLeader = async (id: string) => {
     try {
       await conversationApi.deleteManager(currentConversation, [id]);
-      message.success('Gỡ thành công');
+      toast.success('Gỡ thành công');
     } catch (error) {
-      message.error('Gỡ thất bại');
+      toast.error('Gỡ thất bại');
     }
   };
 
-  const menu = (value) => (
-    <Menu onClick={(e) => handleInteractMember(e, value)}>
-      {value._id !== user._id && (
-        <>
-          {(leaderId === user._id ||
-            managerIds.find((ele) => ele === user._id)) && (
-            <Menu.Item icon={<UserDeleteOutlined />} key="1" danger>
-              <span className="menu-icon">Xóa khỏi nhóm</span>
-            </Menu.Item>
-          )}
+  const isLeader = leaderId === user._id;
+  const isManager = managerIds.find((ele: string) => ele === user._id);
 
-          {leaderId === user._id &&
-            !managerIds.find((ele) => ele === value._id) && (
-              <Menu.Item icon={<KeyOutlined />} key="2">
-                <span className="menu-icon">Thêm phó nhóm </span>
-              </Menu.Item>
-            )}
-
-          {leaderId === user._id &&
-            managerIds.find((ele) => ele === value._id) && (
-              <Menu.Item icon={<UserSwitchOutlined />} key="3">
-                <span className="menu-icon">Gỡ quyền phó nhóm </span>
-              </Menu.Item>
-            )}
-        </>
-      )}
-    </Menu>
-  );
   return (
-    <div id="info_friend-search">
-      <div className="info_friend-search--title">
+    <div className="flex flex-col h-full">
+      <div className="border-b">
         <InfoTitle
           isBack={true}
           text="Thành viên"
@@ -155,70 +95,90 @@ function InfoFriendSearch(props) {
         autoHide={true}
         autoHideTimeout={1000}
         autoHideDuration={200}
-        style={{ width: '100%' }}
+        style={{ width: '100%', flex: 1 }}
       >
-        <div className="info_friend-search-content">
-          <div className="info_friend-searchbar-and-title">
-            <div className="info_friend-search-title">
-              <strong>{`Danh sách thành viên (${members.length})`}</strong>
-            </div>
-            {/* 
-            <div className="info_friend-searchbar">
-                <Input placeholder="Tìm kiếm thành viên" prefix={<SearchOutlined />} />
-            </div> */}
+        <div className="p-4">
+          <h3 className="text-sm font-semibold mb-3">
+            Danh sách thành viên ({members.length})
+          </h3>
 
-            <div className="info_friend-list">
-              {members.map((ele, index) => (
-                <Dropdown
-                  key={index}
-                  overlay={() => menu(ele)}
-                  trigger={['contextMenu']}
-                >
-                  <div
-                    className="info_friend-item"
+          <div className="space-y-1">
+            {members.map((ele, index) => (
+              <ContextMenu key={index}>
+                <ContextMenuTrigger asChild>
+                  <button
                     onClick={() => handleClickUser(ele)}
+                    className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors"
                   >
-                    <div className="info_friend-item-leftside">
-                      <div className="info_friend-item-leftside-avatar">
-                        <PersonalIcon
-                          avatar={ele.avatar}
-                          dimension={40}
-                          name={ele.name}
-                          color={ele.avatarColor}
-                          isHost={
-                            ele._id === leaderId ||
-                            managerIds.find(
-                              (managerId) => managerId === ele._id,
-                            )
-                          }
-                        />
-                      </div>
-
-                      <div className="info_friend-item-leftside-name">
-                        <strong>{ele.name}</strong>
-                        {/* <span>Trưởng Nhóm</span> */}
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <PersonalIcon
+                        avatar={ele.avatar}
+                        dimension={40}
+                        name={ele.name}
+                        color={ele.avatarColor}
+                        isHost={
+                          ele._id === leaderId ||
+                          managerIds.find((managerId: string) => managerId === ele._id)
+                        }
+                      />
+                      <span className="font-medium text-sm">{ele.name}</span>
                     </div>
-                    <div
-                      className={`info_friend-item-rightside ${
-                        ele._id === user._id && 'hidden'
-                      } `}
-                    >
-                      {ele.isFriend ? (
-                        <Tag color="#87d068">Bạn bè</Tag>
-                      ) : (
-                        <Tag color="#f5d003">Người lạ</Tag>
+                    {ele._id !== user._id && (
+                      <Badge variant={ele.isFriend ? 'default' : 'secondary'}>
+                        {ele.isFriend ? 'Bạn bè' : 'Người lạ'}
+                      </Badge>
+                    )}
+                  </button>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                  {ele._id !== user._id && (
+                    <>
+                      {(isLeader || isManager) && (
+                        <ContextMenuItem
+                          onClick={() => setDeleteConfirm(ele)}
+                          className="text-destructive focus:text-destructive"
+                        >
+                          <UserMinus className="h-4 w-4 mr-2" />
+                          Xóa khỏi nhóm
+                        </ContextMenuItem>
                       )}
-                    </div>
-                  </div>
-                </Dropdown>
-              ))}
-              {/* 
-                            {tempMembers} */}
-            </div>
+                      {isLeader && !managerIds.find((id: string) => id === ele._id) && (
+                        <ContextMenuItem onClick={() => handleAddLeader(ele._id)}>
+                          <Key className="h-4 w-4 mr-2" />
+                          Thêm phó nhóm
+                        </ContextMenuItem>
+                      )}
+                      {isLeader && managerIds.find((id: string) => id === ele._id) && (
+                        <ContextMenuItem onClick={() => handleDeleteLeader(ele._id)}>
+                          <UserCog className="h-4 w-4 mr-2" />
+                          Gỡ quyền phó nhóm
+                        </ContextMenuItem>
+                      )}
+                    </>
+                  )}
+                </ContextMenuContent>
+              </ContextMenu>
+            ))}
           </div>
         </div>
       </Scrollbars>
+
+      <AlertDialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cảnh báo</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có thực sự muốn xóa <strong>{deleteConfirm?.name}</strong> khỏi nhóm?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={() => removeMember(deleteConfirm?._id)}>
+              Đồng ý
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

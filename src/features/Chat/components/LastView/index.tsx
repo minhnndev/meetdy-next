@@ -1,27 +1,29 @@
-import { Avatar } from 'antd';
 import AvatarCustom from '@/components/AvatarCustom';
-import PropTypes from 'prop-types';
-import React from 'react';
 
-LastView.propTypes = {
-  lastView: PropTypes.array,
-};
+interface LastViewProps {
+  lastView?: any[];
+}
 
-LastView.defaultProps = {
-  lastView: [],
-};
+function LastView({ lastView = [] }: LastViewProps) {
+  const displayCount = Math.min(lastView.length, 5);
+  const extraCount = lastView.length - displayCount;
 
-function LastView({ lastView }) {
   return (
-    <Avatar.Group
-      maxCount={5}
-      size="small"
-      maxStyle={{ color: '#f56a00', backgroundColor: '#fde3cf' }}
-    >
-      {lastView.map((ele, index) => (
-        <AvatarCustom key={index} src={ele.avatar} name={ele.name} />
+    <div className="flex items-center -space-x-2">
+      {lastView.slice(0, displayCount).map((ele, index) => (
+        <div
+          key={index}
+          className="relative inline-block ring-2 ring-background rounded-full"
+        >
+          <AvatarCustom src={ele.avatar} name={ele.name} size={24} />
+        </div>
       ))}
-    </Avatar.Group>
+      {extraCount > 0 && (
+        <div className="relative flex items-center justify-center w-6 h-6 text-xs font-medium text-orange-600 bg-orange-100 rounded-full ring-2 ring-background">
+          +{extraCount}
+        </div>
+      )}
+    </div>
   );
 }
 

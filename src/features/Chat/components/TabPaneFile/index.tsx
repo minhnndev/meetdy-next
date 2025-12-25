@@ -1,150 +1,112 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Col, Row, Select, DatePicker } from 'antd';
-import {
-  FileExcelFilled,
-  FilePdfFilled,
-  FilePptFilled,
-  FileWordFilled,
-} from '@ant-design/icons';
+import { FileSpreadsheet, FileText, FileType, Presentation } from 'lucide-react';
 import PersonalIcon from '../PersonalIcon';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import { useState } from 'react';
+import { DateRange } from 'react-day-picker';
 
-const { Option } = Select;
+function TabPaneFile() {
+  const [date, setDate] = useState<DateRange | undefined>();
 
-TabPaneFile.propTypes = {};
-
-function TabPaneFile(props) {
-  const { RangePicker } = DatePicker;
-  const dateFormat = 'DD/MM/YYYY';
-
-  const handleDatePickerChange = (date, dateString) => {
-    console.log('date', date);
-    console.log('date String', dateString);
+  const handleDatePickerChange = (range: DateRange | undefined) => {
+    setDate(range);
+    if (range?.from && range?.to) {
+      console.log('date range', format(range.from, 'dd/MM/yyyy'), format(range.to, 'dd/MM/yyyy'));
+    }
   };
 
-  const handleChange = (value) => {
+  const handleChange = (value: string) => {
     console.log(`selected ${value}`);
   };
 
-  function onSearch(val) {
-    console.log('search:', val);
-  }
-
   return (
-    <div id="tab-pane-file">
-      <Row gutter={[16, 8]}>
-        <Col span={8}>
-          <Select
-            dropdownMatchSelectWidth={false}
-            optionLabelProp="label"
-            style={{ width: '100%' }}
-            onChange={handleChange}
-            placeholder="Loại"
-            optionFilterProp="children"
-            // onSearch={onSearch}
-            filterOption={(input, option) =>
-              option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-            filterSort={(optionA, optionB) =>
-              optionA.children
-                .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
-            }
-          >
-            <Option value="1" label="Hoàng Hạ Xuyên">
-              <div className="option-item">
-                <div className="icon-user-item">
-                  <FilePdfFilled />
-                </div>
-
-                <div className="name-user-item">PDF</div>
+    <div className="space-y-3 p-4">
+      <div className="grid grid-cols-2 gap-3">
+        <Select onValueChange={handleChange}>
+          <SelectTrigger>
+            <SelectValue placeholder="Loại" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-red-500" />
+                <span>PDF</span>
               </div>
-            </Option>
-
-            <Option value="2" label="Word">
-              <div className="option-item">
-                <div className="icon-user-item">
-                  <FileWordFilled />
-                </div>
-
-                <div className="name-user-item">Word</div>
+            </SelectItem>
+            <SelectItem value="2">
+              <div className="flex items-center gap-2">
+                <FileType className="h-4 w-4 text-blue-500" />
+                <span>Word</span>
               </div>
-            </Option>
-
-            <Option value="3" label="PowerPoint">
-              <div className="option-item">
-                <div className="icon-user-item">
-                  <FilePptFilled />
-                </div>
-
-                <div className="name-user-item">PowerPoint</div>
+            </SelectItem>
+            <SelectItem value="3">
+              <div className="flex items-center gap-2">
+                <Presentation className="h-4 w-4 text-orange-500" />
+                <span>PowerPoint</span>
               </div>
-            </Option>
-
-            <Option value="4" label="Excel">
-              <div className="option-item">
-                <div className="icon-user-item">
-                  <FileExcelFilled />
-                </div>
-
-                <div className="name-user-item">Excel</div>
+            </SelectItem>
+            <SelectItem value="4">
+              <div className="flex items-center gap-2">
+                <FileSpreadsheet className="h-4 w-4 text-green-500" />
+                <span>Excel</span>
               </div>
-            </Option>
-          </Select>
-        </Col>{' '}
-        <Col span={8}>
-          <Select
-            dropdownMatchSelectWidth={false}
-            optionLabelProp="label"
-            showSearch
-            style={{ width: '100%' }}
-            onChange={handleChange}
-            placeholder="Người gửi"
-            optionFilterProp="children"
-            onSearch={onSearch}
-            filterOption={(input, option) =>
-              option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-            filterSort={(optionA, optionB) =>
-              optionA.children
-                .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
-            }
-          >
-            <Option
-              value="1"
-              title="ádkljfklajskldjflkjaklsdf"
-              label="Hoàng Hạ Xuyên"
-            >
-              <div className="option-item">
-                <div className="icon-user-item">
-                  <PersonalIcon dimension={24} />
-                </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
 
-                <div className="name-user-item">Hoàng Hạ Xuyên</div>
+        <Select onValueChange={handleChange}>
+          <SelectTrigger>
+            <SelectValue placeholder="Người gửi" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">
+              <div className="flex items-center gap-2">
+                <PersonalIcon dimension={24} />
+                <span>Hoàng Hạ Xuyên</span>
               </div>
-            </Option>
-          </Select>
-        </Col>
-        {/* <Col span={8}>
-                    <Select
-                        style={{ width: '100%' }}
-                        onChange={handleChange}
-                        placeholder='Ngày gửi'>
-                        <Option value={1}>Trong vòng 1 tuần</Option>
-                        <Option value={2}>Trong vòng 1 tháng</Option>
-                        <Option value={3}>Trong vòng 3 tháng </Option>
-                    </Select>
-                </Col> */}
-        <Col span={24}>
-          <RangePicker
-            style={{ width: '100%' }}
-            placeholder={['Từ ngày', 'Đến ngày']}
-            format={dateFormat}
-            onChange={handleDatePickerChange}
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="w-full justify-start text-left font-normal">
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date?.from ? (
+              date.to ? (
+                <>
+                  {format(date.from, 'dd/MM/yyyy')} - {format(date.to, 'dd/MM/yyyy')}
+                </>
+              ) : (
+                format(date.from, 'dd/MM/yyyy')
+              )
+            ) : (
+              <span>Chọn khoảng thời gian</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            initialFocus
+            mode="range"
+            defaultMonth={date?.from}
+            selected={date}
+            onSelect={handleDatePickerChange}
+            numberOfMonths={2}
           />
-        </Col>
-      </Row>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }

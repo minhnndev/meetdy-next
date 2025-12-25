@@ -1,26 +1,19 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import ImageItem from '../ImageItem';
-
-import { Image } from 'antd';
 import ModalVideoCustom from '@/components/ModalVideoCustom';
 import ThumbnailCustom from '@/components/ThumbnailCustom';
-ContentTabPaneMedia.propTypes = {
-  items: PropTypes.array,
-  type: PropTypes.string,
-};
+import { Image } from '@/components/ui/image';
 
-ContentTabPaneMedia.defaultProps = {
-  items: [],
-  type: 'image',
-};
+interface ContentTabPaneMediaProps {
+  items?: any[];
+  type?: string;
+}
 
-function ContentTabPaneMedia(props) {
-  const { items, type } = props;
+function ContentTabPaneMedia({ items = [], type = 'image' }: ContentTabPaneMediaProps) {
   const [visible, setVisible] = useState(false);
   const [currentVideo, setCurrentVideo] = useState('');
 
-  const handleVisibleModal = (url) => {
+  const handleVisibleModal = (url: string) => {
     setVisible(true);
     setCurrentVideo(url);
   };
@@ -31,34 +24,32 @@ function ContentTabPaneMedia(props) {
   };
 
   return (
-    <div id="content-tabpane-media-wrapper">
-      <div className="item-in-archive-media">
-        <div className="list-item-sent">
-          {type === 'video' ? (
-            <>
-              {items.map((ele, index) => (
-                <ThumbnailCustom
-                  key={index}
-                  url={ele.content}
-                  onVisibleVideoModal={handleVisibleModal}
-                  height={110}
-                  width={110}
-                />
-              ))}
-            </>
-          ) : (
-            <Image.PreviewGroup>
-              {items.map((itemEle, index) => (
-                <ImageItem
-                  key={index}
-                  url={itemEle.content}
-                  type={type}
-                  onVisibleVideoModal={handleVisibleModal}
-                />
-              ))}
-            </Image.PreviewGroup>
-          )}
-        </div>
+    <div className="p-4">
+      <div className="grid grid-cols-3 gap-2">
+        {type === 'video' ? (
+          <>
+            {items.map((ele, index) => (
+              <ThumbnailCustom
+                key={index}
+                url={ele.content}
+                onVisibleVideoModal={handleVisibleModal}
+                height={110}
+                width={110}
+              />
+            ))}
+          </>
+        ) : (
+          <>
+            {items.map((itemEle, index) => (
+              <ImageItem
+                key={index}
+                url={itemEle.content}
+                type={type}
+                onVisibleVideoModal={handleVisibleModal}
+              />
+            ))}
+          </>
+        )}
       </div>
 
       <ModalVideoCustom

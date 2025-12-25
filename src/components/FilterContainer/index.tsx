@@ -1,20 +1,26 @@
-import { Tabs } from 'antd';
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ConverMultiSearch from '@/components/ConverMultiSearch';
 import ConverPersonalSearch from '@/components/ConverPersonalSearch';
 
-function FilterContainer({ dataMulti = [], dataSingle = [] }) {
-  const { TabPane } = Tabs;
+interface FilterContainerProps {
+  dataMulti?: any[];
+  dataSingle?: any[];
+}
 
+function FilterContainer({ dataMulti = [], dataSingle = [] }: FilterContainerProps) {
   return (
-    <div className="filter-container">
-      <Tabs defaultActiveKey="1">
-        <TabPane tab="Cá nhân" key="1">
+    <div className="w-full">
+      <Tabs defaultValue="personal" className="w-full">
+        <TabsList className="w-full grid grid-cols-2">
+          <TabsTrigger value="personal">Cá nhân</TabsTrigger>
+          <TabsTrigger value="group">Nhóm</TabsTrigger>
+        </TabsList>
+        <TabsContent value="personal" className="mt-2">
           <ConverPersonalSearch data={dataSingle} />
-        </TabPane>
-        <TabPane tab="Nhóm" key="2">
+        </TabsContent>
+        <TabsContent value="group" className="mt-2">
           <ConverMultiSearch data={dataMulti} />
-        </TabPane>
+        </TabsContent>
       </Tabs>
     </div>
   );

@@ -1,85 +1,76 @@
-import { Modal } from 'antd';
-import PropTypes from 'prop-types';
-import React from 'react';
 import { useSelector } from 'react-redux';
 import PersonalIcon from '../PersonalIcon';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
-ModalDetailVote.propTypes = {
-  visible: PropTypes.bool.isRequired,
-  onCancel: PropTypes.func,
-  data: PropTypes.array,
-};
+interface ModalDetailVoteProps {
+  visible: boolean;
+  onCancel?: () => void;
+  data?: any[];
+}
 
-ModalDetailVote.defaultProps = {
-  onCancel: null,
-  data: [],
-  onShowDetail: null,
-};
-
-function ModalDetailVote({ visible, onCancel, data }) {
-  const { memberInConversation } = useSelector((state) => state.chat);
+function ModalDetailVote({ visible, onCancel, data = [] }: ModalDetailVoteProps) {
+  const { memberInConversation } = useSelector((state: any) => state.chat);
 
   const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
-    }
+    onCancel?.();
   };
 
   return (
-    <Modal
-      title="Chi tiết bình chọn"
-      visible={visible}
-      footer={null}
-      onCancel={handleCancel}
-    >
-      <div className="detail-vote-wrapper">
-        {data.map((ele, index) => {
-          if (ele.userIds.length > 0) {
-            return (
-              <div className="detail-vote_item" key={index}>
-                <span className="detail-vote_option">
-                  {ele.name} ({ele.userIds.length})
-                </span>
-                <div className="detail-vote_list-user">
-                  {ele.userIds.map((ele, index) => {
-                    const user = memberInConversation.find(
-                      (member) => member._id === ele,
-                    );
+    <Dialog open={visible} onOpenChange={(open) => !open && handleCancel()}>
+      <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Chi tiết bình chọn</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          {data.map((ele, index) => {
+            if (ele.userIds.length > 0) {
+              return (
+                <div key={index} className="space-y-2">
+                  <div className="font-medium text-sm">
+                    {ele.name} ({ele.userIds.length})
+                  </div>
+                  <div className="space-y-1">
+                    {ele.userIds.map((userId: string, idx: number) => {
+                      const user = memberInConversation.find(
+                        (member: any) => member._id === userId,
+                      );
 
-                    if (user) {
-                      return (
-                        <div className="detail-vote_user-item" key={index}>
-                          <div className="detail-vote_avatar">
+                      if (user) {
+                        return (
+                          <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
                             <PersonalIcon
                               name={user?.name}
                               avatar={user?.avatar}
+                              dimension={32}
                             />
+                            <span className="text-sm">{user?.name}</span>
                           </div>
-
-                          <div className="detail-vote_name">{user?.name}</div>
-                        </div>
-                      );
-                    } else {
-                      return (
-                        <div className="detail-vote_user-item" key={index}>
-                          <div className="detail-vote_avatar">
-                            <PersonalIcon noneUser={true} />
+                        );
+                      } else {
+                        return (
+                          <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
+                            <PersonalIcon noneUser={true} dimension={32} />
+                            <span className="text-sm text-muted-foreground">
+                              Đã rời nhóm
+                            </span>
                           </div>
-
-                          <div className="detail-vote_name leave">
-                            Đã rời nhóm
-                          </div>
-                        </div>
-                      );
-                    }
-                  })}
+                        );
+                      }
+                    })}
+                  </div>
                 </div>
-              </div>
-            );
-          }
-        })}
-      </div>
-    </Modal>
+              );
+            }
+            return null;
+          })}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

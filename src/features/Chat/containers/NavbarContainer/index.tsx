@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  ContactsOutlined,
-  LockOutlined,
-  LogoutOutlined,
-  MessageOutlined,
-  SettingOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+  MessageSquare,
+  Users,
+  Settings,
+  Lock,
+  LogOut,
+  User,
+} from 'lucide-react';
 
 import {
   Popover,
@@ -24,7 +24,11 @@ import ModalChangePassword from '@/components/ModalChangePassword';
 import ModalUpdateProfile from '@/features/Chat/components/ModalUpdateProfile';
 import PersonalIcon from '@/features/Chat/components/PersonalIcon';
 
-export default function NavbarContainer({ onSaveCodeRevoke }) {
+interface NavbarContainerProps {
+  onSaveCodeRevoke?: any;
+}
+
+export default function NavbarContainer({ onSaveCodeRevoke }: NavbarContainerProps) {
   const dispatch = useDispatch();
   const location = useLocation();
 
@@ -64,17 +68,17 @@ export default function NavbarContainer({ onSaveCodeRevoke }) {
     <div className="flex flex-col w-40">
       <button
         onClick={() => setIsModalUpdateProfileVisible(true)}
-        className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-md"
+        className="flex items-center gap-2 px-3 py-2 hover:bg-muted rounded-md transition-colors"
       >
-        <UserOutlined />
+        <User className="h-4 w-4" />
         <span>Tài khoản</span>
       </button>
 
       <button
         onClick={handleLogout}
-        className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-md"
+        className="flex items-center gap-2 px-3 py-2 hover:bg-muted rounded-md transition-colors text-destructive"
       >
-        <LogoutOutlined />
+        <LogOut className="h-4 w-4" />
         <span>Đăng xuất</span>
       </button>
     </div>
@@ -106,18 +110,18 @@ export default function NavbarContainer({ onSaveCodeRevoke }) {
 
           <Link to="/chat">
             <li
-              className={`flex items-center justify-center h-10 w-10 rounded-xl cursor-pointer transition 
+              className={`flex items-center justify-center h-10 w-10 rounded-xl cursor-pointer transition-colors
               ${
                 checkCurrentPage('MESSAGE')
-                  ? 'bg-blue-100 text-blue-600'
-                  : 'hover:bg-gray-100'
+                  ? 'bg-primary/10 text-primary'
+                  : 'hover:bg-muted'
               }`}
               onClick={() => handleSetTabActive(1)}
             >
               <div className="relative">
-                <MessageOutlined />
+                <MessageSquare className="h-5 w-5" />
                 {toTalUnread > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full">
+                  <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs px-1.5 rounded-full">
                     {toTalUnread}
                   </span>
                 )}
@@ -127,18 +131,18 @@ export default function NavbarContainer({ onSaveCodeRevoke }) {
 
           <Link to="/chat/friends">
             <li
-              className={`flex items-center justify-center h-10 w-10 rounded-xl cursor-pointer transition 
+              className={`flex items-center justify-center h-10 w-10 rounded-xl cursor-pointer transition-colors
               ${
                 checkCurrentPage('FRIEND')
-                  ? 'bg-blue-100 text-blue-600'
-                  : 'hover:bg-gray-100'
+                  ? 'bg-primary/10 text-primary'
+                  : 'hover:bg-muted'
               }`}
               onClick={() => handleSetTabActive(2)}
             >
               <div className="relative">
-                <ContactsOutlined />
+                <Users className="h-5 w-5" />
                 {amountNotify > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 rounded-full">
+                  <span className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs px-1.5 rounded-full">
                     {amountNotify}
                   </span>
                 )}
@@ -153,17 +157,17 @@ export default function NavbarContainer({ onSaveCodeRevoke }) {
               <PopoverTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="h-10 w-10 flex items-center justify-center hover:bg-gray-100 rounded-xl"
+                  className="h-10 w-10 flex items-center justify-center hover:bg-muted rounded-xl"
                 >
-                  <SettingOutlined />
+                  <Settings className="h-5 w-5" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent side="right">
                 <button
                   onClick={() => setVisibleModalChangePassword(true)}
-                  className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-md"
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-muted rounded-md transition-colors w-full"
                 >
-                  <LockOutlined />
+                  <Lock className="h-4 w-4" />
                   <span>Đổi mật khẩu</span>
                 </button>
               </PopoverContent>
@@ -174,14 +178,14 @@ export default function NavbarContainer({ onSaveCodeRevoke }) {
 
       <ModalChangePassword
         visible={visibleModalChangePassword}
-        onSaveCodeRevoke={setVisibleModalChangePassword}
-        onCancel={undefined}
+        onSaveCodeRevoke={() => setVisibleModalChangePassword(false)}
+        onCancel={() => setVisibleModalChangePassword(false)}
       />
 
       <ModalUpdateProfile
         isVisible={isModalUpdateProfileVisible}
-        onCancel={setIsModalUpdateProfileVisible}
-        onOk={setIsModalUpdateProfileVisible}
+        onCancel={() => setIsModalUpdateProfileVisible(false)}
+        onOk={() => setIsModalUpdateProfileVisible(false)}
       />
     </div>
   );

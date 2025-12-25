@@ -1,34 +1,27 @@
-import { BarChartOutlined, NumberOutlined } from '@ant-design/icons';
-import { Tabs } from 'antd';
-import PropTypes from 'prop-types';
-import React from 'react';
+import { BarChart2, Hash } from 'lucide-react';
 import Scrollbars from 'react-custom-scrollbars-2';
 import { useSelector } from 'react-redux';
 import InfoTitle from '../InfoTitle';
 import ListChannel from '../ListChannel';
 import TabPaneVote from '../TabPaneVote';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-GroupNews.propTypes = {
-  onBack: PropTypes.func,
-  tabActive: PropTypes.number,
-};
-GroupNews.defaultProps = {
-  onBack: null,
-  tabActive: 0,
-};
+interface GroupNewsProps {
+  onBack?: () => void;
+  tabActive?: number;
+  onChange?: (key: string) => void;
+}
 
-function GroupNews({ onBack, tabActive, onChange }) {
-  const { TabPane } = Tabs;
-  const { channels } = useSelector((state) => state.chat);
+function GroupNews({ onBack, tabActive = 0, onChange }: GroupNewsProps) {
+  const { channels } = useSelector((state: any) => state.chat);
 
-  const handleChangeActiveKey = (key) => {
-    if (onChange) {
-      onChange(key);
-    }
+  const handleChangeActiveKey = (key: string) => {
+    onChange?.(key);
   };
+
   return (
-    <div className="group-news_wrapper">
-      <div className="group-news_header">
+    <div className="flex flex-col h-full">
+      <div className="border-b">
         <InfoTitle
           isBack={true}
           text="Bảng tin nhóm"
@@ -45,37 +38,28 @@ function GroupNews({ onBack, tabActive, onChange }) {
           height: 'calc(100vh - 68px)',
         }}
       >
-        <div className="group-news_body">
-          <div className="group-news_tabpane">
-            <Tabs
-              activeKey={tabActive.toString()}
-              onChange={handleChangeActiveKey}
-            >
-              <TabPane
-                tab={
-                  <span>
-                    <BarChartOutlined />
-                    Bình chọn
-                  </span>
-                }
-                key="1"
-              >
-                <TabPaneVote />
-              </TabPane>
-
-              <TabPane
-                tab={
-                  <span>
-                    <NumberOutlined />
-                    Kênh
-                  </span>
-                }
-                key="2"
-              >
-                <ListChannel data={channels} />
-              </TabPane>
-            </Tabs>
-          </div>
+        <div className="p-4">
+          <Tabs
+            defaultValue={tabActive.toString()}
+            onValueChange={handleChangeActiveKey}
+          >
+            <TabsList className="w-full grid grid-cols-2">
+              <TabsTrigger value="1" className="flex items-center gap-2">
+                <BarChart2 className="h-4 w-4" />
+                Bình chọn
+              </TabsTrigger>
+              <TabsTrigger value="2" className="flex items-center gap-2">
+                <Hash className="h-4 w-4" />
+                Kênh
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="1">
+              <TabPaneVote />
+            </TabsContent>
+            <TabsContent value="2">
+              <ListChannel data={channels} />
+            </TabsContent>
+          </Tabs>
         </div>
       </Scrollbars>
     </div>

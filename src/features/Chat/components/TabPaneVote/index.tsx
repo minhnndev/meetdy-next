@@ -1,17 +1,15 @@
-import { useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { ChevronDown } from 'lucide-react';
 
 import VoteMessage from '../MessageType/VoteMessage';
-import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
 import { fetchVotes, updateVote } from '@/features/Chat/slice/chatSlice';
-import { Button } from 'antd';
-import { CaretDownOutlined } from '@ant-design/icons';
 import voteApi from '@/api/voteApi';
+import { Button } from '@/components/ui/button';
 
 function TabPaneVote() {
   const { currentConversation, votes, totalPagesVote } = useSelector(
-    (state) => state.chat,
+    (state: any) => state.chat,
   );
 
   const dispatch = useDispatch();
@@ -29,18 +27,17 @@ function TabPaneVote() {
       fetchVotes({
         conversationId: currentConversation,
         ...query,
-      }),
+      }) as any,
     );
   }, [currentConversation]);
 
   const handleIncreasePage = async () => {
-    const respone = await voteApi.getVotes(
+    const response = await voteApi.getVotes(
       currentConversation,
       query.page + 1,
       query.size,
     );
-    const { data } = respone;
-    console.log(data);
+    const { data } = response;
     dispatch(updateVote([...votes, ...data]));
 
     setQuery({
@@ -50,20 +47,20 @@ function TabPaneVote() {
   };
 
   return (
-    <div id="tabpane-vote">
-      {votes.map((ele, index) => (
-        <div key={index} className="tabpane-vote-item">
+    <div className="space-y-3 p-4">
+      {votes.map((ele: any, index: number) => (
+        <div key={index} className="rounded-lg border bg-card p-3">
           <VoteMessage data={ele} />
         </div>
       ))}
 
       {query.page + 1 < totalPagesVote && (
         <Button
-          icon={<CaretDownOutlined />}
-          block
-          type="primary"
+          variant="outline"
+          className="w-full"
           onClick={handleIncreasePage}
         >
+          <ChevronDown className="h-4 w-4 mr-2" />
           Xem thêm
         </Button>
       )}

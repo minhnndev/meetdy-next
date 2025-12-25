@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import Scrollbars from 'react-custom-scrollbars-2';
 import { useDispatch } from 'react-redux';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { toast } from 'sonner';
-
-import { Modal } from 'antd';
 
 import friendApi from '@/api/friendApi';
 import userApi from '@/api/userApi';
@@ -13,14 +10,31 @@ import { fetchFriends } from '../../friendSlice';
 import UserCard from '@/components/UserCard';
 import FriendItem from '../FriendItem';
 
-function ListFriend({ data }) {
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+
+interface ListFriendProps {
+  data: any[];
+}
+
+function ListFriend({ data }: ListFriendProps) {
   const dispatch = useDispatch();
   const [isVisible, setIsVisible] = useState(false);
-  const [userIsFind, setUserIsFind] = useState({});
+  const [userIsFind, setUserIsFind] = useState<any>({});
+  const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
 
-  const handleOnClickMenu = async (key, id) => {
+  const handleOnClickMenu = async (key: string, id: string) => {
     if (key === '2') {
-      confirm(id);
+      const tempUser = data.find((ele) => ele._id === id);
+      setDeleteConfirm(tempUser);
     } else {
       setIsVisible(true);
       const tempUser = data.find((ele) => ele._id === id);
@@ -33,58 +47,47 @@ function ListFriend({ data }) {
     setIsVisible(false);
   };
 
-  const handleOkModal = async (id) => {
+  const handleDeleteFriend = async () => {
+    if (!deleteConfirm) return;
     try {
-      await friendApi.deleteFriend(id);
-      dispatch(fetchFriends());
+      await friendApi.deleteFriend(deleteConfirm._id);
+      dispatch(fetchFriends() as any);
       toast.success('Xóa thành công');
-      setIsVisible(false);
     } catch (error) {
       toast.error('Xóa thất bại');
     }
+    setDeleteConfirm(null);
   };
-
-  const handleOnDeleteFriend = (id) => {
-    setIsVisible(true);
-    confirm(id);
-  };
-
-  function confirm(id) {
-    Modal.confirm({
-      title: 'Xác nhận',
-      icon: <ExclamationCircleOutlined />,
-      content: (
-        <span>
-          Bạn có thực sự muốn xóa{' '}
-          <b>{data.find((ele) => ele._id === id).name}</b> khỏi danh sách bạn bè{' '}
-        </span>
-      ),
-      okText: 'Xóa',
-      cancelText: 'Hủy',
-      onOk: () => handleOkModal(id),
-    });
-  }
 
   return (
-    <Scrollbars
-      autoHide={true}
-      autoHideTimeout={1000}
-      autoHideDuration={200}
-      style={{ height: '500px', width: '100%' }}
-    >
-      {data.length > 0 &&
-        data.map((e, index) => {
-          return (
+    <>
+      <Scrollbars
+        autoHide={true}
+        autoHideTimeout={1000}
+        autoHideDuration={200}
+        style={{ height: '500px', width: '100%' }}
+      >
+        {data.length > 0 &&
+          data.map((e, index) => (
             <FriendItem key={index} data={e} onClickMenu={handleOnClickMenu} />
-          );
-        })}
+          ))}
+      </Scrollbars>
 
-      {/* <UserCard
-        user={userIsFind}
-        isVisible={isVisible}
-        onCancel={handleCancelModalUserCard}
-      /> */}
-    </Scrollbars>
+      <AlertDialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có thực sự muốn xóa <strong>{deleteConfirm?.name}</strong> khỏi danh sách bạn bè?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteFriend}>Xóa</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 

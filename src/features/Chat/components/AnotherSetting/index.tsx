@@ -1,127 +1,134 @@
-import {
-  CaretDownOutlined,
-  DeleteOutlined,
-  ExclamationCircleOutlined,
-  ExportOutlined,
-} from '@ant-design/icons';
-import { message, Modal } from 'antd';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { ChevronDown, LogOut, Trash } from 'lucide-react';
+import { toast } from 'sonner';
 
 import conversationApi from '@/api/conversationApi';
 import { leaveGroup } from '../../slice/chatSlice';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
-const styleIconDrop = {
-  transform: 'rotate(-90deg)',
-};
+interface AnotherSettingProps {
+  socket: any;
+}
 
-const styleInteract = {
-  maxHeight: '0px',
-};
-
-function AnotherSetting({ socket }) {
+function AnotherSetting({ socket }: AnotherSettingProps) {
   const [isDrop, setIsDrop] = useState(true);
   const { currentConversation, conversations } = useSelector(
-    (state) => state.chat,
+    (state: any) => state.chat,
   );
-  const { user } = useSelector((state) => state.global);
+  const { user } = useSelector((state: any) => state.global);
   const dispatch = useDispatch();
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleOnClick = () => {
     setIsDrop(!isDrop);
   };
 
-  function confirm() {
-    Modal.confirm({
-      title: 'Cảnh báo',
-      icon: <ExclamationCircleOutlined />,
-      content: 'Bạn có thực sự muốn rời khỏi nhóm',
-      okText: 'Đồng ý',
-      cancelText: 'Hủy',
-      onOk: async () => {
-        try {
-          await conversationApi.leaveGroup(currentConversation);
-          message.success(`Rời nhóm thành công`);
+  const handleLeaveGroup = async () => {
+    try {
+      await conversationApi.leaveGroup(currentConversation);
+      toast.success('Rời nhóm thành công');
+      socket.emit('leave-conversation', currentConversation);
+      dispatch(leaveGroup(currentConversation));
+    } catch (error) {
+      toast.error('Rời nhóm thất bại');
+    }
+    setShowLeaveConfirm(false);
+  };
 
-          socket.emit('leave-conversation', currentConversation);
+  const handleDeleteGroup = async () => {
+    try {
+      await conversationApi.deleteConversation(currentConversation);
+      toast.success('Xóa thành công');
+    } catch (error) {
+      toast.error('Đã có lỗi xảy ra');
+    }
+    setShowDeleteConfirm(false);
+  };
 
-          dispatch(leaveGroup(currentConversation));
-        } catch (error) {
-          message.error(`Rời nhóm thất bại`);
-        }
-      },
-    });
-  }
-
-  function confirmDeleteGroup() {
-    Modal.confirm({
-      title: 'Xác nhận',
-      icon: <ExclamationCircleOutlined />,
-      content: (
-        <span>
-          Toàn bộ nội dung cuộc trò chuyện sẻ bị xóa, bạn có chắc chắn muốn xóa
-          ?
-        </span>
-      ),
-      okText: 'Xóa',
-      cancelText: 'Không',
-      onOk: async () => {
-        try {
-          await conversationApi.deleteConversation(currentConversation);
-          message.success('Xóa thành công');
-        } catch (error) {
-          message.error('Đã có lỗi xảy ra');
-        }
-      },
-    });
-  }
+  const convo = conversations.find((ele: any) => ele._id === currentConversation);
+  const isLeader = convo?.leaderId === user._id;
 
   return (
-    <div className="info_setting">
-      <div className="info_setting-header" onClick={handleOnClick}>
-        <div className="info_setting-header-title">Cài đặt khác</div>
-
-        <div
-          className="info_setting-header-icon"
-          style={isDrop ? {} : styleIconDrop}
-        >
-          <CaretDownOutlined />
-        </div>
-      </div>
-
-      <div
-        className="info_setting-interact"
-        style={isDrop ? {} : styleInteract}
+    <div className="border-b py-3">
+      <button
+        className="w-full flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors rounded-lg"
+        onClick={handleOnClick}
       >
-        {conversations.find((ele) => ele._id === currentConversation)
-          .leaderId === user._id ? (
-          <div
-            className="info_setting-interact-amount danger"
-            onClick={confirmDeleteGroup}
-          >
-            <div className="info_setting-interact-amount-icon">
-              <DeleteOutlined />
-            </div>
+        <span className="font-medium text-sm">Cài đặt khác</span>
+        <ChevronDown
+          className={`h-4 w-4 transition-transform ${!isDrop ? '-rotate-90' : ''}`}
+        />
+      </button>
 
-            <div className="info_setting-interact-amount-text">
-              <span>Giải tán nhóm</span>
+      <div className={`overflow-hidden transition-all ${isDrop ? 'max-h-96' : 'max-h-0'}`}>
+        {isLeader ? (
+          <button
+            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors text-destructive"
+            onClick={() => setShowDeleteConfirm(true)}
+          >
+            <div className="p-2 rounded-lg bg-destructive/10">
+              <Trash className="h-4 w-4" />
             </div>
-          </div>
+            <span className="text-sm">Giải tán nhóm</span>
+          </button>
         ) : (
-          <div
-            className="info_setting-interact-amount danger"
-            onClick={confirm}
+          <button
+            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors text-destructive"
+            onClick={() => setShowLeaveConfirm(true)}
           >
-            <div className="info_setting-interact-amount-icon">
-              <ExportOutlined />
+            <div className="p-2 rounded-lg bg-destructive/10">
+              <LogOut className="h-4 w-4" />
             </div>
-
-            <div className="info_setting-interact-amount-text">
-              <span>Rời nhóm</span>
-            </div>
-          </div>
+            <span className="text-sm">Rời nhóm</span>
+          </button>
         )}
       </div>
+
+      <AlertDialog open={showLeaveConfirm} onOpenChange={setShowLeaveConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cảnh báo</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có thực sự muốn rời khỏi nhóm?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLeaveGroup}>Đồng ý</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận</AlertDialogTitle>
+            <AlertDialogDescription>
+              Toàn bộ nội dung cuộc trò chuyện sẽ bị xóa, bạn có chắc chắn muốn xóa?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Không</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteGroup}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Xóa
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

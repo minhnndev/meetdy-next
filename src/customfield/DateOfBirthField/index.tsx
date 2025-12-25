@@ -1,133 +1,115 @@
-import { Select } from 'antd';
 import { useState } from 'react';
 import dateUtils from '@/utils/dateUtils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
-const { Option } = Select;
+interface DateOfBirthFieldProps {
+  field: any;
+}
 
-DateOfBirthField.propTypes = {};
-
-DateOfBirthField.defaultProps = {};
-
-function DateOfBirthField({ field }) {
+function DateOfBirthField({ field }: DateOfBirthFieldProps) {
   const { name, value } = field;
   const { day, month, year } = value;
   const [dateOfBirth, setDateOfBirth] = useState({ ...value });
 
-  const renderDays = () => {
+  const getDaysInMonth = () => {
     let end = 31;
-
     const { month, year } = dateOfBirth;
     if (month === 4 || month === 6 || month === 9 || month === 11) end = 30;
-
     if (month === 2) {
-      if (dateUtils.checkLeapYear(year)) end = 29;
-      else end = 28;
+      end = dateUtils.checkLeapYear(year) ? 29 : 28;
     }
-
-    const result = [];
-
-    for (let i = 1; i <= end; i++) {
-      result.push(<Option value={i}>{i}</Option>);
-    }
-    return result;
+    return end;
   };
 
-  const renderMonths = () => {
-    const result = [];
-
-    for (let i = 1; i <= 12; i++) {
-      result.push(
-        <Option value={i} disabled={handleMonthDisabled(i)}>
-          {i}
-        </Option>,
-      );
-    }
-    return result;
-  };
-
-  const handleMonthDisabled = (month) => {
+  const isMonthDisabled = (monthNum: number) => {
     const { day, year } = dateOfBirth;
-
     if (day === 31) {
-      if (
-        month === 2 ||
-        month === 4 ||
-        month === 6 ||
-        month === 9 ||
-        month === 11
-      )
-        return true;
+      if ([2, 4, 6, 9, 11].includes(monthNum)) return true;
     }
-
-    if (day === 30 && month === 2) return true;
-
-    if (day === 29 && month === 2 && !dateUtils.checkLeapYear(year))
-      return true;
+    if (day === 30 && monthNum === 2) return true;
+    if (day === 29 && monthNum === 2 && !dateUtils.checkLeapYear(year)) return true;
+    return false;
   };
 
-  const renderYears = () => {
-    const result = [];
-
-    const yearValid = new Date().getFullYear() - 10;
-    for (let i = 1950; i <= yearValid; i++) {
-      result.push(<Option value={i}>{i}</Option>);
-    }
-    return result;
+  const handleDayChange = (dayValue: string) => {
+    const valueTemp = { ...value, day: parseInt(dayValue) };
+    setDateOfBirth(valueTemp);
+    handleValueChange(valueTemp);
   };
 
-  const handleDayChange = (dayValue) => {
-    const valueTempt = { ...value, day: dayValue };
-    setDateOfBirth(valueTempt);
-    handleValueChange(valueTempt);
+  const handleMonthChange = (monthValue: string) => {
+    const valueTemp = { ...value, month: parseInt(monthValue) };
+    setDateOfBirth(valueTemp);
+    handleValueChange(valueTemp);
   };
 
-  const handleMonthChange = (monthValue) => {
-    const valueTempt = { ...value, month: monthValue };
-    setDateOfBirth(valueTempt);
-    handleValueChange(valueTempt);
+  const handleYearChange = (yearValue: string) => {
+    const valueTemp = { ...value, year: parseInt(yearValue) };
+    setDateOfBirth(valueTemp);
+    handleValueChange(valueTemp);
   };
 
-  const handleYearChange = (yearValue) => {
-    const valueTempt = { ...value, year: yearValue };
-    setDateOfBirth(valueTempt);
-    handleValueChange(valueTempt);
-  };
-
-  const handleValueChange = (value) => {
+  const handleValueChange = (newValue: any) => {
     const changeEvent = {
       target: {
         name,
-        value,
+        value: newValue,
       },
     };
-
     field.onChange(changeEvent);
   };
 
+  const yearValid = new Date().getFullYear() - 10;
+  const years = Array.from({ length: yearValid - 1950 + 1 }, (_, i) => 1950 + i);
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
+  const daysCount = getDaysInMonth();
+  const days = Array.from({ length: daysCount }, (_, i) => i + 1);
+
   return (
-    <div className="day-of-birth_wrapper">
-      <Select
-        defaultValue={day}
-        style={{ width: 120 }}
-        onChange={handleDayChange}
-      >
-        {renderDays()}
+    <div className="flex gap-2">
+      <Select defaultValue={day?.toString()} onValueChange={handleDayChange}>
+        <SelectTrigger className="w-24">
+          <SelectValue placeholder="Ngày" />
+        </SelectTrigger>
+        <SelectContent>
+          {days.map((d) => (
+            <SelectItem key={d} value={d.toString()}>
+              {d}
+            </SelectItem>
+          ))}
+        </SelectContent>
       </Select>
 
-      <Select
-        defaultValue={month}
-        style={{ width: 120 }}
-        onChange={handleMonthChange}
-      >
-        {renderMonths()}
+      <Select defaultValue={month?.toString()} onValueChange={handleMonthChange}>
+        <SelectTrigger className="w-24">
+          <SelectValue placeholder="Tháng" />
+        </SelectTrigger>
+        <SelectContent>
+          {months.map((m) => (
+            <SelectItem key={m} value={m.toString()} disabled={isMonthDisabled(m)}>
+              {m}
+            </SelectItem>
+          ))}
+        </SelectContent>
       </Select>
 
-      <Select
-        defaultValue={year}
-        style={{ width: 120 }}
-        onChange={handleYearChange}
-      >
-        {renderYears()}
+      <Select defaultValue={year?.toString()} onValueChange={handleYearChange}>
+        <SelectTrigger className="w-28">
+          <SelectValue placeholder="Năm" />
+        </SelectTrigger>
+        <SelectContent>
+          {years.map((y) => (
+            <SelectItem key={y} value={y.toString()}>
+              {y}
+            </SelectItem>
+          ))}
+        </SelectContent>
       </Select>
     </div>
   );

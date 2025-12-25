@@ -1,108 +1,83 @@
-import { Col, Row, Select } from 'antd';
-import RangeCalendarCustom from '@/components/RangeCalendarCustom';
-import PropTypes from 'prop-types';
 import { useState } from 'react';
 import fileHelpers from '@/utils/fileHelpers';
 import PersonalIcon from '../PersonalIcon';
+import RangeCalendarCustom from '@/components/RangeCalendarCustom';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
-TabPaneMedia.propTypes = {
-  members: PropTypes.array,
-  onQueryChange: PropTypes.func,
-};
+interface TabPaneMediaProps {
+  members?: any[];
+  onQueryChange?: (query: any) => void;
+}
 
-TabPaneMedia.defaultProps = {
-  members: [],
-  onQueryChange: null,
-};
-
-function TabPaneMedia(props) {
-  const { members, onQueryChange } = props;
-  const { Option } = Select;
-
+function TabPaneMedia({ members = [], onQueryChange }: TabPaneMediaProps) {
   const [sender, setSender] = useState('');
-  const [query, setQuery] = useState({});
-  const handleChange = (memberId) => {
-    const index = members.findIndex((memberEle) => memberEle._id == memberId);
-    let queryTempt = {};
+  const [query, setQuery] = useState<any>({});
+
+  const handleChange = (memberId: string) => {
+    const index = members.findIndex((memberEle) => memberEle._id === memberId);
+    let queryTemp: any = {};
 
     if (index > -1) {
       setSender(members[index].name);
-      queryTempt = {
+      queryTemp = {
         ...query,
         senderId: memberId,
       };
-      setQuery(queryTempt);
+      setQuery(queryTemp);
     } else {
       setSender('');
-      queryTempt = {
+      queryTemp = {
         ...query,
         senderId: '',
       };
-      setQuery(queryTempt);
+      setQuery(queryTemp);
     }
 
-    if (onQueryChange) onQueryChange(queryTempt);
+    onQueryChange?.(queryTemp);
   };
 
-  const handleDatePickerChange = (date, dateString) => {
-    const queryTempt = {
+  const handleDatePickerChange = (date: any, dateString: [string, string]) => {
+    const queryTemp = {
       ...query,
       ...fileHelpers.convertDateStringsToServerDateObject(dateString),
     };
-    setQuery({ ...query, queryTempt });
-    if (onQueryChange) onQueryChange(queryTempt);
+    setQuery({ ...query, ...queryTemp });
+    onQueryChange?.(queryTemp);
   };
 
   return (
-    <div id="tabpane-media">
-      <Row gutter={[16, 8]}>
-        <Col span={24}>
-          <Select
-            dropdownMatchSelectWidth={false}
-            optionLabelProp="label"
-            showSearch
-            style={{ width: '100%' }}
-            onChange={handleChange}
-            placeholder="Người gửi"
-            optionFilterProp="children"
-            //onSearch={onSearch}
-            value={sender}
-            filterOption={(input, option) =>
-              option.value.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-            filterSort={(optionA, optionB) =>
-              optionA.children
-                .toLowerCase()
-                .localeCompare(optionB.children.toLowerCase())
-            }
-            allowClear
-          >
-            {members.map((memberEle, index) => (
-              <Option key={index} value={memberEle._id}>
-                <div className="option-item">
-                  <div className="icon-user-item">
-                    <PersonalIcon
-                      dimension={24}
-                      avatar={memberEle.avatar}
-                      name={memberEle.name}
-                    />
-                  </div>
+    <div className="space-y-3 p-4">
+      <Select value={sender} onValueChange={handleChange}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Người gửi" />
+        </SelectTrigger>
+        <SelectContent>
+          {members.map((memberEle, index) => (
+            <SelectItem key={index} value={memberEle._id}>
+              <div className="flex items-center gap-2">
+                <PersonalIcon
+                  dimension={24}
+                  avatar={memberEle.avatar}
+                  name={memberEle.name}
+                />
+                <span>{memberEle.name}</span>
+              </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-                  <div className="name-user-item">{memberEle.name}</div>
-                </div>
-              </Option>
-            ))}
-          </Select>
-        </Col>
-
-        <Col span={24}>
-          <RangeCalendarCustom
-            style={{ width: '100%' }}
-            onChange={handleDatePickerChange}
-            allowClear={true}
-          />
-        </Col>
-      </Row>
+      <RangeCalendarCustom
+        style={{ width: '100%' }}
+        onChange={handleDatePickerChange}
+        allowClear={true}
+      />
     </div>
   );
 }

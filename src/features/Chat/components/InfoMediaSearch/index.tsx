@@ -1,76 +1,58 @@
-import { Tabs } from 'antd';
-import mediaApi from '@/api/mediaApi';
-import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import Scrollbars from 'react-custom-scrollbars-2';
 import { useSelector } from 'react-redux';
+import mediaApi from '@/api/mediaApi';
 import ContentTabPaneFile from '../ContentTabPaneFile';
 import ContentTabPaneMedia from '../ContentTabPaneMedia';
 import InfoTitle from '../InfoTitle';
 import TabPaneMedia from '../TabPaneMedia';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-InfoMediaSearch.propTypes = {
-  onBack: PropTypes.func,
-  tabpane: PropTypes.number.isRequired,
-};
-InfoMediaSearch.defaultProps = {
-  onBack: null,
-};
+interface InfoMediaSearchProps {
+  onBack?: (value?: any) => void;
+  tabpane: number;
+}
 
-function InfoMediaSearch(props) {
-  const { onBack, tabpane } = props;
-  const { TabPane } = Tabs;
+function InfoMediaSearch({ onBack, tabpane }: InfoMediaSearchProps) {
   const [activeKey, setActiveKey] = useState(tabpane.toString());
   const { memberInConversation, currentConversation } = useSelector(
-    (state) => state.chat,
+    (state: any) => state.chat,
   );
-  const [medias, setMedias] = useState([]);
+  const [medias, setMedias] = useState<any[]>([]);
 
-  const getTypeWithTabpane = (value) => {
-    if (tabpane === 1) {
-      return 'IMAGE';
-    }
-    if (tabpane === 2) {
-      return 'VIDEO';
-    }
-    if (tabpane === 3) {
-      return 'FILE';
-    }
+  const getTypeWithTabpane = (value: number) => {
+    if (value === 1) return 'IMAGE';
+    if (value === 2) return 'VIDEO';
+    if (value === 3) return 'FILE';
+    return 'IMAGE';
   };
 
-  const [query, setQuery] = useState({
+  const [query, setQuery] = useState<any>({
     conversationId: currentConversation,
     type: getTypeWithTabpane(tabpane),
   });
 
-  const handleOnBack = (value) => {
-    if (onBack) {
-      onBack(value);
-    }
+  const handleOnBack = (value?: any) => {
+    onBack?.(value);
   };
 
-  const handleChangeTab = (activeKey) => {
-    console.log('tabChange: ', activeKey);
-    setQuery({ ...query, type: getType(activeKey), senderId: '' });
-    setActiveKey(activeKey);
+  const handleChangeTab = (key: string) => {
+    setQuery({ ...query, type: getType(key), senderId: '' });
+    setActiveKey(key);
   };
 
-  const handleQueryChange = async (queryResult) => {
+  const handleQueryChange = async (queryResult: any) => {
     setQuery({ ...query, ...queryResult });
   };
 
-  const getType = (key) => {
-    let type = 'IMAGE';
-    if (key == '2') type = 'VIDEO';
-    if (key == '3') type = 'FILE';
-
-    return type;
+  const getType = (key: string) => {
+    if (key === '2') return 'VIDEO';
+    if (key === '3') return 'FILE';
+    return 'IMAGE';
   };
 
   useEffect(() => {
     const fetchMedia = async () => {
-      console.log('fetchMedia');
-      console.log('query: ', query);
       const mediasResult = await mediaApi.fetchAllMedia(
         query.conversationId,
         query.type,
@@ -78,16 +60,14 @@ function InfoMediaSearch(props) {
         query.startTime,
         query.endTime,
       );
-      console.log('medias: ', mediasResult);
       setMedias(mediasResult);
     };
-
     fetchMedia();
   }, [query]);
 
   return (
-    <div id="info_media-search">
-      <div className="info_media-search--title">
+    <div className="flex flex-col h-full">
+      <div className="border-b">
         <InfoTitle
           isBack={true}
           text="Kho lưu trữ"
@@ -96,42 +76,39 @@ function InfoMediaSearch(props) {
         />
       </div>
 
-      <div className="info_media-search--tabpane">
-        <Tabs
-          activeKey={activeKey}
-          // defaultActiveKey={activeKey}
-          size="middle"
-          onChange={handleChangeTab}
-        >
-          <TabPane tab="Ảnh" key="1">
-            <TabPaneMedia
-              members={memberInConversation}
-              onQueryChange={handleQueryChange}
-            />
-          </TabPane>
+      <div className="flex-1 overflow-hidden">
+        <Tabs value={activeKey} onValueChange={handleChangeTab} className="h-full flex flex-col">
+          <TabsList className="w-full grid grid-cols-3 mx-4 mt-4">
+            <TabsTrigger value="1">Ảnh</TabsTrigger>
+            <TabsTrigger value="2">Video</TabsTrigger>
+            <TabsTrigger value="3">File</TabsTrigger>
+          </TabsList>
 
-          <TabPane tab="Video" key="2">
+          <TabsContent value="1" className="flex-1 overflow-hidden">
             <TabPaneMedia
               members={memberInConversation}
               onQueryChange={handleQueryChange}
             />
-          </TabPane>
-          <TabPane tab="File" key="3">
+          </TabsContent>
+          <TabsContent value="2" className="flex-1 overflow-hidden">
             <TabPaneMedia
               members={memberInConversation}
               onQueryChange={handleQueryChange}
             />
-          </TabPane>
+          </TabsContent>
+          <TabsContent value="3" className="flex-1 overflow-hidden">
+            <TabPaneMedia
+              members={memberInConversation}
+              onQueryChange={handleQueryChange}
+            />
+          </TabsContent>
         </Tabs>
-      </div>
 
-      <div className="info_media-search-content">
         <Scrollbars
           autoHide={true}
           autoHideTimeout={1000}
           autoHideDuration={200}
-          style={{ width: '100%' }}
-          height="100%"
+          style={{ width: '100%', height: '60%' }}
         >
           {activeKey === '1' && (
             <ContentTabPaneMedia items={medias} type="image" />

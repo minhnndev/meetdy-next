@@ -1,109 +1,87 @@
-import { DownloadOutlined } from '@ant-design/icons';
-import { Image, Modal } from 'antd';
-import ModalVideoCustom from '@/components/ModalVideoCustom';
-import OverlayImage from '@/components/OverlayImage';
+import { Download } from 'lucide-react';
 import parse from 'html-react-parser';
-import PropTypes from 'prop-types';
-import React from 'react';
 import { defaultStyles, FileIcon } from 'react-file-icon';
+
+import ModalVideoCustom from '@/components/ModalVideoCustom';
 import fileHelpers from '@/utils/fileHelpers';
 import PinItem from '../PinItem';
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
-ModalDetailMessagePin.propTypes = {
-  visible: PropTypes.bool,
-  message: PropTypes.object,
-  onClose: PropTypes.func,
-};
+interface ModalDetailMessagePinProps {
+  visible?: boolean;
+  message?: any;
+  onClose?: () => void;
+}
 
-ModalDetailMessagePin.defaultProps = {
-  visible: false,
-  message: {},
-  onClose: null,
-};
-
-function ModalDetailMessagePin({ visible, message, onClose }) {
-  const fileName =
-    message.type === 'FILE' ? fileHelpers.getFileName(message.content) : '';
-  const fileExtension =
-    message.type === 'FILE' ? fileHelpers.getFileExtension(fileName) : '';
+function ModalDetailMessagePin({
+  visible = false,
+  message = {},
+  onClose,
+}: ModalDetailMessagePinProps) {
+  const fileName = message.type === 'FILE' ? fileHelpers.getFileName(message.content) : '';
+  const fileExtension = message.type === 'FILE' ? fileHelpers.getFileExtension(fileName) : '';
 
   const handleOnClose = () => {
-    if (onClose) {
-      onClose();
-    }
+    onClose?.();
   };
 
   const handleOnClickDownLoad = () => {
     window.open(message.content, '_blank');
   };
 
+  if (message.type === 'IMAGE') {
+    return (
+      <Dialog open={visible} onOpenChange={(open) => !open && handleOnClose()}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden">
+          <img src={message.content} alt="" className="w-full h-auto" />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (message.type === 'VIDEO') {
+    return (
+      <ModalVideoCustom
+        isVisible={visible}
+        url={message.content}
+        onClose={handleOnClose}
+      />
+    );
+  }
+
   return (
-    <div className="modal-detail-message-pin">
-      {(message.type === 'TEXT' || message.type === 'HTML') && (
-        <Modal
-          visible={visible}
-          footer={null}
-          onCancel={handleOnClose}
-          closable={false}
-        >
+    <Dialog open={visible} onOpenChange={(open) => !open && handleOnClose()}>
+      <DialogContent className="max-w-md">
+        {(message.type === 'TEXT' || message.type === 'HTML') && (
           <PinItem message={message}>
             {message.type === 'TEXT' ? message.content : parse(message.content)}
           </PinItem>
-        </Modal>
-      )}
+        )}
 
-      {message.type === 'IMAGE' && (
-        <Image
-          preview={{
-            visible: visible,
-            onVisibleChange: (visible, prevVisible) => {
-              if (onClose) {
-                onClose();
-              }
-            },
-            mask: <OverlayImage />,
-          }}
-          src={message.content}
-          style={{ display: 'none' }}
-        />
-      )}
-
-      {message.type === 'FILE' && (
-        <Modal
-          visible={visible}
-          footer={null}
-          onCancel={handleOnClose}
-          closable={false}
-        >
+        {message.type === 'FILE' && (
           <PinItem message={message}>
-            <div className="file_info-wrapper-pin">
-              <div className="file_info">
-                <div className="file_info-icon">
+            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10">
                   <FileIcon
                     extension={fileExtension}
-                    {...defaultStyles[fileExtension]}
+                    {...(defaultStyles as any)[fileExtension]}
                   />
                 </div>
-
-                <div className="file_info-name">{fileName}</div>
+                <span className="text-sm truncate max-w-48">{fileName}</span>
               </div>
-
-              <div className="icon-download" onClick={handleOnClickDownLoad}>
-                <DownloadOutlined />
-              </div>
+              <Button variant="ghost" size="icon" onClick={handleOnClickDownLoad}>
+                <Download className="h-4 w-4" />
+              </Button>
             </div>
           </PinItem>
-        </Modal>
-      )}
-
-      {message.type === 'VIDEO' && (
-        <ModalVideoCustom
-          isVisible={visible}
-          url={message.content}
-          onClose={handleOnClose}
-        />
-      )}
-    </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
 

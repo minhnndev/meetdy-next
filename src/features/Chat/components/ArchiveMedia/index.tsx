@@ -1,37 +1,19 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
-
-import { CaretDownOutlined } from '@ant-design/icons';
+import { ChevronDown } from 'lucide-react';
 import ImageItem from '../ImageItem';
-import { Image } from 'antd';
 import ModalVideoCustom from '@/components/ModalVideoCustom';
 import ThumbnailCustom from '@/components/ThumbnailCustom';
 
-ArchiveMedia.propTypes = {
-  viewMediaClick: PropTypes.func,
-  name: PropTypes.string,
-  items: PropTypes.array,
-};
+interface ArchiveMediaProps {
+  viewMediaClick?: (type: number, subtype: number) => void;
+  name?: string;
+  items?: any[];
+}
 
-ArchiveMedia.defaultProps = {
-  viewMediaClick: null,
-  name: '',
-  items: [],
-};
-
-function ArchiveMedia(props) {
-  const { viewMediaClick, name, items } = props;
+function ArchiveMedia({ viewMediaClick, name = '', items = [] }: ArchiveMediaProps) {
   const [isDrop, setIsDrop] = useState(true);
-
   const [visible, setVisible] = useState(false);
   const [currentVideo, setCurrentVideo] = useState('');
-
-  const styleIconDrop = {
-    transform: 'rotate(-90deg)',
-  };
-  const styleInteract = {
-    maxHeight: '0px',
-  };
 
   const handleOnClick = () => {
     setIsDrop(!isDrop);
@@ -47,7 +29,7 @@ function ArchiveMedia(props) {
     }
   };
 
-  const handleVisibleModal = (url) => {
+  const handleVisibleModal = (url: string) => {
     setVisible(true);
     setCurrentVideo(url);
   };
@@ -58,20 +40,21 @@ function ArchiveMedia(props) {
   };
 
   return (
-    <div className="info_media">
-      <div className="info_media-header" onClick={handleOnClick}>
-        <div className="info_media-header-title">{name}</div>
+    <div className="border-b py-3">
+      <button
+        className="w-full flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors rounded-lg"
+        onClick={handleOnClick}
+      >
+        <span className="font-medium text-sm">{name}</span>
+        <ChevronDown
+          className={`h-4 w-4 transition-transform ${!isDrop ? '-rotate-90' : ''}`}
+        />
+      </button>
 
-        <div
-          className="info_media-header-icon"
-          style={isDrop ? {} : styleIconDrop}
-        >
-          <CaretDownOutlined />
-        </div>
-      </div>
-
-      <div className="info_media-interact" style={isDrop ? {} : styleInteract}>
-        <div className="info_media-interact-media">
+      <div
+        className={`overflow-hidden transition-all ${isDrop ? 'max-h-96' : 'max-h-0'}`}
+      >
+        <div className="grid grid-cols-4 gap-2 px-4 py-2">
           {name === 'Video' ? (
             <>
               {items.map((ele, index) => (
@@ -83,7 +66,7 @@ function ArchiveMedia(props) {
               ))}
             </>
           ) : (
-            <Image.PreviewGroup>
+            <>
               {items.map((itemEle, index) => (
                 <ImageItem
                   key={index}
@@ -94,12 +77,17 @@ function ArchiveMedia(props) {
                   onVisibleVideoModal={handleVisibleModal}
                 />
               ))}
-            </Image.PreviewGroup>
+            </>
           )}
         </div>
 
-        <div className="info_media-interact-button">
-          <button onClick={handleViewAllOnClick}>Xem Tất cả</button>
+        <div className="px-4">
+          <button
+            onClick={handleViewAllOnClick}
+            className="text-sm text-primary hover:underline"
+          >
+            Xem Tất cả
+          </button>
         </div>
       </div>
 

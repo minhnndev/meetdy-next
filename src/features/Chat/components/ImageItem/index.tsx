@@ -1,46 +1,23 @@
-import { CheckCircleFilled, ShareAltOutlined } from '@ant-design/icons';
-import { Image } from 'antd';
-import PropTypes from 'prop-types';
 import { useState } from 'react';
-import IMAGE_ITEM_STYLE from './ImageItemStyle';
 import OverlayImage from '@/components/OverlayImage';
 import { fallback } from '@/constants/images';
+import { Image } from '@/components/ui/image';
 
-ImageItem.propTypes = {
-  url: PropTypes.string,
-  height: PropTypes.number,
-  width: PropTypes.number,
-  type: PropTypes.string,
-  onVisibleVideoModal: PropTypes.func,
-};
+interface ImageItemProps {
+  url?: string;
+  height?: number;
+  width?: number;
+  type?: string;
+  onVisibleVideoModal?: (url: string) => void;
+}
 
-ImageItem.defaultProps = {
-  url: 'https://kenh14cdn.com/thumb_w/660/2020/7/23/h2-1595477334052655614583.jpg',
-  height: 110,
-  width: 110,
-  type: 'image',
-  onVisibleVideoModal: null,
-};
-
-function ImageItem(props) {
-  const { url, height, width, type, onVisibleVideoModal } = props;
-  const [select, setSelect] = useState(false);
-
-  const dementionStyle = {
-    width: width,
-    height: height,
-  };
-
-  const selectStyle = {
-    color: '#4c92ff',
-  };
-
-  const handleShareImage = () => {};
-
-  const handleSelectImage = () => {
-    setSelect(!select);
-  };
-
+function ImageItem({
+  url = '',
+  height = 110,
+  width = 110,
+  type = 'image',
+  onVisibleVideoModal,
+}: ImageItemProps) {
   const handleOnClick = () => {
     if (type === 'video' && onVisibleVideoModal) {
       onVisibleVideoModal(url);
@@ -48,18 +25,23 @@ function ImageItem(props) {
   };
 
   return (
-    <div className="item-img-wrapper" onClick={handleOnClick}>
-      <div id="item-img" style={dementionStyle}>
-        <Image
-          style={IMAGE_ITEM_STYLE.IMAGE}
-          src={url}
-          fallback={fallback}
-          width={width}
-          height={height}
-          preview={{ mask: <OverlayImage /> }}
-        />
+    <button
+      onClick={handleOnClick}
+      className="relative overflow-hidden rounded-lg group"
+      style={{ width, height }}
+    >
+      <img
+        src={url || fallback}
+        alt=""
+        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+        onError={(e) => {
+          (e.target as HTMLImageElement).src = fallback;
+        }}
+      />
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+        <OverlayImage />
       </div>
-    </div>
+    </button>
   );
 }
 

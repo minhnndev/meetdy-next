@@ -1,25 +1,24 @@
-import { Spin } from 'antd';
 import React from 'react';
-import 'react-quill/dist/quill.snow.css'; // ES6
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { Loading } from '@/components/ui/loading';
 import AboutWebApp from './Components/AboutWebApp';
 import Developer from './Components/Developer';
 import Feature from './Components/Feature';
 import Footer from './Components/Footer';
 import Header from './Components/Header';
 
-function Home(props) {
+function Home() {
   const { developers, infoApp, isLoading, features, infoWebApps } = useSelector(
-    (state) => state.home,
+    (state: any) => state.home,
   );
 
   return (
-    <Spin size="large" spinning={isLoading}>
-      <div className="home_page">
+    <Loading size="lg" spinning={isLoading}>
+      <div className="min-h-screen bg-background">
         <Header data={infoApp} />
         <Footer data={infoWebApps} />
       </div>
-    </Spin>
+    </Loading>
   );
 }
 

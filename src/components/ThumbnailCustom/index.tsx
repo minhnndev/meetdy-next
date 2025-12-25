@@ -1,42 +1,36 @@
-import { PlayCircleFilled } from '@ant-design/icons';
-import React from 'react';
-import PropTypes from 'prop-types';
+import { PlayCircle } from 'lucide-react';
 
-ThumbnailCustom.propTypes = {
-  url: PropTypes.string.isRequired,
-  onVisibleVideoModal: PropTypes.func,
-  height: PropTypes.number,
-  width: PropTypes.number,
-};
+interface ThumbnailCustomProps {
+  url: string;
+  onVisibleVideoModal?: (url: string) => void;
+  height?: number;
+  width?: number;
+}
 
-ThumbnailCustom.defaultProps = {
-  url: PropTypes.string.isRequired,
-  onVisibleVideoModal: null,
-  height: 80,
-  width: 80,
-};
-
-function ThumbnailCustom({ url, onVisibleVideoModal, height, width }) {
+function ThumbnailCustom({
+  url,
+  onVisibleVideoModal,
+  height = 80,
+  width = 80,
+}: ThumbnailCustomProps) {
   function handlePlayVideo() {
-    if (onVisibleVideoModal) {
-      onVisibleVideoModal(url);
-    }
+    onVisibleVideoModal?.(url);
   }
 
   return (
-    <div
+    <button
       style={{ height: `${height}px`, width: `${width}px` }}
-      className="thumbnail-video_custom"
+      className="relative rounded-lg overflow-hidden group cursor-pointer"
       onClick={handlePlayVideo}
     >
-      <video>
-        <source height={height} width={width} src={url} type="video/mp4" />
+      <video className="w-full h-full object-cover">
+        <source src={url} type="video/mp4" />
       </video>
 
-      <div className="overlay">
-        <PlayCircleFilled />
+      <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/50 transition-colors">
+        <PlayCircle className="h-8 w-8 text-white" />
       </div>
-    </div>
+    </button>
   );
 }
 

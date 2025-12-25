@@ -1,40 +1,33 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-
-import PersonalIcon from '@/features/Chat/components/PersonalIcon';
-import { Empty } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import PersonalIcon from '@/features/Chat/components/PersonalIcon';
+import { Empty } from '@/components/ui/empty';
 import {
   fetchListMessages,
   setCurrentConversation,
 } from '@/features/Chat/slice/chatSlice';
 
-ConverPersonalSearch.propTypes = {
-  data: PropTypes.array,
-};
+interface ConverPersonalSearchProps {
+  data?: any[];
+}
 
-ConverPersonalSearch.defaultProps = {
-  data: [],
-};
-
-function ConverPersonalSearch({ data }) {
+function ConverPersonalSearch({ data = [] }: ConverPersonalSearchProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleClickItem = (value) => {
-    dispatch(fetchListMessages({ conversationId: value._id, size: 10 }));
+  const handleClickItem = (value: any) => {
+    dispatch(fetchListMessages({ conversationId: value._id, size: 10 }) as any);
     dispatch(setCurrentConversation(value._id));
-
     navigate('/chat');
   };
+
   return (
-    <div className="list-filter_single-conver">
+    <div className="space-y-1">
       {data.length === 0 && <Empty />}
       {data.map((ele, index) => (
-        <div
+        <button
           key={index}
-          className="single-conver_item"
+          className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors text-left"
           onClick={() => handleClickItem(ele)}
         >
           <PersonalIcon
@@ -42,9 +35,8 @@ function ConverPersonalSearch({ data }) {
             color={ele.avatarColor}
             name={ele.name}
           />
-
-          <div className="single-conver_name">{ele.name}</div>
-        </div>
+          <span className="font-medium text-sm">{ele.name}</span>
+        </button>
       ))}
     </div>
   );

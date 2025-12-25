@@ -1,4 +1,8 @@
-import { Col, Modal, Row, Select } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { FastField, Form, Formik } from 'formik';
+import * as Yup from 'yup';
+
 import meApi from '@/api/meApi';
 import { setAvatarProfile } from '@/app/globalSlice';
 import UploadAvatar from '@/components/UploadAvatar';
@@ -6,45 +10,45 @@ import UploadCoverImage from '@/components/UploadConverImage';
 import DateOfBirthField from '@/customfield/DateOfBirthField';
 import GenderRadioField from '@/customfield/GenderRadioField';
 import InputFieldNotTitle from '@/customfield/InputFieldNotTitle';
-import { FastField, Form, Formik } from 'formik';
-import PropTypes from 'prop-types';
-import { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import * as Yup from 'yup';
 
-ModalUpdateProfile.propTypes = {
-  isVisible: PropTypes.bool,
-  onCancel: PropTypes.func,
-  onOk: PropTypes.func,
-  loading: PropTypes.bool,
-};
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
-ModalUpdateProfile.defaultProps = {
-  isVisible: false,
-  onCancel: null,
-  onOk: null,
-  loading: false,
-};
+interface ModalUpdateProfileProps {
+  isVisible?: boolean;
+  onCancel?: (value?: boolean) => void;
+  onOk?: () => void;
+  loading?: boolean;
+}
 
-function ModalUpdateProfile({ isVisible, onCancel, onOk, loading }) {
+function ModalUpdateProfile({
+  isVisible = false,
+  onCancel,
+  onOk,
+  loading = false,
+}: ModalUpdateProfileProps) {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.global);
-  const formRef = useRef();
+  const { user } = useSelector((state: any) => state.global);
+  const formRef = useRef<any>();
 
-  //
-  const [avatar, setAvatar] = useState(null);
-  const [coverImg, setCoverImg] = useState(null);
+  const [avatar, setAvatar] = useState<any>(null);
+  const [coverImg, setCoverImg] = useState<any>(null);
   const [isClear, setIsClear] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const refInitValue = useRef();
+  const refInitValue = useRef<any>();
 
-  const handleGetCoverImg = (coverImg) => {
-    setCoverImg(coverImg);
+  const handleGetCoverImg = (img: any) => {
+    setCoverImg(img);
   };
 
-  const handleGetAvatar = (avatar) => {
-    console.log('avatar', avatar);
-    setAvatar(avatar);
+  const handleGetAvatar = (img: any) => {
+    setAvatar(img);
   };
 
   useEffect(() => {
@@ -58,27 +62,21 @@ function ModalUpdateProfile({ isVisible, onCancel, onOk, loading }) {
     }
   }, [isVisible]);
 
-  const checkChangeValue = (value1, value2) => {
-    if (value1.name !== value2.name) {
-      return false;
-    }
-    if (value1.dateOfBirth !== value2.dateOfBirth) {
-      return false;
-    }
-    if (value1.gender !== value2.gender) {
-      return false;
-    }
+  const checkChangeValue = (value1: any, value2: any) => {
+    if (value1.name !== value2.name) return false;
+    if (value1.dateOfBirth !== value2.dateOfBirth) return false;
+    if (value1.gender !== value2.gender) return false;
     return true;
   };
 
   const handleCancel = () => {
-    onCancel(false);
+    onCancel?.(false);
     setIsClear(true);
     setCoverImg(null);
     setAvatar(null);
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values: any) => {
     setConfirmLoading(true);
 
     try {
@@ -90,7 +88,7 @@ function ModalUpdateProfile({ isVisible, onCancel, onOk, loading }) {
       if (coverImg) {
         const frmData = new FormData();
         frmData.append('file', coverImg);
-        const response = await meApi.updateCoverImage(frmData);
+        await meApi.updateCoverImage(frmData);
       }
 
       if (avatar) {
@@ -105,10 +103,7 @@ function ModalUpdateProfile({ isVisible, onCancel, onOk, loading }) {
     }
 
     setConfirmLoading(false);
-
-    if (onCancel) {
-      onCancel();
-    }
+    onCancel?.();
   };
 
   const handleOke = () => {
@@ -118,30 +113,19 @@ function ModalUpdateProfile({ isVisible, onCancel, onOk, loading }) {
   };
 
   return (
-    <Modal
-      title="Cập nhật thông tin"
-      visible={isVisible}
-      onOk={handleOke}
-      onCancel={handleCancel}
-      width={400}
-      style={{ padding: 0 }}
-      okText="Cập nhật"
-      cancelText="Hủy"
-      centered
-      confirmLoading={confirmLoading}
-    >
-      <div className="profile-update_wrapper">
-        <div className="profile-update_img">
-          <div className="profile-update_cover-image">
-            <div className="profile-update_upload">
-              <UploadCoverImage
-                coverImg={user.coverImage}
-                getFile={handleGetCoverImg}
-                isClear={isClear}
-              />
-            </div>
-
-            <div className="profile-update_avatar">
+    <Dialog open={isVisible} onOpenChange={(open) => !open && handleCancel()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Cập nhật thông tin</DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          <div className="relative mb-16">
+            <UploadCoverImage
+              coverImg={user.coverImage}
+              getFile={handleGetCoverImg}
+              isClear={isClear}
+            />
+            <div className="absolute -bottom-12 left-1/2 -translate-x-1/2">
               <UploadAvatar
                 avatar={user.avatar}
                 getFile={handleGetAvatar}
@@ -149,9 +133,7 @@ function ModalUpdateProfile({ isVisible, onCancel, onOk, loading }) {
               />
             </div>
           </div>
-        </div>
 
-        <div className="profile-update_info">
           <Formik
             innerRef={formRef}
             initialValues={{
@@ -167,43 +149,41 @@ function ModalUpdateProfile({ isVisible, onCancel, onOk, loading }) {
             })}
             enableReinitialize={true}
           >
-            {(formikProps) => {
-              return (
-                <Form>
-                  <Row gutter={[0, 16]}>
-                    <Col span={24}>
-                      <p>Tên </p>
-                      <FastField
-                        name="name"
-                        component={InputFieldNotTitle}
-                        type="text"
-                        maxLength={100}
-                      ></FastField>
-                    </Col>
+            {() => (
+              <Form className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Tên</label>
+                  <FastField
+                    name="name"
+                    component={InputFieldNotTitle}
+                    type="text"
+                    maxLength={100}
+                  />
+                </div>
 
-                    <Col span={24}>
-                      <p>Ngày sinh</p>
-                      <FastField
-                        name="dateOfBirth"
-                        component={DateOfBirthField}
-                      ></FastField>
-                    </Col>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Ngày sinh</label>
+                  <FastField name="dateOfBirth" component={DateOfBirthField} />
+                </div>
 
-                    <Col span={24}>
-                      <p>Giới tính</p>
-                      <FastField
-                        name="gender"
-                        component={GenderRadioField}
-                      ></FastField>
-                    </Col>
-                  </Row>
-                </Form>
-              );
-            }}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Giới tính</label>
+                  <FastField name="gender" component={GenderRadioField} />
+                </div>
+              </Form>
+            )}
           </Formik>
         </div>
-      </div>
-    </Modal>
+        <DialogFooter>
+          <Button variant="outline" onClick={handleCancel}>
+            Hủy
+          </Button>
+          <Button onClick={handleOke} disabled={confirmLoading}>
+            {confirmLoading ? 'Đang cập nhật...' : 'Cập nhật'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

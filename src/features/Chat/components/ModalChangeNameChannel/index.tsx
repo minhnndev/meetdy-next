@@ -1,61 +1,70 @@
 import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { Input, Modal } from 'antd';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
-ModalChangeNameChannel.propTypes = {
-  visible: PropTypes.bool,
-  onOk: PropTypes.func,
-  onCancel: PropTypes.func,
-  initialValue: PropTypes.string,
-};
+interface ModalChangeNameChannelProps {
+  visible?: boolean;
+  onOk?: (name: string) => void;
+  onCancel?: () => void;
+  initialValue?: string;
+}
 
-ModalChangeNameChannel.defaultProps = {
-  visible: false,
-  onOk: null,
-  onCancel: null,
-  initialValue: '',
-};
-
-function ModalChangeNameChannel({ visible, onOk, onCancel, initialValue }) {
+function ModalChangeNameChannel({
+  visible = false,
+  onOk,
+  onCancel,
+  initialValue = '',
+}: ModalChangeNameChannelProps) {
   const [value, setValue] = useState('');
 
   useEffect(() => {
     setValue(initialValue);
   }, [initialValue, visible]);
-  const handleOnchange = (e) => {
+
+  const handleOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   };
 
   const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
-      setValue('');
-    }
+    onCancel?.();
+    setValue('');
   };
 
   const handleOk = () => {
-    if (onOk) {
-      onOk(value);
-    }
+    onOk?.(value);
   };
 
   return (
-    <Modal
-      title="Đổi tên Channel"
-      visible={visible}
-      onOk={handleOk}
-      onCancel={handleCancel}
-      onText="Thay đổi"
-      cancelText="Hủy"
-      okButtonProps={{ disabled: value.trim().length === 0 }}
-    >
-      <Input
-        placeholder="Nhập tên mới"
-        allowClear
-        value={value}
-        onChange={handleOnchange}
-      />
-    </Modal>
+    <Dialog open={visible} onOpenChange={(open) => !open && handleCancel()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Đổi tên Channel</DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          <Input
+            placeholder="Nhập tên mới"
+            value={value}
+            onChange={handleOnchange}
+            onKeyDown={(e) => e.key === 'Enter' && value.trim() && handleOk()}
+          />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={handleCancel}>
+            Hủy
+          </Button>
+          <Button onClick={handleOk} disabled={value.trim().length === 0}>
+            Thay đổi
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

@@ -1,29 +1,42 @@
-import { SearchOutlined } from '@ant-design/icons';
-import { Checkbox, Col, Divider, Input, message, Modal, Row } from 'antd';
+import { useEffect, useState } from 'react';
+import { Search } from 'lucide-react';
+import { toast } from 'sonner';
+
 import conversationApi from '@/api/conversationApi';
 import messageApi from '@/api/messageApi';
-import PropTypes from 'prop-types';
-import { useEffect, useState } from 'react';
 import ConversationAvatar from '../ConversationAvatar';
 import ItemsSelected from '../ItemsSelected';
 import PersonalIcon from '../PersonalIcon';
 
-ModalShareMessage.propTypes = {
-  visible: PropTypes.bool,
-  onCancel: PropTypes.func,
-};
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
 
-function ModalShareMessage({ visible, onCancel, idMessage }) {
-  const [itemSelected, setItemSelected] = useState([]);
+interface ModalShareMessageProps {
+  visible?: boolean;
+  onCancel?: () => void;
+  idMessage?: string;
+}
+
+function ModalShareMessage({ visible = false, onCancel, idMessage }: ModalShareMessageProps) {
+  const [itemSelected, setItemSelected] = useState<any[]>([]);
   const [frInput, setFrInput] = useState('');
-  const [conversations, setConversations] = useState([]);
-  const [checkList, setCheckList] = useState([]);
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [checkList, setCheckList] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchData = async (name = '', type = 0) => {
     const data = await conversationApi.fetchListConversations(name, type);
-    const tempdata = [];
-    data.forEach((ele) => {
+    const tempdata: any[] = [];
+    data.forEach((ele: any) => {
       if (ele.lastMessage) {
         tempdata.push(ele);
       }
@@ -42,189 +55,144 @@ function ModalShareMessage({ visible, onCancel, idMessage }) {
   }, [visible]);
 
   const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
-    }
+    onCancel?.();
   };
 
   const handleOk = async () => {
+    if (!idMessage) return;
     setLoading(true);
     try {
-      itemSelected.forEach(async (ele) => {
+      for (const ele of itemSelected) {
         await messageApi.forwardMessage(idMessage, ele._id);
-      });
-      message.success('Chuyển tiếp tin nhắn thành công');
+      }
+      toast.success('Chuyển tiếp tin nhắn thành công');
     } catch (error) {
-      message.error('Đã có lỗi xảy ra');
+      toast.error('Đã có lỗi xảy ra');
     }
     setLoading(false);
-
     handleCancel();
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setFrInput(value);
 
     if (!value && visible) {
       fetchData();
     } else {
-      const tempConver = [...conversations];
-      const realConver = [];
-      tempConver.forEach((conver) => {
-        const index = conver.name.search(value);
-        if (index > -1) {
-          realConver.push(conver);
-        }
-      });
+      const realConver = conversations.filter((conver) =>
+        conver.name.toLowerCase().includes(value.toLowerCase()),
+      );
       setConversations(realConver);
     }
   };
 
-  const handleChangeCheckBox = (e) => {
-    const value = e.target.value;
+  const handleToggleCheckbox = (elementId: string) => {
+    const index = checkList.findIndex((id) => id === elementId);
+    let newCheckList = [...checkList];
+    let newItemSelected = [...itemSelected];
 
-    // check xem có trong checklist chưa
-    const index = checkList.findIndex((element) => element === value);
-    let checkListTemp = [...checkList];
-    let itemSelectedTemp = [...itemSelected];
-
-    // nếu như đã có
     if (index !== -1) {
-      itemSelectedTemp = itemSelectedTemp.filter(
-        (element) => element._id !== value,
-      );
-
-      checkListTemp = checkListTemp.filter((element) => element !== value);
-
-      // chưa có
+      newItemSelected = newItemSelected.filter((el) => el._id !== elementId);
+      newCheckList = newCheckList.filter((id) => id !== elementId);
     } else {
-      checkListTemp.push(value);
-      const index = conversations.findIndex((element) => element._id === value);
-
-      if (index !== -1) {
-        itemSelectedTemp.push(conversations[index]);
+      newCheckList.push(elementId);
+      const item = conversations.find((el) => el._id === elementId);
+      if (item) {
+        newItemSelected.push(item);
       }
     }
-    setCheckList(checkListTemp);
-    setItemSelected(itemSelectedTemp);
+
+    setCheckList(newCheckList);
+    setItemSelected(newItemSelected);
     setFrInput('');
     fetchData();
   };
 
-  const handleRemoveItem = (id) => {
-    let checkListTemp = [...checkList];
-    let itemSelectedTemp = [...itemSelected];
-
-    itemSelectedTemp = itemSelectedTemp.filter((element) => element._id !== id);
-
-    checkListTemp = checkListTemp.filter((element) => element !== id);
-
-    setCheckList(checkListTemp);
-    setItemSelected(itemSelectedTemp);
-
+  const handleRemoveItem = (id: string) => {
+    setItemSelected(itemSelected.filter((el) => el._id !== id));
+    setCheckList(checkList.filter((elId) => elId !== id));
     setFrInput('');
     fetchData();
   };
 
   return (
-    <Modal
-      title="Chuyển tiếp tin nhắn"
-      visible={visible}
-      onOk={handleOk}
-      onCancel={handleCancel}
-      okText="Chia sẻ"
-      cancelText="Hủy"
-      confirmLoading={loading}
-      centered
-    >
-      <div id="modal-share-message">
-        <div className="search-friend-input">
-          <Input
-            size="middle"
-            placeholder="Nhập cuộc trò chuyện bạn muốn tìm kiếm"
-            style={{ width: '100%' }}
-            prefix={<SearchOutlined />}
-            onChange={handleSearch}
-            value={frInput}
-          />
-        </div>
-
-        <Divider />
-
-        <div className="list-conver-interact">
-          <div
-            className={`list-conver-interact--left  ${
-              itemSelected.length > 0 ? '' : 'full-container'
-            }  `}
-          >
-            <div className="title-list-conver">
-              <span>Danh sách Cuộc trò chuyện</span>
-            </div>
-
-            <div className="checkbox-list-conver">
-              <Checkbox.Group
-                style={{ width: '100%' }}
-                // onChange={handleCheckBoxChange}
-                value={checkList}
-              >
-                <Row gutter={[0, 0]}>
-                  {conversations.map((element, index) => (
-                    <Col span={24} key={index}>
-                      <Checkbox
-                        // disabled={checkInitialValue(element._id)}
-                        value={element._id}
-                        onChange={handleChangeCheckBox}
-                      >
-                        <div className="item-checkbox">
-                          {element.type ? (
-                            <ConversationAvatar
-                              totalMembers={element.totalMembers}
-                              avatar={element.avatar}
-                              type={element.type}
-                              name={element.name}
-                              dimension={22}
-                              sizeAvatar={40}
-                              frameSize={36}
-                              avatarColor={element.avatarColor}
-                            />
-                          ) : (
-                            <PersonalIcon
-                              dimension={36}
-                              avatar={element.avatar}
-                              name={element.name}
-                              color={element.avatarColor}
-                            />
-                          )}
-
-                          <span className="item-name">{element.name}</span>
-                        </div>
-                      </Checkbox>
-                    </Col>
-                  ))}
-                </Row>
-              </Checkbox.Group>
-            </div>
+    <Dialog open={visible} onOpenChange={(open) => !open && handleCancel()}>
+      <DialogContent className="max-w-lg max-h-[80vh]">
+        <DialogHeader>
+          <DialogTitle>Chuyển tiếp tin nhắn</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Nhập cuộc trò chuyện bạn muốn tìm kiếm"
+              className="pl-9"
+              onChange={handleSearch}
+              value={frInput}
+            />
           </div>
 
-          <div
-            className={`list-conver-interact--right ${
-              itemSelected.length > 0 ? '' : 'close'
-            }`}
-          >
-            <div className="title-list-conver-checked">
-              <strong>
-                Đã chọn: {itemSelected.length > 0 && itemSelected.length}
-              </strong>
+          <Separator />
+
+          <div className="flex gap-4 max-h-[300px]">
+            <div className={`flex-1 overflow-y-auto ${itemSelected.length > 0 ? '' : 'w-full'}`}>
+              <p className="text-sm font-medium mb-2">Danh sách Cuộc trò chuyện</p>
+              <div className="space-y-1">
+                {conversations.map((element, index) => (
+                  <label
+                    key={index}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer"
+                  >
+                    <Checkbox
+                      checked={checkList.includes(element._id)}
+                      onCheckedChange={() => handleToggleCheckbox(element._id)}
+                    />
+                    {element.type ? (
+                      <ConversationAvatar
+                        totalMembers={element.totalMembers}
+                        avatar={element.avatar}
+                        type={element.type}
+                        name={element.name}
+                        dimension={22}
+                        sizeAvatar={36}
+                        frameSize={32}
+                        avatarColor={element.avatarColor}
+                      />
+                    ) : (
+                      <PersonalIcon
+                        dimension={36}
+                        avatar={element.avatar}
+                        name={element.name}
+                        color={element.avatarColor}
+                      />
+                    )}
+                    <span className="text-sm truncate">{element.name}</span>
+                  </label>
+                ))}
+              </div>
             </div>
 
-            <div className="checkbox-list-conver">
-              <ItemsSelected items={itemSelected} onRemove={handleRemoveItem} />
-            </div>
+            {itemSelected.length > 0 && (
+              <div className="w-40 border-l pl-4 overflow-y-auto">
+                <p className="text-sm font-medium mb-2">
+                  Đã chọn: {itemSelected.length}
+                </p>
+                <ItemsSelected items={itemSelected} onRemove={handleRemoveItem} />
+              </div>
+            )}
           </div>
         </div>
-      </div>
-    </Modal>
+        <DialogFooter>
+          <Button variant="outline" onClick={handleCancel}>
+            Hủy
+          </Button>
+          <Button onClick={handleOk} disabled={loading || itemSelected.length === 0}>
+            {loading ? 'Đang chia sẻ...' : 'Chia sẻ'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

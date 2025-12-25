@@ -1,30 +1,22 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import './style.css';
-import { Mentions } from 'antd';
 import PersonalIcon from '../PersonalIcon';
 
-MentionOption.propTypes = {
-  value: PropTypes.string.isRequired,
-  user: PropTypes.object,
-};
+interface MentionOptionProps {
+  value: string;
+  user?: any;
+  onClick?: () => void;
+}
 
-MentionOption.defaultProps = {
-  user: {},
-};
-
-function MentionOption({ value }) {
-  const { Option } = Mentions;
+function MentionOption({ value, user = {}, onClick }: MentionOptionProps) {
   return (
-    <Option value={value}>
-      <div className="mention-option">
-        <div className="icon-user-item">
-          <PersonalIcon dimension={24} avatar={user.avatar} name={user.name} />
-        </div>
-
-        <div className="name-user-item">{user.name}</div>
-      </div>
-    </Option>
+    <button
+      className="w-full flex items-center gap-2 p-2 hover:bg-muted/50 transition-colors rounded-lg text-left"
+      onClick={onClick}
+      data-value={value}
+    >
+      <PersonalIcon dimension={24} avatar={user.avatar} name={user.name} />
+      <span className="text-sm">{user.name}</span>
+    </button>
   );
 }
 

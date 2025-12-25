@@ -1,12 +1,7 @@
-import {
-  CaretDownOutlined,
-  DashOutlined,
-  MessageTwoTone,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Dropdown, Menu, message as MessageNotify, Modal } from 'antd';
+import { ChevronDown, MessageSquare, MoreHorizontal } from 'lucide-react';
+import { toast } from 'sonner';
 
 import pinMessageApi from '@/api/pinMessageApi';
 import { fetchPinMessages } from '../../slice/chatSlice';
@@ -14,64 +9,57 @@ import { fetchPinMessages } from '../../slice/chatSlice';
 import TypeMessagePin from '../TypeMessagePin';
 import ModalDetailMessagePin from '../ModalDetailMessagePin';
 
-const NutshellPinMessageStyle = {
-  BUTTON_LIST: {
-    fontSize: '1.3rem',
-    borderRadius: '10px',
-    padding: '0.2rem 1rem',
-    height: 'unset',
-  },
-  MENU_ITEM: {
-    fontSize: '1.3rem',
-    fontWeight: '500',
-  },
-};
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+
+interface NutshellPinMessageProps {
+  isItem?: boolean;
+  onOpenDrawer?: () => void;
+  message: any;
+  quantity?: number;
+  isHover?: boolean;
+}
 
 function NutshellPinMessage({
-  isItem,
+  isItem = false,
   onOpenDrawer,
   message,
-  quantity,
-  isHover,
-}) {
+  quantity = 0,
+  isHover = true,
+}: NutshellPinMessageProps) {
   const dispatch = useDispatch();
-  const { currentConversation } = useSelector((state) => state.chat);
+  const { currentConversation } = useSelector((state: any) => state.chat);
   const [visible, setVisible] = useState(false);
+  const [confirmUnpin, setConfirmUnpin] = useState(false);
 
-  function confirm() {
-    Modal.confirm({
-      title: 'Bỏ ghim',
-      icon: <ExclamationCircleOutlined />,
-      content: 'Bạn có chắc muốn bỏ ghim nội dung này không ?',
-      okText: 'Bỏ ghim',
-      cancelText: 'Không',
-      onOk: async () => {
-        await pinMessageApi.removePinMessage(message._id);
-        MessageNotify.success('Xóa thành công');
-        dispatch(fetchPinMessages({ conversationId: currentConversation }));
-      },
-      okButtonProps: { type: 'danger' },
-    });
-  }
-
-  const handleOnClickMenu = ({ _, key }) => {
-    if (key === '1') {
-      confirm();
+  const handleUnpin = async () => {
+    try {
+      await pinMessageApi.removePinMessage(message._id);
+      toast.success('Xóa thành công');
+      dispatch(fetchPinMessages({ conversationId: currentConversation }) as any);
+    } catch (error) {
+      toast.error('Xóa thất bại');
     }
+    setConfirmUnpin(false);
   };
 
-  const menu = (
-    <Menu onClick={handleOnClickMenu}>
-      <Menu.Item key="1" danger>
-        <span style={NutshellPinMessageStyle.MENU_ITEM}>Bỏ gim</span>
-      </Menu.Item>
-    </Menu>
-  );
-
   const handleOnClickVisbleList = () => {
-    if (onOpenDrawer) {
-      onOpenDrawer();
-    }
+    onOpenDrawer?.();
   };
 
   const handleOnClick = () => {
@@ -85,18 +73,20 @@ function NutshellPinMessage({
   return (
     <>
       <div
-        className={`nutshell-pin-container ${isItem ? 'select' : ''} ${
-          isHover ? '' : 'no-hover'
-        }`}
+        className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
+          isItem ? 'bg-muted/50' : ''
+        } ${isHover ? 'hover:bg-muted/50' : ''}`}
       >
-        <div className="nutshell-pin-container_left" onClick={handleOnClick}>
-          <div className="nutshell-pin-container_icon">
-            <MessageTwoTone />
+        <button
+          onClick={handleOnClick}
+          className="flex items-center gap-3 flex-1 text-left"
+        >
+          <div className="flex-shrink-0 p-2 rounded-lg bg-primary/10">
+            <MessageSquare className="h-4 w-4 text-primary" />
           </div>
-
-          <div className="nutshell-pin-container_messsage">
-            <div className="nutshell-pin-container_title">Tin nhắn</div>
-            <div className="nutshell-pin-container_detail">
+          <div className="min-w-0">
+            <div className="text-xs text-muted-foreground">Tin nhắn</div>
+            <div className="text-sm truncate">
               <TypeMessagePin
                 name={message.user.name}
                 content={message.content}
@@ -104,27 +94,34 @@ function NutshellPinMessage({
               />
             </div>
           </div>
-        </div>
-        <div
-          className={`nutshell-pin-container_right ${
-            isItem ? 'no-display' : ''
-          }`}
-        >
+        </button>
+
+        <div className={`flex-shrink-0 ${isItem ? 'hidden' : ''}`}>
           {isItem ? (
-            <Dropdown overlay={menu} placement="bottomLeft" trigger={['click']}>
-              <button className="nutshell-pin-container_button-interact">
-                <DashOutlined />
-              </button>
-            </Dropdown>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => setConfirmUnpin(true)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  Bỏ ghim
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Button
-              style={NutshellPinMessageStyle.BUTTON_LIST}
-              type="primary"
-              ghost
+              variant="outline"
+              size="sm"
               onClick={handleOnClickVisbleList}
+              className="text-primary"
             >
               {`${quantity} ghim tin khác`}
-              <CaretDownOutlined />
+              <ChevronDown className="h-4 w-4 ml-1" />
             </Button>
           )}
         </div>
@@ -135,6 +132,23 @@ function NutshellPinMessage({
         message={message}
         onClose={handleCloseModal}
       />
+
+      <AlertDialog open={confirmUnpin} onOpenChange={setConfirmUnpin}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bỏ ghim</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc muốn bỏ ghim nội dung này không?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Không</AlertDialogCancel>
+            <AlertDialogAction onClick={handleUnpin} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Bỏ ghim
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

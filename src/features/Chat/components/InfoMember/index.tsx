@@ -1,172 +1,146 @@
-import {
-  CaretDownOutlined,
-  CopyOutlined,
-  ExclamationCircleOutlined,
-  LinkOutlined,
-  LockOutlined,
-  UnlockOutlined,
-  UnlockTwoTone,
-} from '@ant-design/icons';
-import PropTypes from 'prop-types';
-
-import { GrGroup } from 'react-icons/gr';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { message, Modal } from 'antd';
+import { ChevronDown, Copy, Link, Lock, Unlock, Users } from 'lucide-react';
+import { toast } from 'sonner';
+
 import conversationApi from '@/api/conversationApi';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 
-InfoMember.propTypes = {
-  viewMemberClick: PropTypes.func,
-  quantity: PropTypes.number.isRequired,
-};
+interface InfoMemberProps {
+  viewMemberClick?: (type: number) => void;
+  quantity: number;
+}
 
-InfoMember.defaultProps = {
-  viewMemberClick: null,
-};
-
-function InfoMember(props) {
-  const { viewMemberClick, quantity } = props;
+function InfoMember({ viewMemberClick, quantity }: InfoMemberProps) {
   const [isDrop, setIsDrop] = useState(true);
   const { currentConversation, conversations } = useSelector(
-    (state) => state.chat,
+    (state: any) => state.chat,
   );
-  const [status, setSatus] = useState(false);
-  const { confirm } = Modal;
-  const { user } = useSelector((state) => state.global);
+  const [status, setStatus] = useState(false);
+  const { user } = useSelector((state: any) => state.global);
   const [checkLeader, setCheckLeader] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
-    const tempStatus = conversations.find(
-      (ele) => ele._id === currentConversation,
-    ).isJoinFromLink;
-    const tempCheck =
-      conversations.find((ele) => ele._id === currentConversation).leaderId ===
-      user._id;
-    setCheckLeader(tempCheck);
-    setSatus(tempStatus);
-  }, [currentConversation]);
-
-  const styleIconDrop = {
-    transform: 'rotate(-90deg)',
-  };
-
-  const styleInteract = {
-    maxHeight: '0px',
-  };
+    const convo = conversations.find((ele: any) => ele._id === currentConversation);
+    if (convo) {
+      setStatus(convo.isJoinFromLink);
+      setCheckLeader(convo.leaderId === user._id);
+    }
+  }, [currentConversation, conversations, user._id]);
 
   const handleOnClick = () => {
     setIsDrop(!isDrop);
   };
 
   const handleViewAll = () => {
-    if (viewMemberClick) {
-      viewMemberClick(1);
-    }
+    viewMemberClick?.(1);
   };
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(
       `${import.meta.env.VITE_API_URL}/jf-link/${currentConversation}`,
     );
-    message.info('Đã sao chép link');
+    toast.info('Đã sao chép link');
   };
 
-  const handleChangeSatus = async () => {
+  const handleChangeStatus = async () => {
     try {
       await conversationApi.changeStatusForGroup(
         currentConversation,
-        status ? 0 : 1,
+        status ? false : true,
       );
-
-      setSatus(!status);
-      message.success('Cập nhật thành công');
+      setStatus(!status);
+      toast.success('Cập nhật thành công');
     } catch (error) {
-      message.error('Cập nhật thành công');
+      toast.error('Cập nhật thất bại');
     }
+    setShowConfirm(false);
   };
-  function showConfirm() {
-    confirm({
-      title: 'Cảnh báo',
-      icon: <ExclamationCircleOutlined />,
-      content: status
-        ? 'Người dùng có thể không tham gia bằng link được nữa'
-        : 'Người dùng có thể tham gia bằng link',
-      onOk: handleChangeSatus,
-      okText: 'Đồng ý',
-      cancelText: 'Hủy',
-    });
-  }
 
   return (
-    <div className="info_member">
-      <div className="info_member-header" onClick={handleOnClick}>
-        <div className="info_member-header-title">Thành viên nhóm</div>
+    <div className="border-b py-3">
+      <button
+        className="w-full flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors rounded-lg"
+        onClick={handleOnClick}
+      >
+        <span className="font-medium text-sm">Thành viên nhóm</span>
+        <ChevronDown
+          className={`h-4 w-4 transition-transform ${!isDrop ? '-rotate-90' : ''}`}
+        />
+      </button>
 
-        <div
-          className="info_member-header-icon"
-          style={isDrop ? {} : styleIconDrop}
+      <div className={`overflow-hidden transition-all ${isDrop ? 'max-h-96' : 'max-h-0'}`}>
+        <button
+          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors"
+          onClick={handleViewAll}
         >
-          <CaretDownOutlined />
-        </div>
-      </div>
-
-      <div className="info_member-interact" style={isDrop ? {} : styleInteract}>
-        <div className="info_member-interact-amount" onClick={handleViewAll}>
-          <div className="info_member-interact-amount-icon">
-            <GrGroup />
+          <div className="p-2 rounded-lg bg-muted">
+            <Users className="h-4 w-4" />
           </div>
+          <span className="text-sm">{quantity} thành viên</span>
+        </button>
 
-          <div className="info_member-interact-amount-text">
-            <span>{quantity} thành viên</span>
+        <div className="flex items-center gap-3 px-4 py-3">
+          <div className="p-2 rounded-lg bg-muted shrink-0">
+            <Link className="h-4 w-4" />
           </div>
-        </div>
-
-        <div className="info_member-interact-amount">
-          <div className="info_member-interact-amount-icon">
-            <LinkOutlined />
-          </div>
-
-          <div className="info_member-interact-amount-text">
-            <div className="info_member-interact_link-title">
-              Link tham gia nhóm
-            </div>
-
-            <div className="info_member-interact_link-des">
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium">Link tham gia nhóm</div>
+            <div className="text-xs text-muted-foreground truncate">
               {`${import.meta.env.VITE_API_URL}/jf-link/${currentConversation}`}
             </div>
           </div>
-
-          <div
-            className={`info_member-interact_button ${
-              checkLeader ? '' : 'flex-end'
-            }`}
-          >
-            <div className="copy-link cirle-button" onClick={handleCopyLink}>
-              <CopyOutlined />
-            </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={handleCopyLink}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
 
             {checkLeader && (
-              <>
-                {status ? (
-                  <div
-                    className="authorize-toggle cirle-button  green"
-                    onClick={showConfirm}
-                  >
-                    <UnlockOutlined />
-                  </div>
-                ) : (
-                  <div
-                    className="authorize-toggle cirle-button  red"
-                    onClick={showConfirm}
-                  >
-                    <LockOutlined />
-                  </div>
-                )}
-              </>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`h-8 w-8 ${status ? 'text-green-600' : 'text-destructive'}`}
+                onClick={() => setShowConfirm(true)}
+              >
+                {status ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+              </Button>
             )}
           </div>
         </div>
       </div>
+
+      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cảnh báo</AlertDialogTitle>
+            <AlertDialogDescription>
+              {status
+                ? 'Người dùng có thể không tham gia bằng link được nữa'
+                : 'Người dùng có thể tham gia bằng link'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={handleChangeStatus}>Đồng ý</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

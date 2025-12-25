@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { Spin } from 'antd';
-
+import { Loading } from '@/components/ui/loading';
 import ForgotPage from './pages/ForgotPage';
 import LoginPage from './pages/LoginPage';
 import RegistryPage from './pages/RegistryPage';
@@ -11,10 +9,8 @@ import NotFoundPage from '@/components/NotFoundPage';
 
 function Account() {
   const navigate = useNavigate();
-
-  const { isLoading } = useSelector((state) => state.account);
-  const { user } = useSelector((state) => state.global);
-  const { infoWebApps } = useSelector((state) => state.home);
+  const { isLoading } = useSelector((state: any) => state.account);
+  const { user } = useSelector((state: any) => state.global);
 
   useEffect(() => {
     if (user) {
@@ -24,17 +20,16 @@ function Account() {
   }, [user, navigate]);
 
   return (
-    <Spin spinning={isLoading}>
-      <div id="account_page">
+    <Loading spinning={isLoading}>
+      <div className="min-h-screen bg-background">
         <Routes>
           <Route path="login" element={<LoginPage />} />
           <Route path="registry" element={<RegistryPage />} />
           <Route path="forgot" element={<ForgotPage />} />
-
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
-    </Spin>
+    </Loading>
   );
 }
 

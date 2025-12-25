@@ -1,27 +1,53 @@
-import {
-  ExclamationCircleOutlined,
-  LeftOutlined,
-  TagTwoTone,
-} from '@ant-design/icons';
-import { Button, Input, message, Modal, Popover } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { ArrowLeft, Edit, Info, Plus, Tag, Trash } from 'lucide-react';
+import { toast } from 'sonner';
 
 import ServiceClassify from '@/api/classifyApi';
-
 import { fetchListClassify } from '../../slice/chatSlice';
-import { Edit, Plus, Tag, Trash } from 'lucide-react';
 
-function ModalClassify({ isVisible, onCancel, onOpen }) {
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+
+interface ModalClassifyProps {
+  isVisible: boolean;
+  onCancel: () => void;
+  onOpen: () => void;
+}
+
+function ModalClassify({ isVisible, onCancel, onOpen }: ModalClassifyProps) {
   const dispatch = useDispatch();
-  const previousName = useRef(null);
-  const { classifies, colors } = useSelector((state) => state.chat);
+  const previousName = useRef<any>(null);
+  const { classifies, colors } = useSelector((state: any) => state.chat);
 
   const [isShowModalAdd, setIsShowModalAdd] = useState(false);
   const [nameTag, setNameTag] = useState('');
-  const [color, setColor] = useState({});
+  const [color, setColor] = useState<any>({});
   const [isShowError, setIsShowError] = useState(false);
   const [isModalEdit, setIsModalEdit] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
 
   useEffect(() => {
     if (colors.length > 0) {
@@ -30,9 +56,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }) {
   }, [colors]);
 
   const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
-    }
+    onCancel?.();
   };
 
   const handleCancelModalAdd = () => {
@@ -43,27 +67,21 @@ function ModalClassify({ isVisible, onCancel, onOpen }) {
     setIsShowModalAdd(true);
     setIsModalEdit(false);
     setNameTag('');
-    if (onCancel) {
-      onCancel();
-    }
+    onCancel?.();
   };
 
   const handleBackModal = () => {
     setIsShowModalAdd(false);
     setIsModalEdit(false);
-
-    if (onOpen) {
-      onOpen();
-    }
+    onOpen?.();
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const index = classifies.findIndex(
-      (ele) => ele.name.toLowerCase() === value.toLowerCase(),
+      (ele: any) => ele.name.toLowerCase() === value.toLowerCase(),
     );
 
-    // !isModalEdit &&
     if (index >= 0) {
       if (!isModalEdit) {
         setIsShowError(true);
@@ -81,8 +99,8 @@ function ModalClassify({ isVisible, onCancel, onOpen }) {
     setNameTag(value);
   };
 
-  const handleClickColor = (color) => {
-    setColor(color);
+  const handleClickColor = (selectedColor: any) => {
+    setColor(selectedColor);
   };
 
   const handleCreateClassify = async () => {
@@ -90,187 +108,193 @@ function ModalClassify({ isVisible, onCancel, onOpen }) {
       try {
         await ServiceClassify.updateClassify(
           previousName.current._id,
-          nameTag,
-          color._id,
+          { name: nameTag, colorId: color._id },
         );
-        message.success('Cập nhật thành công');
+        toast.success('Cập nhật thành công');
         setIsShowModalAdd(false);
-        dispatch(fetchListClassify());
-        if (onOpen) {
-          onOpen();
-        }
+        dispatch(fetchListClassify() as any);
+        onOpen?.();
       } catch (error) {
-        message.error('Cập nhật thất bại');
+        toast.error('Cập nhật thất bại');
       }
     } else {
       try {
-        await ServiceClassify.addClassify(nameTag, color._id);
-        message.success('Thêm thành công');
+        await ServiceClassify.addClassify({ name: nameTag, colorId: color._id });
+        toast.success('Thêm thành công');
         setIsShowModalAdd(false);
-        dispatch(fetchListClassify());
+        dispatch(fetchListClassify() as any);
       } catch (error) {
-        message.error('Thêm thất bại');
+        toast.error('Thêm thất bại');
       }
     }
-
     setIsModalEdit(false);
   };
 
-  const content = (
-    <div className="popup-change-color">
-      <span>Thay đổi màu thẻ</span>
-      <div className="list-color">
-        {colors.length > 0 &&
-          colors.map((ele, index) => (
-            <div
-              key={index}
-              onClick={() => handleClickColor(ele)}
-              className="popup-color-item"
-              style={{ background: ele.code }}
-            />
-          ))}
-      </div>
-    </div>
-  );
-
-  const handleEditClasify = (value) => {
+  const handleEditClasify = (value: any) => {
     setIsModalEdit(true);
     setIsShowModalAdd(true);
-    if (onCancel) {
-      onCancel();
-    }
+    onCancel?.();
     setNameTag(value.name);
     setColor(value.color);
     previousName.current = value;
   };
 
-  const handleDeleteClasify = async (value) => {
+  const handleDeleteClasify = async (value: any) => {
     try {
       await ServiceClassify.deleteClassify(value._id);
-      message.success('Xóa thành công');
-      dispatch(fetchListClassify());
+      toast.success('Xóa thành công');
+      dispatch(fetchListClassify() as any);
     } catch (error) {
-      message.error('Xóa thất bại');
+      toast.error('Xóa thất bại');
     }
+    setDeleteConfirm(null);
   };
 
-  function confirm(value) {
-    Modal.confirm({
-      title: 'Cảnh báo',
-      icon: <ExclamationCircleOutlined />,
-      content: `Bạn có thực sự muốn xóa ? `,
-      okText: 'Đồng ý',
-      cancelText: 'Hủy',
-      onOk: () => {
-        handleDeleteClasify(value);
-      },
-    });
-  }
+  const isSubmitDisabled =
+    nameTag.trim().length === 0 ||
+    isShowError ||
+    !(
+      previousName.current?.name !== nameTag ||
+      previousName.current?.color._id !== color?._id
+    );
 
   return (
     <>
-      <Modal
-        open={isVisible}
-        title="Quản lý thẻ phân loại"
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <div className="space-y-2">
-          {classifies.map((ele, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-2 bg-gray-50 rounded-md"
-            >
-              <div className="flex items-center gap-2">
-                <TagTwoTone twoToneColor={ele.color.code} />
-                <div className="text-sm font-medium">{ele.name}</div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  className="p-1 hover:bg-gray-200 rounded"
-                  onClick={() => handleEditClasify(ele)}
-                >
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-1 hover:bg-gray-200 rounded"
-                  onClick={() => confirm(ele)}
-                >
-                  <Trash className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          ))}
-
-          <button
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600"
-            onClick={handleShowModalAdd}
-          >
-            <Plus className="w-4 h-4" /> Thêm phân loại
-          </button>
-        </div>
-      </Modal>
-
-      <Modal
-        title={
-          <div className="modal-add_header">
-            <div className="modal-add_header--icon" onClick={handleBackModal}>
-              <LeftOutlined />
-            </div>
-            <span>
-              {isModalEdit ? 'Chi Tiết thẻ phân loại' : 'Thêm thẻ phân loại'}
-            </span>
-          </div>
-        }
-        open={isShowModalAdd}
-        onOk={handleCreateClassify}
-        onCancel={handleCancelModalAdd}
-        okButtonProps={{
-          disabled:
-            (nameTag.trim().length > 0 ? false : true) ||
-            isShowError ||
-            !(
-              previousName.current?.name !== nameTag ||
-              previousName.current?.color._id !== color?._id
-            ),
-        }}
-        okText={isModalEdit ? 'Cập nhật' : 'Thêm phân loại'}
-        cancelText="Hủy"
-      >
-        <div className="modal-add-classify_wrapper">
-          <div className="modal-add-classify--title">Tên thẻ phân loại</div>
-
-          <div className="modal-add-classify--input">
-            <Input
-              spellCheck={false}
-              value={nameTag}
-              size="middle"
-              placeholder="Nhập tên thẻ phân loại"
-              onChange={handleInputChange}
-              suffix={
-                <div className="tag-select-icon">
-                  <Popover content={content} trigger="click">
-                    <Button
-                      type="text"
-                      icon={<TagTwoTone twoToneColor={color?.code} />}
-                    />
-                  </Popover>
+      <Dialog open={isVisible} onOpenChange={(open) => !open && handleCancel()}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold">
+              Quản lý thẻ phân loại
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 py-4">
+            {classifies.map((ele: any, index: number) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <Tag
+                    className="h-4 w-4"
+                    style={{ color: ele.color.code }}
+                  />
+                  <span className="text-sm font-medium">{ele.name}</span>
                 </div>
-              }
-            />
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handleEditClasify(ele)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-destructive hover:text-destructive"
+                    onClick={() => setDeleteConfirm(ele)}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+            <Button
+              className="w-full mt-4"
+              onClick={handleShowModalAdd}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Thêm phân loại
+            </Button>
           </div>
+        </DialogContent>
+      </Dialog>
 
-          <div className="check-name-classify">
-            {isShowError && (
-              <h4 style={{ color: 'red' }}>
-                <InfoCircleFilled />
-                Tên phân loại đã tồn tại
-              </h4>
-            )}
+      <Dialog open={isShowModalAdd} onOpenChange={(open) => !open && handleCancelModalAdd()}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleBackModal}
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <DialogTitle>
+                {isModalEdit ? 'Chi tiết thẻ phân loại' : 'Thêm thẻ phân loại'}
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Tên thẻ phân loại</label>
+              <div className="flex gap-2">
+                <Input
+                  value={nameTag}
+                  placeholder="Nhập tên thẻ phân loại"
+                  onChange={handleInputChange}
+                  className="flex-1"
+                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <Tag className="h-4 w-4" style={{ color: color?.code }} />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-3">
+                    <p className="text-sm font-medium mb-2">Thay đổi màu thẻ</p>
+                    <div className="flex flex-wrap gap-2">
+                      {colors.length > 0 &&
+                        colors.map((ele: any, index: number) => (
+                          <button
+                            key={index}
+                            onClick={() => handleClickColor(ele)}
+                            className="h-6 w-6 rounded-full border-2 border-transparent hover:border-foreground/20 transition-colors"
+                            style={{ background: ele.code }}
+                          />
+                        ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+              {isShowError && (
+                <p className="text-sm text-destructive flex items-center gap-1">
+                  <Info className="h-3 w-3" />
+                  Tên phân loại đã tồn tại
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      </Modal>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCancelModalAdd}>
+              Hủy
+            </Button>
+            <Button onClick={handleCreateClassify} disabled={isSubmitDisabled}>
+              {isModalEdit ? 'Cập nhật' : 'Thêm phân loại'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cảnh báo</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có thực sự muốn xóa thẻ phân loại này?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={() => handleDeleteClasify(deleteConfirm)}>
+              Đồng ý
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

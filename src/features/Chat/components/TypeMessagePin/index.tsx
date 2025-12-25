@@ -1,83 +1,63 @@
-import { FontColorsOutlined, PlaySquareOutlined } from '@ant-design/icons';
-import { Image, Tag } from 'antd';
+import { FileText, PlaySquare, Type } from 'lucide-react';
 import OverlayImage from '@/components/OverlayImage';
-import PropTypes from 'prop-types';
-import React from 'react';
 import { defaultStyles, FileIcon } from 'react-file-icon';
 import fileHelpers from '@/utils/fileHelpers';
 
-TypeMessagePin.propTypes = {
-  type: PropTypes.string,
-  content: PropTypes.string,
-  name: PropTypes.string,
-};
+interface TypeMessagePinProps {
+  type?: string;
+  content?: string;
+  name?: string;
+}
 
-TypeMessagePin.defaultProps = {
-  type: '',
-  content: '',
-  name: '',
-};
-
-function TypeMessagePin({ type, content, name }) {
+function TypeMessagePin({ type = '', content = '', name = '' }: TypeMessagePinProps) {
   const fileName = type === 'FILE' ? fileHelpers.getFileName(content) : '';
-  const fileExtension =
-    type === 'FILE' ? fileHelpers.getFileExtension(fileName) : '';
+  const fileExtension = type === 'FILE' ? fileHelpers.getFileExtension(fileName) : '';
 
   return (
-    <div className="type-pin-message">
+    <div className="text-sm">
       {type === 'TEXT' && (
-        <div className="text-pin">{`${name}: ${content}`}</div>
+        <span className="text-muted-foreground truncate">
+          {name}: {content}
+        </span>
       )}
 
       {type === 'IMAGE' && (
-        <div className="type-pin-message_IMAGE">
-          <div className="type-pin-message_name">{name}:&nbsp;</div>
-
-          <div className="type-pin-message_des">
-            <Image
-              height={20}
-              src={content}
-              preview={{ mask: <OverlayImage />, visible: false }}
-            />
-          </div>
+        <div className="flex items-center gap-1">
+          <span className="text-muted-foreground">{name}:</span>
+          <img
+            src={content}
+            alt=""
+            className="h-5 w-5 object-cover rounded"
+          />
         </div>
       )}
 
       {type === 'HTML' && (
-        <div className="type-pin-message_HTML">
-          <div className="type-pin-message_name">{name}:&nbsp;</div>
-
-          <div className="type-pin-message_des">
-            <FontColorsOutlined /> văn bản
-          </div>
+        <div className="flex items-center gap-1">
+          <span className="text-muted-foreground">{name}:</span>
+          <Type className="h-4 w-4" />
+          <span>văn bản</span>
         </div>
       )}
 
       {type === 'VIDEO' && (
-        <div className="type-pin-message_VIDEO">
-          <div className="type-pin-message_name">{name}:&nbsp;</div>
-
-          <div className="type-pin-message_des">
-            video&nbsp;
-            <PlaySquareOutlined />
-          </div>
+        <div className="flex items-center gap-1">
+          <span className="text-muted-foreground">{name}:</span>
+          <span>video</span>
+          <PlaySquare className="h-4 w-4" />
         </div>
       )}
 
       {type === 'FILE' && (
-        <div className="type-pin-message_FILE">
-          <div className="type-pin-message_name">{name}:&nbsp;</div>
-
-          <div className="type-pin-message_des_FILE">
-            <div className="file_info-icon">
-              <FileIcon
-                extension={fileExtension}
-                {...defaultStyles[fileExtension]}
-              />
-            </div>
-
-            <div className="file_info-name">{fileName}</div>
+        <div className="flex items-center gap-1">
+          <span className="text-muted-foreground">{name}:</span>
+          <div className="h-4 w-4">
+            <FileIcon
+              extension={fileExtension}
+              {...(defaultStyles as any)[fileExtension]}
+            />
           </div>
+          <span className="truncate max-w-24">{fileName}</span>
         </div>
       )}
     </div>

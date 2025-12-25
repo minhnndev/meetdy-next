@@ -1,86 +1,52 @@
-import { Button } from 'antd';
 import PersonalIcon from '@/features/Chat/components/PersonalIcon';
+import { Button } from '@/components/ui/button';
 
-function FriendCard({ isMyRequest, data, onAccept, onDeny, onCancel }) {
+interface FriendCardProps {
+  isMyRequest?: boolean;
+  data: any;
+  onAccept?: (data: any) => void;
+  onDeny?: (data: any) => void;
+  onCancel?: (data: any) => void;
+}
+
+function FriendCard({ isMyRequest = false, data, onAccept, onDeny, onCancel }: FriendCardProps) {
   const handleRemoveMyRequest = () => {
-    if (onCancel) {
-      onCancel(data);
-    }
+    onCancel?.(data);
   };
 
   const handleDeniedRequest = () => {
-    if (onDeny) {
-      onDeny(data);
-    }
+    onDeny?.(data);
   };
 
   const handleAcceptFriend = () => {
-    if (onAccept) {
-      onAccept(data);
-    }
+    onAccept?.(data);
   };
 
   return (
-    <div className="friend-card">
-      <div className="friend-card_info-user">
-        <div className="friend-card_avatar">
-          <PersonalIcon
-            avatar={data.avatar}
-            dimension={72}
-            name={data.name}
-            color={data.avatarColor}
-          />
-        </div>
-        <div className="friend-card_name">
-          {data.name}
-
-          {/* btn-responsive */}
-          <div className="friend-card_interact-mobile">
-            {isMyRequest ? (
-              <div className="friend-card_button friend-card_cancel-request">
-                <Button type="danger" onClick={handleRemoveMyRequest}>
-                  Hủy yêu cầu
-                </Button>
-              </div>
-            ) : (
-              <>
-                <div className="friend-card_button friend-card_button--deny">
-                  <Button type="default" onClick={handleDeniedRequest}>
-                    Bỏ qua
-                  </Button>
-                </div>
-
-                <div className="friend-card_button friend-card_button--accept">
-                  <Button type="primary" onClick={handleAcceptFriend}>
-                    Đồng ý
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+    <div className="flex items-center justify-between p-4 bg-card rounded-xl border hover:shadow-sm transition-shadow">
+      <div className="flex items-center gap-4">
+        <PersonalIcon
+          avatar={data.avatar}
+          dimension={56}
+          name={data.name}
+          color={data.avatarColor}
+        />
+        <div className="font-medium">{data.name}</div>
       </div>
 
-      <div className="friend-card_interact">
+      <div className="flex items-center gap-2">
         {isMyRequest ? (
-          <div className="friend-card_button friend-card_button--accept">
-            <Button type="danger" onClick={handleRemoveMyRequest}>
-              Hủy yêu cầu
-            </Button>
-          </div>
+          <Button variant="destructive" size="sm" onClick={handleRemoveMyRequest}>
+            Hủy yêu cầu
+          </Button>
         ) : (
           <>
-            <div className="friend-card_button friend-card_button--deny">
-              <Button type="default" onClick={handleDeniedRequest}>
-                Bỏ qua
-              </Button>
-            </div>
-
-            <div className="friend-card_button friend-card_button--accept">
-              <Button type="primary" onClick={handleAcceptFriend}>
-                Đồng ý
-              </Button>
-            </div>
+            <Button variant="outline" size="sm" onClick={handleDeniedRequest}>
+              Bỏ qua
+            </Button>
+            <Button size="sm" onClick={handleAcceptFriend}>
+              Đồng ý
+            </Button>
           </>
         )}
       </div>

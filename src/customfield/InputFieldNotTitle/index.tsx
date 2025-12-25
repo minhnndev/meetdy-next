@@ -1,20 +1,26 @@
-import { Input } from 'antd';
-import TagCustom from '@/components/TagCustom';
 import { ErrorMessage } from 'formik';
+import { Input } from '@/components/ui/input';
+import TagCustom from '@/components/TagCustom';
 
-InputFieldNotTitle.defaultProps = {
-  type: 'text',
-  placeholder: '',
-  maxLength: 100,
-  disabled: false,
-};
+interface InputFieldNotTitleProps {
+  field: any;
+  type?: string;
+  placeholder?: string;
+  maxLength?: number;
+  disabled?: boolean;
+}
 
-function InputFieldNotTitle(props) {
-  const { field, type, placeholder, maxLength, disabled } = props;
+function InputFieldNotTitle({
+  field,
+  type = 'text',
+  placeholder = '',
+  maxLength = 100,
+  disabled = false,
+}: InputFieldNotTitleProps) {
   const { name } = field;
 
   return (
-    <div>
+    <div className="space-y-1">
       <Input
         {...field}
         type={type}
