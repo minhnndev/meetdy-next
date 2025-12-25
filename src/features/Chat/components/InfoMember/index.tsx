@@ -58,7 +58,7 @@ function InfoMember({ viewMemberClick, quantity }: InfoMemberProps) {
     try {
       await conversationApi.changeStatusForGroup(
         currentConversation,
-        status ? false : true,
+        !status,
       );
       setStatus(!status);
       toast.success('Cập nhật thành công');
