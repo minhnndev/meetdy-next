@@ -47,7 +47,7 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="App">
+      <div>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/jf-link/:conversationId" element={<JoinFromLink />} />
@@ -62,7 +62,6 @@ function App() {
             <Route path="/admin/*" element={<Admin />} />
           </Route>
 
-          {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

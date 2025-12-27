@@ -21,23 +21,18 @@ function ConverMultiSearch({ data }) {
   };
 
   return (
-    <div className="list-filter_single-conver">
+    <div>
       {data.length === 0 && <Empty />}
 
       {data.map((ele, index) => (
-        <div
-          key={index}
-          className="single-conver_item"
-          onClick={() => handleClickItem(ele)}
-        >
+        <div key={index} onClick={() => handleClickItem(ele)}>
           <ConversationAvatar
             avatar={ele.avatar}
             totalMembers={ele.totalMembers}
             type={ele.type}
-            name={ele}
+            name={ele.name}
           />
-
-          <div className="single-conver_name">{ele.name}</div>
+          <div>{ele.name}</div>
         </div>
       ))}
     </div>

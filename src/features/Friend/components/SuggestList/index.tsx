@@ -1,16 +1,23 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import SuggestCard from '../SuggestCard';
 import UserCard from '@/components/UserCard';
 
+type SuggestUser = {
+  id?: string;
+  _id?: string;
+  status?: string;
+  [key: string]: any;
+};
+
 interface SuggestListProps {
-  data?: Array<any>;
+  data?: SuggestUser[];
 }
 
 export default function SuggestList({ data = [] }: SuggestListProps) {
   const [isUserCardVisible, setIsUserCardVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any>({});
+  const [selectedUser, setSelectedUser] = useState<SuggestUser>({});
 
-  const handleSelectUser = (user: any) => {
+  const handleSelectUser = (user: SuggestUser) => {
     setSelectedUser(user);
     setIsUserCardVisible(true);
   };
@@ -19,34 +26,38 @@ export default function SuggestList({ data = [] }: SuggestListProps) {
     setIsUserCardVisible(false);
   };
 
-  const filteredData = data.filter((u) => u.status === 'NOT_FRIEND');
+  const filteredData = useMemo(
+    () => data.filter((u) => u.status === 'NOT_FRIEND'),
+    [data],
+  );
 
   return (
-    <div id="suggest_list">
+    <div className="space-y-3">
       <UserCard
         user={selectedUser}
         isVisible={isUserCardVisible}
         onCancel={handleCloseUserCard}
       />
 
-      <div
-        className="
-        grid gap-4
-        grid-cols-1
-        sm:grid-cols-2
-        md:grid-cols-2
-        lg:grid-cols-3
-        xl:grid-cols-4
-      "
-      >
-        {filteredData.map((item, index) => (
-          <SuggestCard
-            key={item.id || index}
-            data={item}
-            onClick={handleSelectUser}
-          />
-        ))}
-      </div>
+      {filteredData.length === 0 ? (
+        <div className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">
+          Không có gợi ý kết bạn phù hợp.
+        </div>
+      ) : (
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredData.map((item) => (
+            <SuggestCard
+              key={
+                item.id ??
+                item._id ??
+                `${item.username ?? ''}-${item.name ?? ''}`
+              }
+              data={item}
+              onClick={handleSelectUser}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

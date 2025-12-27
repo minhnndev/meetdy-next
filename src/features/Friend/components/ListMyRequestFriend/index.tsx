@@ -13,7 +13,7 @@ function ListMyFriendRequest({ data = [] }) {
   };
 
   return (
-    <div className="list-my-friend-request">
+    <div className="space-y-3">
       {data &&
         data.length > 0 &&
         data.map((ele, index) => (

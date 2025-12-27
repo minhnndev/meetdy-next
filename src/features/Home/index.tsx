@@ -13,7 +13,7 @@ function Home() {
 
   return (
     <Loading size="lg" spinning={isLoading}>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         <Header data={infoApp} />
         <Feature data={features} />
         <AboutWebApp data={infoWebApps} />

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Scrollbars from 'react-custom-scrollbars-2';
 import { useDispatch } from 'react-redux';
 import { toast } from 'sonner';
@@ -7,7 +7,6 @@ import friendApi from '@/api/friendApi';
 import userApi from '@/api/userApi';
 import { fetchFriends } from '../../friendSlice';
 
-import UserCard from '@/components/UserCard';
 import FriendItem from '../FriendItem';
 
 import {
@@ -21,34 +20,40 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-interface ListFriendProps {
-  data: any[];
-}
+type Friend = {
+  _id?: string;
+  id?: string;
+  username?: string;
+  name?: string;
+  [key: string]: any;
+};
 
-function ListFriend({ data }: ListFriendProps) {
+type Props = {
+  data?: Friend[];
+};
+
+function ListFriend({ data = [] }: Props) {
   const dispatch = useDispatch();
-  const [isVisible, setIsVisible] = useState(false);
-  const [userIsFind, setUserIsFind] = useState<any>({});
-  const [deleteConfirm, setDeleteConfirm] = useState<any>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<Friend | null>(null);
 
   const handleOnClickMenu = async (key: string, id: string) => {
-    if (key === '2') {
-      const tempUser = data.find((ele) => ele._id === id);
-      setDeleteConfirm(tempUser);
-    } else {
-      setIsVisible(true);
-      const tempUser = data.find((ele) => ele._id === id);
-      const realUser = await userApi.getUser(tempUser.username);
-      setUserIsFind(realUser);
-    }
-  };
+    const tempUser = data.find((ele) => ele?._id === id || ele?.id === id);
+    if (!tempUser) return;
 
-  const handleCancelModalUserCard = () => {
-    setIsVisible(false);
+    if (key === '2') {
+      setDeleteConfirm(tempUser);
+      return;
+    }
+
+    const realUser = await userApi.getUser(tempUser.username as any);
+    console.log('🚀 ~ realUser:', realUser);
   };
 
   const handleDeleteFriend = async () => {
-    if (!deleteConfirm) return;
+    if (!deleteConfirm?._id) {
+      setDeleteConfirm(null);
+      return;
+    }
     try {
       await friendApi.deleteFriend(deleteConfirm._id);
       dispatch(fetchFriends() as any);
@@ -59,34 +64,48 @@ function ListFriend({ data }: ListFriendProps) {
     setDeleteConfirm(null);
   };
 
-  return (
-    <>
-      <Scrollbars
-        autoHide={true}
-        autoHideTimeout={1000}
-        autoHideDuration={200}
-        style={{ height: '500px', width: '100%' }}
-      >
-        {data.length > 0 &&
-          data.map((e, index) => (
-            <FriendItem key={index} data={e} onClickMenu={handleOnClickMenu} />
-          ))}
-      </Scrollbars>
+  const items = useMemo(() => data.filter(Boolean), [data]);
 
-      <AlertDialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
+  const renderAlertWarning = () => {
+    return (
+      <AlertDialog
+        open={!!deleteConfirm}
+        onOpenChange={() => setDeleteConfirm(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Xác nhận</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có thực sự muốn xóa <strong>{deleteConfirm?.name}</strong> khỏi danh sách bạn bè?
+              Bạn có thực sự muốn xóa <strong>{deleteConfirm?.name}</strong>{' '}
+              khỏi danh sách bạn bè?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Hủy</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteFriend}>Xóa</AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteFriend}>
+              Xóa
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    );
+  };
+
+  return (
+    <>
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="flex flex-col">
+          {items.map((e) => (
+            <FriendItem
+              key={e._id ?? e.id ?? e.username}
+              data={e}
+              onClickMenu={handleOnClickMenu}
+            />
+          ))}
+        </div>
+      </div>
+
+      {renderAlertWarning()}
     </>
   );
 }

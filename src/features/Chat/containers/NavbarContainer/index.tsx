@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   MessageSquare,
   Users,
@@ -14,7 +14,6 @@ import {
   HelpCircle,
   Shield,
   Palette,
-  ChevronRight,
 } from 'lucide-react';
 
 import {
@@ -22,12 +21,6 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from '@/components/ui/popover';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
@@ -38,6 +31,7 @@ import { setToTalUnread } from '../../slice/chatSlice';
 import ModalChangePassword from '@/components/ModalChangePassword';
 import ModalUpdateProfile from '@/features/Chat/components/ModalUpdateProfile';
 import PersonalIcon from '@/features/Chat/components/PersonalIcon';
+
 import MenuItem from './MenuItem';
 import NavButton from './NavButton';
 
@@ -178,45 +172,37 @@ export default function NavbarContainer() {
   );
 
   return (
-    <TooltipProvider delayDuration={200}>
+    <>
       <div className="h-full w-full bg-muted/30 border-r flex flex-col">
         <div className="p-3 flex justify-center">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-            <MessageSquare className="h-5 w-5 text-primary-foreground" />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center">
+            <MessageSquare className="h-5 w-5 text-primary" />
           </div>
         </div>
 
-        <Separator className="mx-3" />
+        <Separator />
 
         <div className="p-3 flex justify-center">
           <Popover open={profileOpen} onOpenChange={setProfileOpen}>
             <PopoverTrigger asChild>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="p-0 rounded-full ring-2 ring-transparent hover:ring-primary/30 transition"
-                  >
-                    <PersonalIcon
-                      isActive
-                      common={false}
-                      avatar={user?.avatar}
-                      name={user?.name}
-                      color={user?.avatarColor}
-                    />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right">Tài khoản</TooltipContent>
-              </Tooltip>
+              <Button
+                variant="ghost"
+                className="p-0 rounded-full ring-2 ring-transparent hover:ring-primary/30 transition"
+              >
+                <PersonalIcon
+                  isActive
+                  common={false}
+                  avatar={user?.avatar}
+                  name={user?.name}
+                  color={user?.avatarColor}
+                />
+              </Button>
             </PopoverTrigger>
-
-            <PopoverContent side="right" sideOffset={12} className="p-0 z-50">
-              {profileContent}
-            </PopoverContent>
+            <PopoverContent side="right">{profileContent}</PopoverContent>
           </Popover>
         </div>
 
-        <Separator className="mx-3" />
+        <Separator />
 
         {/* Navigation */}
         <nav className="flex-1 p-3 flex flex-col gap-2">
@@ -239,23 +225,18 @@ export default function NavbarContainer() {
           </NavButton>
         </nav>
 
-        <Separator className="mx-3" />
+        <Separator />
 
         {/* Settings */}
         <div className="p-3">
           <Popover open={settingsOpen} onOpenChange={setSettingsOpen}>
             <PopoverTrigger asChild>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="w-full h-12 rounded-xl hover:bg-muted"
-                  >
-                    <Settings className="h-5 w-5" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right">Cài đặt</TooltipContent>
-              </Tooltip>
+              <Button
+                variant="ghost"
+                className="w-full h-12 rounded-xl hover:bg-muted"
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
             </PopoverTrigger>
 
             <PopoverContent side="right" sideOffset={12} className="p-0 z-50">
@@ -277,6 +258,6 @@ export default function NavbarContainer() {
         onCancel={() => setIsModalUpdateProfileVisible(false)}
         onSuccess={() => setIsModalUpdateProfileVisible(false)}
       />
-    </TooltipProvider>
+    </>
   );
 }

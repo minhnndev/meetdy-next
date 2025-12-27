@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { Icon } from '@/components/ui/icon';
-import { Delete, DotIcon, Info } from 'lucide-react';
+import { Delete, DotIcon, Info, Menu } from 'lucide-react';
 
 type FriendItemProps = {
   data: any;
@@ -58,7 +58,6 @@ export default function FriendItem({ data, onClickMenu }: FriendItemProps) {
             e.preventDefault();
           }}
         >
-          {/* Left Section */}
           <div
             className="flex items-center gap-3 flex-1"
             onClick={handleOpenConversation}
@@ -81,20 +80,18 @@ export default function FriendItem({ data, onClickMenu }: FriendItemProps) {
             </div>
           </div>
 
-          {/* Right Section */}
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
               className="h-8 w-8 rounded-full hover:bg-muted"
             >
-              <Icon icon={DotIcon} className="text-lg" />
+              <Icon icon={Menu} />
             </Button>
           </DropdownMenuTrigger>
         </div>
       </DropdownMenuTrigger>
 
-      {/* Menu Content */}
       <DropdownMenuContent className="w-40">
         <DropdownMenuItem onClick={() => handleMenuSelect('1')}>
           <Icon icon={Info} className="mr-2 text-base" />

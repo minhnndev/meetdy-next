@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import Scrollbars from 'react-custom-scrollbars-2';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Icon } from '@/components/ui/icon';
@@ -10,6 +9,8 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { CardHeader, CardTitle } from '@/components/ui/card';
 
 import conversationApi from '@/api/conversationApi';
 import FilterContainer from '@/components/FilterContainer';
@@ -35,11 +36,130 @@ import {
 import { getValueFromKey } from '@/constants/filterFriend';
 import { sortGroup } from '@/utils/groupUtils';
 
-// Spinner
 function Spinner() {
   return (
-    <div className="flex items-center justify-center py-10">
-      <div className="h-6 w-6 animate-spin rounded-full border-4 border-gray-300 border-t-gray-700" />
+    <div className="flex items-center justify-center h-full">
+      <div className="h-6 w-6 animate-spin rounded-full border-4 border-muted border-t-primary" />
+    </div>
+  );
+}
+
+type RootState = any;
+
+type TabKey = 0 | 1 | 2;
+
+type SidebarItemProps = {
+  icon: string;
+  label: string;
+  active?: boolean;
+  onClick?: () => void;
+  count?: number;
+};
+
+type SectionProps = {
+  title: string;
+  children: React.ReactNode;
+  right?: React.ReactNode;
+  className?: string;
+};
+
+function SidebarItem({
+  icon,
+  label,
+  active,
+  onClick,
+  count,
+}: SidebarItemProps) {
+  return (
+    <Button
+      type="button"
+      variant={active ? 'secondary' : 'ghost'}
+      onClick={onClick}
+      className="w-full justify-start gap-3 h-10 px-3"
+    >
+      <Icon icon={icon} className="text-lg" />
+      <span className="text-sm font-medium truncate">{label}</span>
+      {typeof count === 'number' && (
+        <span className="ml-auto text-xs text-muted-foreground tabular-nums">
+          {count}
+        </span>
+      )}
+    </Button>
+  );
+}
+
+function Section({ title, children, right, className }: SectionProps) {
+  return (
+    <div className={className}>
+      <CardHeader className="py-3 px-4">
+        <div className="flex items-center justify-between gap-3">
+          <CardTitle className="text-sm font-semibold">{title}</CardTitle>
+          {right}
+        </div>
+      </CardHeader>
+      <div className="px-4 pb-4 pt-0">{children}</div>
+    </div>
+  );
+}
+
+type GroupFiltersProps = {
+  groupCount: number;
+  groupFilterType: string;
+  sortFilterType: string;
+  onLeftChange: (v: string) => void;
+  onRightChange: (v: string) => void;
+};
+
+function GroupFilters(props: GroupFiltersProps) {
+  const {
+    groupCount,
+    groupFilterType,
+    sortFilterType,
+    onLeftChange,
+    onRightChange,
+  } = props;
+
+  return (
+    <div className="flex justify-between items-center gap-2 px-4 py-3 border-b bg-white">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="gap-2">
+            <Icon icon="mdi:menu-down" className="text-base" />
+            <span className="truncate">
+              {getValueFromKey('LEFT', groupFilterType)} ({groupCount})
+            </span>
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="start">
+          <DropdownMenuItem onClick={() => onLeftChange('1')}>
+            Tất cả nhóm
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onLeftChange('2')}>
+            Nhóm tôi quản lý
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="gap-2">
+            <Icon icon="mdi:filter" className="text-base" />
+            <span className="truncate">
+              {getValueFromKey('RIGHT', sortFilterType)}
+            </span>
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => onRightChange('1')}>
+            A → Z
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onRightChange('2')}>
+            Z → A
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
@@ -48,7 +168,6 @@ export default function Friend() {
   const dispatch = useDispatch();
   const refOriginalGroups = useRef<any[]>([]);
 
-  /* ----------------------------- Redux State ----------------------------- */
   const {
     requestFriends,
     myRequestFriend,
@@ -57,35 +176,18 @@ export default function Friend() {
     phoneBook,
     isLoading,
     suggestFriends,
-  } = useSelector((state: any) => state.friend);
+  } = useSelector((state: RootState) => state.friend);
 
-  const { user } = useSelector((state: any) => state.global);
-
-  /* ----------------------------- Local UI State ----------------------------- */
-  const [activeTab, setActiveTab] = useState<0 | 1 | 2>(0);
+  const [activeTab, setActiveTab] = useState<TabKey>(0);
   const [groupFilterType, setGroupFilterType] = useState('1');
   const [sortFilterType, setSortFilterType] = useState('1');
   const [filteredGroups, setFilteredGroups] = useState<any[]>([]);
-  const [groupSortKey, setGroupSortKey] = useState(1);
 
   const [searchValue, setSearchValue] = useState('');
   const [showFilterResult, setShowFilterResult] = useState(false);
 
-  const [singleSearchResult, setSingleSearchResult] = useState([]);
-  const [groupSearchResult, setGroupSearchResult] = useState([]);
-
-  /* ----------------------------- Effects ----------------------------- */
-  useEffect(() => {
-    if (groups.length > 0) {
-      const sorted = sortGroup(groups, 1);
-      refOriginalGroups.current = sorted;
-      setFilteredGroups(sorted);
-    }
-  }, [groups]);
-
-  useEffect(() => {
-    if (activeTab === 2) dispatch(fetchPhoneBook());
-  }, [activeTab]);
+  const [singleSearchResult, setSingleSearchResult] = useState<any[]>([]);
+  const [groupSearchResult, setGroupSearchResult] = useState<any[]>([]);
 
   useEffect(() => {
     dispatch(fetchListRequestFriend());
@@ -96,27 +198,17 @@ export default function Friend() {
     dispatch(fetchSuggestFriend());
   }, []);
 
-  /* ----------------------------- Handlers ----------------------------- */
-  const handleGroupLeftFilter = (key: string) => {
-    setGroupFilterType(key);
-
-    if (key === '2') {
-      setFilteredGroups(
-        refOriginalGroups.current.filter((g) => g.leaderId === user._id),
-      );
-    } else {
-      setFilteredGroups(sortGroup(refOriginalGroups.current, groupSortKey));
+  useEffect(() => {
+    if (groups.length) {
+      const sorted = sortGroup(groups, 1);
+      refOriginalGroups.current = sorted;
+      setFilteredGroups(sorted);
     }
-  };
+  }, [groups]);
 
-  const handleGroupSort = (key: string) => {
-    setSortFilterType(key);
-
-    const sortKey = key === '1' ? 1 : 0;
-    setGroupSortKey(sortKey);
-
-    setFilteredGroups(sortGroup(filteredGroups, sortKey));
-  };
+  useEffect(() => {
+    if (activeTab === 2) dispatch(fetchPhoneBook());
+  }, [activeTab]);
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
@@ -136,208 +228,134 @@ export default function Friend() {
 
       setSingleSearchResult(single);
       setGroupSearchResult(multiple);
-    } catch (_) {}
+    } catch {}
   };
 
-  /* ----------------------------- UI Render ----------------------------- */
+  const counts = useMemo(
+    () => ({
+      friends: friends?.length ?? 0,
+      request: requestFriends?.length ?? 0,
+      sent: myRequestFriend?.length ?? 0,
+      suggest: suggestFriends?.length ?? 0,
+    }),
+    [friends, requestFriends, myRequestFriend, suggestFriends],
+  );
+
+  if (isLoading) return <Spinner />;
+
   return (
-    <div className="w-full h-full">
-      {isLoading ? (
-        <Spinner />
-      ) : (
-        <div className="flex w-full h-full">
-          {/* ---------------- Sidebar ---------------- */}
-          <div className="w-full sm:w-1/2 md:w-7/12 lg:w-1/2 xl:w-5/12 border-r p-3 flex flex-col">
+    <div className="min-h-screen h-screen flex bg-white">
+      <aside className="w-full sm:w-72 lg:w-80 border-r border-slate-200/80 bg-white">
+        <div className="h-full flex flex-col">
+          <div className="px-4 pt-4 pb-3">
             <SearchContainer
               onSearchChange={handleSearchChange}
               valueText={searchValue}
               onSubmitSearch={handleSearchSubmit}
               isFriendPage
             />
+          </div>
 
+          <div className="flex-1 overflow-auto">
             {showFilterResult ? (
-              <FilterContainer
-                dataSingle={singleSearchResult}
-                dataMulti={groupSearchResult}
-                valueText={searchValue}
-              />
+              <div className="px-2 pb-4">
+                <FilterContainer
+                  dataSingle={singleSearchResult}
+                  dataMulti={groupSearchResult}
+                  valueText={searchValue}
+                />
+              </div>
             ) : (
-              <div className="mt-4 flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <SidebarItem
-                    icon="mdi:user"
-                    label="Danh sách kết bạn"
-                    onClick={() => setActiveTab(0)}
-                  />
-                  <SidebarItem
-                    icon="mdi:account-group"
-                    label="Danh sách nhóm"
-                    onClick={() => setActiveTab(1)}
-                  />
-                  <SidebarItem
-                    icon="mdi:contacts"
-                    label="Danh bạ"
-                    onClick={() => setActiveTab(2)}
-                  />
-                  <Separator className="my-3" />
-                </div>
+              <div className="px-2 pb-4 space-y-3">
+                <SidebarItem
+                  active={activeTab === 0}
+                  icon="mdi:user"
+                  label="Danh sách kết bạn"
+                  onClick={() => setActiveTab(0)}
+                  count={counts.request + counts.sent + counts.suggest}
+                />
+                <SidebarItem
+                  active={activeTab === 1}
+                  icon="mdi:account-group"
+                  label="Danh sách nhóm"
+                  onClick={() => setActiveTab(1)}
+                  count={filteredGroups.length}
+                />
+                <SidebarItem
+                  active={activeTab === 2}
+                  icon="mdi:contacts"
+                  label="Danh bạ"
+                  onClick={() => setActiveTab(2)}
+                />
 
-                <Section title={`Bạn bè (${friends.length})`}>
+                <Separator />
+
+                <Section title={`Bạn bè (${counts.friends})`}>
                   <ListFriend data={friends} />
                 </Section>
               </div>
             )}
           </div>
-
-          {/* ---------------- Body ---------------- */}
-          <div className="hidden sm:flex flex-col flex-1">
-            <div className="border-b p-3">
-              <HeaderFriend subtab={activeTab} />
-            </div>
-
-            <div className="flex-1 overflow-hidden">
-              <Scrollbars autoHide autoHideTimeout={800} autoHideDuration={200}>
-                {/* Group tab */}
-                {activeTab === 1 && (
-                  <>
-                    <GroupFilters
-                      groupCount={filteredGroups.length}
-                      groupFilterType={groupFilterType}
-                      sortFilterType={sortFilterType}
-                      onLeftChange={handleGroupLeftFilter}
-                      onRightChange={handleGroupSort}
-                    />
-
-                    <div className="p-3">
-                      <ListGroup data={filteredGroups} />
-                    </div>
-                  </>
-                )}
-
-                {/* Friend tab */}
-                {activeTab === 0 && (
-                  <div className="p-3 flex flex-col gap-6">
-                    <Section
-                      title={`Lời mời kết bạn (${requestFriends.length})`}
-                    >
-                      <ListRequestFriend data={requestFriends} />
-                    </Section>
-
-                    <Section
-                      title={`Đã gửi yêu cầu (${myRequestFriend.length})`}
-                    >
-                      <ListMyFriendRequest data={myRequestFriend} />
-                    </Section>
-
-                    <Section title={`Gợi ý kết bạn (${suggestFriends.length})`}>
-                      <SuggestList data={suggestFriends} />
-                    </Section>
-                  </div>
-                )}
-
-                {/* Contact Tab */}
-                {activeTab === 2 && (
-                  <div className="p-3 flex flex-col gap-3">
-                    {phoneBook?.map(
-                      (ele, idx) =>
-                        ele.isExists && <ContactItem key={idx} data={ele} />,
-                    )}
-                  </div>
-                )}
-              </Scrollbars>
-            </div>
-          </div>
         </div>
-      )}
-    </div>
-  );
-}
+      </aside>
 
-/* ---------------------------- Sub Components ---------------------------- */
+      <main className="flex-1 hidden sm:flex flex-col bg-white">
+        <header className="border-b border-slate-200/80 bg-white shadow-sm">
+          <HeaderFriend subtab={activeTab} />
+        </header>
 
-function Separator({ className = '' }) {
-  return <div className={`h-px bg-gray-200 ${className}`} />;
-}
+        <section className="flex-1 overflow-hidden bg-slate-50/40">
+          {activeTab === 0 && (
+            <div className="p-4 space-y-4">
+              <Section title={`Lời mời (${counts.request})`}>
+                <ListRequestFriend data={requestFriends} />
+              </Section>
 
-function SidebarItem({
-  icon,
-  label,
-  onClick,
-}: {
-  icon: string;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <div
-      onClick={onClick}
-      className="flex items-center gap-3 cursor-pointer hover:bg-gray-100 p-2 rounded-lg transition"
-    >
-      <Icon icon={icon} className="text-xl" />
-      <span className="text-sm font-medium">{label}</span>
-    </div>
-  );
-}
+              <Section title={`Đã gửi (${counts.sent})`}>
+                <ListMyFriendRequest data={myRequestFriend} />
+              </Section>
 
-function Section({ title, children }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="text-sm font-medium">{title}</div>
-      {children}
-    </div>
-  );
-}
+              <Section title={`Gợi ý (${counts.suggest})`}>
+                <SuggestList data={suggestFriends} />
+              </Section>
+            </div>
+          )}
 
-function GroupFilters({
-  groupCount,
-  groupFilterType,
-  sortFilterType,
-  onLeftChange,
-  onRightChange,
-}) {
-  return (
-    <div className="flex justify-between p-3">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-2 px-3 py-2 text-sm"
-          >
-            <Icon icon="mdi:menu-down" />
-            {getValueFromKey('LEFT', groupFilterType)} ({groupCount})
-          </Button>
-        </DropdownMenuTrigger>
+          {activeTab === 1 && (
+            <>
+              <GroupFilters
+                groupCount={filteredGroups.length}
+                groupFilterType={groupFilterType}
+                sortFilterType={sortFilterType}
+                onLeftChange={setGroupFilterType}
+                onRightChange={setSortFilterType}
+              />
+              <div className="p-4">
+                <Section title="Nhóm">
+                  <ListGroup data={filteredGroups} />
+                </Section>
+              </div>
+            </>
+          )}
 
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => onLeftChange('1')}>
-            Theo tên nhóm A → Z
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onLeftChange('2')}>
-            Nhóm tôi quản lý
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-2 px-3 py-2 text-sm"
-          >
-            <Icon icon="mdi:filter" />
-            {getValueFromKey('RIGHT', sortFilterType)}
-          </Button>
-        </DropdownMenuTrigger>
-
-        <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => onRightChange('1')}>
-            A → Z
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onRightChange('2')}>
-            Z → A
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          {activeTab === 2 && (
+            <div className="p-4">
+              <Section title="Danh bạ">
+                <div className="space-y-3">
+                  {phoneBook?.map((ele: any) =>
+                    ele.isExists ? (
+                      <ContactItem
+                        key={ele._id ?? ele.id ?? ele.username}
+                        data={ele}
+                      />
+                    ) : null,
+                  )}
+                </div>
+              </Section>
+            </div>
+          )}
+        </section>
+      </main>
     </div>
   );
 }

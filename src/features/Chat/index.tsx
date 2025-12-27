@@ -570,17 +570,14 @@ function Chat({ socket, idNewMessage }: { socket: any; idNewMessage?: any }) {
         />
       )}
 
-      <div className="min-h-screen h-screen flex bg-slate-50/50">
+      <div className="min-h-screen h-screen flex">
         <aside
-          className={`transition-all duration-200 bg-white border-r border-slate-200/80 ${
-            currentConversation ? 'hidden sm:block' : 'block w-full'
-          } sm:w-72 lg:w-80`}
+          className={`transition-all duration-200 
+            ${currentConversation ? 'hidden sm:block' : 'block w-full'} 
+            sm:w-72 lg:w-80`}
         >
           <div className="h-full flex flex-col">
             <div className="px-4 pt-4 pb-3">
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">
-                Tin nhắn
-              </h2>
               <SearchContainer
                 valueText={valueInput}
                 onSearchChange={handleOnSearchChange}
@@ -615,7 +612,7 @@ function Chat({ socket, idNewMessage }: { socket: any; idNewMessage?: any }) {
               />
             </header>
 
-            <section className="flex-1 flex flex-col overflow-hidden relative bg-gradient-to-b from-slate-50/50 to-white">
+            <section className="flex-1 flex flex-col overflow-hidden relative">
               <div className="flex-1 overflow-hidden px-4 py-2">
                 <BodyChatContainer
                   scrollId={scrollId}
