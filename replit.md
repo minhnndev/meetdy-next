@@ -53,6 +53,16 @@ A React-based chat application built with Vite, TypeScript, and Tailwind CSS v4.
 - GroupCard (BsThreeDotsVertical → MoreVertical from Lucide, improved card styling)
 - UserMessage toast notifications fixed to use sonner pattern
 
+## Design System (January 2026)
+- **Message bubbles**: 
+  - Sent: gradient primary background (from-primary to-primary/90), rounded-[18px], max-width 75%
+  - Received: slate-100 background, rounded-[18px], max-width 75%
+- **Conversation list**: rounded-2xl cards, ring-based active states, improved unread badges
+- **Timestamps**: 11px font size, 70% opacity for sent messages
+- **Seen indicator**: CheckCheck icon in emerald-500
+- **Modal dialogs**: rounded-2xl containers, rounded-xl inputs/buttons
+- **Hover states**: slate-50 background for list items, subtle shadows
+
 ## Development
 - Run: `npm run dev` (starts Vite dev server on port 5000)
 - Build: `npm run build` (outputs to `dist/`)
