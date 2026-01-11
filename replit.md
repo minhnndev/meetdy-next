@@ -38,11 +38,17 @@ A React-based chat application built with Vite, TypeScript, and Tailwind CSS v4.
 - PeerJS for WebRTC video calls
 - sonner for toast notifications
 
-## UI Migration Status (December 2025)
+## UI Migration Status (January 2026)
 - Migrated from Ant Design (antd) to shadcn/ui with Tailwind CSS v4
 - Applied modern Lark/Loop-inspired design
+- All @ant-design/icons replaced with lucide-react in user-facing components
 - Admin section still uses antd (lower priority)
 - All user-facing components now use shadcn/ui
+
+## Recently Migrated Components
+- FileItem, ReplyBlock, InfoTitle, PinItem, ConversationAvatar
+- ListReaction, ModalCreateGroup, ModalAddMemberToConver
+- CallVideo ActionNavbar (now uses shadcn Button instead of antd Menu)
 
 ## Development
 - Run: `npm run dev` (starts Vite dev server on port 5000)
