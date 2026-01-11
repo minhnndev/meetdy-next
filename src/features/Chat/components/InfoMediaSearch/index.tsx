@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import Scrollbars from 'react-custom-scrollbars-2';
 import { useSelector } from 'react-redux';
+import { ArrowLeft, Image, Video, FileText } from 'lucide-react';
 import mediaApi from '@/api/mediaApi';
 import ContentTabPaneFile from '../ContentTabPaneFile';
 import ContentTabPaneMedia from '../ContentTabPaneMedia';
-import InfoTitle from '../InfoTitle';
 import TabPaneMedia from '../TabPaneMedia';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 
 interface InfoMediaSearchProps {
   onBack?: (value?: any) => void;
@@ -66,58 +67,82 @@ function InfoMediaSearch({ onBack, tabpane }: InfoMediaSearchProps) {
   }, [query]);
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="border-b">
-        <InfoTitle
-          isBack={true}
-          text="Kho lưu trữ"
-          onBack={handleOnBack}
-          isSelected={true}
-        />
+    <div className="flex flex-col h-full bg-white">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-200">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => handleOnBack()}
+          className="h-8 w-8 rounded-lg hover:bg-slate-100"
+        >
+          <ArrowLeft className="w-4 h-4 text-slate-600" />
+        </Button>
+        <h3 className="font-semibold text-slate-900">Kho lưu trữ</h3>
       </div>
 
-      <div className="flex-1 overflow-hidden">
-        <Tabs value={activeKey} onValueChange={handleChangeTab} className="h-full flex flex-col">
-          <TabsList className="w-full grid grid-cols-3 mx-4 mt-4">
-            <TabsTrigger value="1">Ảnh</TabsTrigger>
-            <TabsTrigger value="2">Video</TabsTrigger>
-            <TabsTrigger value="3">File</TabsTrigger>
-          </TabsList>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Tabs value={activeKey} onValueChange={handleChangeTab} className="flex-1 flex flex-col">
+          <div className="px-4 pt-3">
+            <TabsList className="w-full grid grid-cols-3 h-10 rounded-xl bg-slate-100/80 p-1">
+              <TabsTrigger 
+                value="1" 
+                className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm flex items-center gap-1.5"
+              >
+                <Image className="w-4 h-4" />
+                <span>Ảnh</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="2"
+                className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm flex items-center gap-1.5"
+              >
+                <Video className="w-4 h-4" />
+                <span>Video</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="3"
+                className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm flex items-center gap-1.5"
+              >
+                <FileText className="w-4 h-4" />
+                <span>File</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="1" className="flex-1 overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-100">
             <TabPaneMedia
               members={memberInConversation}
               onQueryChange={handleQueryChange}
             />
-          </TabsContent>
-          <TabsContent value="2" className="flex-1 overflow-hidden">
-            <TabPaneMedia
-              members={memberInConversation}
-              onQueryChange={handleQueryChange}
-            />
-          </TabsContent>
-          <TabsContent value="3" className="flex-1 overflow-hidden">
-            <TabPaneMedia
-              members={memberInConversation}
-              onQueryChange={handleQueryChange}
-            />
-          </TabsContent>
+          </div>
+
+          <div className="flex-1 overflow-hidden">
+            <Scrollbars
+              autoHide
+              autoHideTimeout={1000}
+              autoHideDuration={200}
+              style={{ width: '100%', height: '100%' }}
+            >
+              <div className="p-4">
+                {activeKey === '1' && (
+                  <ContentTabPaneMedia items={medias} type="image" />
+                )}
+                {activeKey === '2' && (
+                  <ContentTabPaneMedia items={medias} type="video" />
+                )}
+                {activeKey === '3' && <ContentTabPaneFile items={medias} />}
+
+                {medias.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+                    {activeKey === '1' && <Image className="w-12 h-12 mb-3 opacity-50" />}
+                    {activeKey === '2' && <Video className="w-12 h-12 mb-3 opacity-50" />}
+                    {activeKey === '3' && <FileText className="w-12 h-12 mb-3 opacity-50" />}
+                    <p className="text-sm">Không có dữ liệu</p>
+                  </div>
+                )}
+              </div>
+            </Scrollbars>
+          </div>
         </Tabs>
-
-        <Scrollbars
-          autoHide={true}
-          autoHideTimeout={1000}
-          autoHideDuration={200}
-          style={{ width: '100%', height: '60%' }}
-        >
-          {activeKey === '1' && (
-            <ContentTabPaneMedia items={medias} type="image" />
-          )}
-          {activeKey === '2' && (
-            <ContentTabPaneMedia items={medias} type="video" />
-          )}
-          {activeKey === '3' && <ContentTabPaneFile items={medias} />}
-        </Scrollbars>
       </div>
     </div>
   );

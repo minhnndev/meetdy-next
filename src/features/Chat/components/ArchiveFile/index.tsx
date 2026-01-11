@@ -1,28 +1,14 @@
-import { CaretDownOutlined } from '@ant-design/icons';
+import { ChevronDown, FileText } from 'lucide-react';
 import FileItem from '@/components/FileItem';
-import PropTypes from 'prop-types';
 import { useState } from 'react';
 
-ArchiveFile.propTypes = {
-  viewMediaClick: PropTypes.func,
-  items: PropTypes.array,
-};
+interface ArchiveFileProps {
+  viewMediaClick?: (type: number, subtype: number) => void;
+  items?: any[];
+}
 
-ArchiveFile.defaultProps = {
-  viewMediaClick: null,
-  items: [],
-};
-
-function ArchiveFile(props) {
-  const { viewMediaClick, items } = props;
+function ArchiveFile({ viewMediaClick, items = [] }: ArchiveFileProps) {
   const [isDrop, setIsDrop] = useState(true);
-  const styleIconDrop = {
-    transform: 'rotate(-90deg)',
-  };
-
-  const styleInteract = {
-    maxHeight: '0px',
-  };
 
   const handleOnClick = () => {
     setIsDrop(!isDrop);
@@ -35,30 +21,48 @@ function ArchiveFile(props) {
   };
 
   return (
-    <div className="info_file">
-      <div className="info_file-header" onClick={handleOnClick}>
-        <div className="info_file-header-title">File</div>
-
-        <div
-          className="info_file-header-icon"
-          style={isDrop ? {} : styleIconDrop}
-        >
-          <CaretDownOutlined />
+    <div className="border-b border-slate-100">
+      <button
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
+        onClick={handleOnClick}
+      >
+        <div className="flex items-center gap-2">
+          <FileText className="w-4 h-4 text-slate-500" />
+          <span className="font-medium text-sm text-slate-700">File</span>
+          {items.length > 0 && (
+            <span className="text-xs text-slate-400">({items.length})</span>
+          )}
         </div>
-      </div>
+        <ChevronDown
+          className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${!isDrop ? '-rotate-90' : ''}`}
+        />
+      </button>
 
-      <div className="info_file-interact" style={isDrop ? {} : styleInteract}>
-        <div className="info_file-interact-file">
-          {items.map((itemEle, index) => {
-            if (index < 3) {
-              return <FileItem key={index} file={itemEle} />;
-            }
-          })}
+      <div
+        className={`overflow-hidden transition-all duration-200 ${isDrop ? 'max-h-96' : 'max-h-0'}`}
+      >
+        <div className="px-4 py-2 space-y-2">
+          {items.slice(0, 3).map((itemEle, index) => (
+            <FileItem key={index} file={itemEle} />
+          ))}
         </div>
 
-        <div className="info_file-interact-button">
-          <button onClick={handleViewAllOnClick}>Xem Tất cả</button>
-        </div>
+        {items.length > 0 && (
+          <div className="px-4 pb-3">
+            <button
+              onClick={handleViewAllOnClick}
+              className="text-sm text-primary font-medium hover:underline"
+            >
+              Xem tất cả {items.length > 3 && `(${items.length})`}
+            </button>
+          </div>
+        )}
+
+        {items.length === 0 && (
+          <div className="px-4 pb-3 text-sm text-slate-400">
+            Chưa có file nào
+          </div>
+        )}
       </div>
     </div>
   );

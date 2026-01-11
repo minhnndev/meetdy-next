@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Image as ImageIcon, Video } from 'lucide-react';
 import ImageItem from '../ImageItem';
 import ModalVideoCustom from '@/components/ModalVideoCustom';
 import ThumbnailCustom from '@/components/ThumbnailCustom';
@@ -39,56 +39,81 @@ function ArchiveMedia({ viewMediaClick, name = '', items = [] }: ArchiveMediaPro
     setCurrentVideo('');
   };
 
+  const displayItems = items.slice(0, 8);
+  const IconComponent = name === 'Video' ? Video : ImageIcon;
+
   return (
-    <div className="border-b py-3">
+    <div className="border-b border-slate-100">
       <button
-        className="w-full flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors rounded-lg"
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
         onClick={handleOnClick}
       >
-        <span className="font-medium text-sm">{name}</span>
+        <div className="flex items-center gap-2">
+          <IconComponent className="w-4 h-4 text-slate-500" />
+          <span className="font-medium text-sm text-slate-700">{name}</span>
+          {items.length > 0 && (
+            <span className="text-xs text-slate-400">({items.length})</span>
+          )}
+        </div>
         <ChevronDown
-          className={`h-4 w-4 transition-transform ${!isDrop ? '-rotate-90' : ''}`}
+          className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${!isDrop ? '-rotate-90' : ''}`}
         />
       </button>
 
       <div
-        className={`overflow-hidden transition-all ${isDrop ? 'max-h-96' : 'max-h-0'}`}
+        className={`overflow-hidden transition-all duration-200 ${isDrop ? 'max-h-[400px]' : 'max-h-0'}`}
       >
-        <div className="grid grid-cols-4 gap-2 px-4 py-2">
-          {name === 'Video' ? (
-            <>
-              {items.map((ele, index) => (
-                <ThumbnailCustom
-                  key={index}
-                  url={ele.content}
-                  onVisibleVideoModal={handleVisibleModal}
-                />
-              ))}
-            </>
-          ) : (
-            <>
-              {items.map((itemEle, index) => (
-                <ImageItem
-                  key={index}
-                  width={80}
-                  height={80}
-                  url={itemEle.content}
-                  type={name === 'Video' ? name.toLowerCase() : 'image'}
-                  onVisibleVideoModal={handleVisibleModal}
-                />
-              ))}
-            </>
-          )}
-        </div>
+        {displayItems.length > 0 ? (
+          <>
+            <div className="grid grid-cols-4 gap-1.5 px-4 py-2">
+              {name === 'Video' ? (
+                <>
+                  {displayItems.map((ele, index) => (
+                    <div 
+                      key={index} 
+                      className="aspect-square rounded-lg overflow-hidden bg-slate-100 hover:opacity-90 transition-opacity cursor-pointer"
+                    >
+                      <ThumbnailCustom
+                        url={ele.content}
+                        onVisibleVideoModal={handleVisibleModal}
+                      />
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <>
+                  {displayItems.map((itemEle, index) => (
+                    <div 
+                      key={index}
+                      className="aspect-square rounded-lg overflow-hidden bg-slate-100 hover:opacity-90 transition-opacity cursor-pointer"
+                    >
+                      <ImageItem
+                        width={80}
+                        height={80}
+                        url={itemEle.content}
+                        type="image"
+                        onVisibleVideoModal={handleVisibleModal}
+                      />
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
 
-        <div className="px-4">
-          <button
-            onClick={handleViewAllOnClick}
-            className="text-sm text-primary hover:underline"
-          >
-            Xem Tất cả
-          </button>
-        </div>
+            <div className="px-4 pb-3">
+              <button
+                onClick={handleViewAllOnClick}
+                className="text-sm text-primary font-medium hover:underline"
+              >
+                Xem tất cả {items.length > 8 && `(${items.length})`}
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="px-4 pb-3 text-sm text-slate-400">
+            Chưa có {name.toLowerCase()} nào
+          </div>
+        )}
       </div>
 
       <ModalVideoCustom

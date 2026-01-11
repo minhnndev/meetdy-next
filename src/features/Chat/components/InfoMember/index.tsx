@@ -15,6 +15,11 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface InfoMemberProps {
   viewMemberClick?: (type: number) => void;
@@ -69,75 +74,96 @@ function InfoMember({ viewMemberClick, quantity }: InfoMemberProps) {
   };
 
   return (
-    <div className="border-b py-3">
+    <div className="border-b border-slate-100">
       <button
-        className="w-full flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors rounded-lg"
+        className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-colors"
         onClick={handleOnClick}
       >
-        <span className="font-medium text-sm">Thành viên nhóm</span>
+        <div className="flex items-center gap-2">
+          <Users className="w-4 h-4 text-slate-500" />
+          <span className="font-medium text-sm text-slate-700">Thành viên</span>
+          <span className="text-xs text-slate-400">({quantity})</span>
+        </div>
         <ChevronDown
-          className={`h-4 w-4 transition-transform ${!isDrop ? '-rotate-90' : ''}`}
+          className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${!isDrop ? '-rotate-90' : ''}`}
         />
       </button>
 
-      <div className={`overflow-hidden transition-all ${isDrop ? 'max-h-96' : 'max-h-0'}`}>
+      <div className={`overflow-hidden transition-all duration-200 ${isDrop ? 'max-h-96' : 'max-h-0'}`}>
         <button
-          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
           onClick={handleViewAll}
         >
-          <div className="p-2 rounded-lg bg-muted">
-            <Users className="h-4 w-4" />
+          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Users className="h-4 w-4 text-primary" />
           </div>
-          <span className="text-sm">{quantity} thành viên</span>
+          <div className="text-left">
+            <span className="text-sm font-medium text-slate-700">Xem tất cả thành viên</span>
+            <p className="text-xs text-slate-400">{quantity} người</p>
+          </div>
         </button>
 
         <div className="flex items-center gap-3 px-4 py-3">
-          <div className="p-2 rounded-lg bg-muted shrink-0">
-            <Link className="h-4 w-4" />
+          <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+            <Link className="h-4 w-4 text-blue-500" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium">Link tham gia nhóm</div>
-            <div className="text-xs text-muted-foreground truncate">
+            <div className="text-sm font-medium text-slate-700">Link tham gia</div>
+            <div className="text-xs text-slate-400 truncate">
               {`${import.meta.env.VITE_API_URL}/jf-link/${currentConversation}`}
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={handleCopyLink}
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-lg"
+                  onClick={handleCopyLink}
+                >
+                  <Copy className="h-4 w-4 text-slate-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Sao chép link</TooltipContent>
+            </Tooltip>
 
             {checkLeader && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className={`h-8 w-8 ${status ? 'text-green-600' : 'text-destructive'}`}
-                onClick={() => setShowConfirm(true)}
-              >
-                {status ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={`h-8 w-8 rounded-lg ${status ? 'text-green-600 hover:text-green-700' : 'text-red-500 hover:text-red-600'}`}
+                    onClick={() => setShowConfirm(true)}
+                  >
+                    {status ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {status ? 'Tắt link tham gia' : 'Bật link tham gia'}
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         </div>
       </div>
 
       <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Cảnh báo</AlertDialogTitle>
+            <AlertDialogTitle>Xác nhận thay đổi</AlertDialogTitle>
             <AlertDialogDescription>
               {status
-                ? 'Người dùng có thể không tham gia bằng link được nữa'
-                : 'Người dùng có thể tham gia bằng link'}
+                ? 'Sau khi tắt, người dùng sẽ không thể tham gia nhóm bằng link nữa.'
+                : 'Sau khi bật, bất kỳ ai có link đều có thể tham gia nhóm.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Hủy</AlertDialogCancel>
-            <AlertDialogAction onClick={handleChangeStatus}>Đồng ý</AlertDialogAction>
+            <AlertDialogCancel className="rounded-xl">Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={handleChangeStatus} className="rounded-xl">
+              Xác nhận
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

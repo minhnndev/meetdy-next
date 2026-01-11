@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Scrollbars from 'react-custom-scrollbars-2';
 import { useDispatch, useSelector } from 'react-redux';
+import { X, Info } from 'lucide-react';
 
 import userApi from '@/api/userApi';
 
@@ -12,18 +13,25 @@ import InfoFriendSearch from '@/features/Chat/components/InfoFriendSearch';
 import InfoMediaSearch from '@/features/Chat/components/InfoMediaSearch';
 import InfoMember from '@/features/Chat/components/InfoMember';
 import InfoNameAndThumbnail from '@/features/Chat/components/InfoNameAndThumbnail';
-import InfoTitle from '@/features/Chat/components/InfoTitle';
 import { fetchAllMedia } from '@/features/Chat/slice/mediaSlice';
 import UserCard from '@/components/UserCard';
+import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 import type { RootState, AppDispatch } from '@/store';
 
 type Props = {
   socket?: any;
   onViewChannel?: (id?: string) => void;
+  onOpenInfoBlock?: () => void;
+  onClose?: () => void;
 };
 
-export default function InfoContainer({ socket = {}, onViewChannel }: Props) {
+export default function InfoContainer({ socket = {}, onViewChannel, onOpenInfoBlock, onClose }: Props) {
   const dispatch = useDispatch<AppDispatch>();
 
   const [navState, setNavState] = useState({ view: 0, tabpane: 0 });
@@ -71,82 +79,78 @@ export default function InfoContainer({ socket = {}, onViewChannel }: Props) {
 
   return (
     <div className="flex h-full w-full flex-col bg-white">
-      {/* ===== INFO VIEW ===== */}
       {navState.view === 0 && (
         <>
-          {/* Header */}
-          <div className="border-b border-zinc-200 px-5 py-3">
-            <InfoTitle
-              onBack={goInfo}
-              text={
-                currentConver?.type ? 'Thông tin nhóm' : 'Thông tin hội thoại'
-              }
-            />
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+            <div className="flex items-center gap-2">
+              <Info className="w-4 h-4 text-slate-500" />
+              <h3 className="font-semibold text-slate-900">
+                {currentConver?.type ? 'Thông tin nhóm' : 'Thông tin'}
+              </h3>
+            </div>
+            {onClose && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={onClose}
+                    className="h-8 w-8 rounded-lg hover:bg-slate-100"
+                  >
+                    <X className="w-4 h-4 text-slate-500" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="left">Đóng</TooltipContent>
+              </Tooltip>
+            )}
           </div>
 
-          {/* Body */}
           <Scrollbars
             autoHide
             autoHideTimeout={1000}
             autoHideDuration={200}
             style={{ height: 'calc(100vh - 56px)' }}
           >
-            <div className="space-y-6 px-5 py-4">
-              {/* Name + Avatar */}
-              <div>
-                <InfoNameAndThumbnail conversation={currentConver} />
-              </div>
+            <div className="space-y-1">
+              <InfoNameAndThumbnail conversation={currentConver} />
 
-              {/* Members & Channels */}
               {type && (
                 <>
-                  <div className="border-t border-zinc-200 pt-4">
-                    <InfoMember
-                      viewMemberClick={goMembers}
-                      quantity={memberInConversation?.length ?? 0}
-                    />
-                  </div>
+                  <InfoMember
+                    viewMemberClick={goMembers}
+                    quantity={memberInConversation?.length ?? 0}
+                  />
 
-                  <div className="border-t border-zinc-200 pt-4">
-                    <Channel onViewChannel={onViewChannel} data={channels} />
-                  </div>
+                  <Channel onViewChannel={onViewChannel} data={channels} />
                 </>
               )}
 
-              {/* Media */}
-              <div className="border-t border-zinc-200 pt-4 space-y-4">
-                <ArchiveMedia
-                  name="Ảnh"
-                  items={media.images}
-                  viewMediaClick={goMedia}
-                />
+              <ArchiveMedia
+                name="Ảnh"
+                items={media.images}
+                viewMediaClick={goMedia}
+              />
 
-                <ArchiveMedia
-                  name="Video"
-                  items={media.videos}
-                  viewMediaClick={goMedia}
-                />
+              <ArchiveMedia
+                name="Video"
+                items={media.videos}
+                viewMediaClick={goMedia}
+              />
 
-                <ArchiveFile items={media.files} viewMediaClick={goMedia} />
-              </div>
+              <ArchiveFile items={media.files} viewMediaClick={goMedia} />
 
-              {/* Settings */}
               {currentConver?.type && (
-                <div className="border-t border-zinc-200 pt-4">
-                  <AnotherSetting socket={socket} />
-                </div>
+                <AnotherSetting socket={socket} />
               )}
             </div>
           </Scrollbars>
         </>
       )}
 
-      {/* ===== MEDIA SEARCH ===== */}
       {navState.view === 2 && (
         <InfoMediaSearch onBack={goInfo} tabpane={navState.tabpane} />
       )}
 
-      {/* ===== MEMBER SEARCH ===== */}
       {navState.view === 1 && (
         <InfoFriendSearch
           onBack={goInfo}
@@ -155,7 +159,6 @@ export default function InfoContainer({ socket = {}, onViewChannel }: Props) {
         />
       )}
 
-      {/* ===== USER CARD ===== */}
       {selectedUser && (
         <UserCard
           isVisible={isUserCardVisible}

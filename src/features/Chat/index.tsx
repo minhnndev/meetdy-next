@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useResolvedPath, useLocation } from 'react-router-dom';
-import { ChevronsLeft, ChevronDown } from 'lucide-react';
+import { ChevronsLeft, ChevronDown, X } from 'lucide-react';
 
 import { setJoinChatLayout } from '@/app/globalSlice';
 import conversationApi from '@/api/conversationApi';
@@ -506,63 +506,80 @@ function Chat({ socket, idNewMessage }: { socket: any; idNewMessage?: any }) {
 
   const renderAsideInfoConversation = () => {
     return (
-      <aside
-        className={`${
-          isOpenInfo ? 'block' : 'hidden'
-        } hidden lg:block lg:w-80 border-l border-slate-200/80 bg-white`}
-      >
-        <div className="h-full overflow-auto relative">
-          {openDrawerInfo && width <= 1199 && (
+      <>
+        {openDrawerInfo && width <= 1199 && (
+          <>
+            <div 
+              className="fixed inset-0 bg-black/30 z-40 transition-opacity duration-300"
+              onClick={() => setOpenDrawerInfo(false)}
+            />
             <div
-              className="fixed top-0 right-0 h-full bg-white shadow-lg z-50 transition-transform"
+              className="fixed top-0 right-0 h-full bg-white shadow-2xl z-50 transition-transform duration-300 ease-out"
               style={{
                 width: `${renderWidthDrawer(width)}%`,
-                transform: openDrawerInfo
-                  ? 'translateX(0)'
-                  : 'translateX(100%)',
+                transform: openDrawerInfo ? 'translateX(0)' : 'translateX(100%)',
               }}
             >
-              <div className="h-full overflow-auto">
-                {visibleNews ? (
-                  <GroupNews
-                    tabActive={tabActiveInNews}
-                    onBack={handleOnBack}
-                    onChange={handleChangeActiveKey}
-                  />
-                ) : (
-                  <InfoContainer
-                    onViewChannel={handleChangeViewChannel}
-                    socket={socket}
-                    onOpenInfoBlock={() => setIsOpenInfo(true)}
-                  />
-                )}
+              <div className="h-full flex flex-col">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
+                  <h3 className="font-semibold text-slate-900">
+                    {visibleNews ? 'Bảng tin nhóm' : 'Thông tin'}
+                  </h3>
+                  <button
+                    onClick={() => setOpenDrawerInfo(false)}
+                    className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                  >
+                    <X className="w-5 h-5 text-slate-500" />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-auto">
+                  {visibleNews ? (
+                    <GroupNews
+                      tabActive={tabActiveInNews}
+                      onBack={handleOnBack}
+                      onChange={handleChangeActiveKey}
+                    />
+                  ) : (
+                    <InfoContainer
+                      onViewChannel={handleChangeViewChannel}
+                      socket={socket}
+                      onOpenInfoBlock={() => setIsOpenInfo(true)}
+                    />
+                  )}
+                </div>
               </div>
-              <button
-                onClick={() => setOpenDrawerInfo(false)}
-                className="absolute top-3 left-3 p-2 rounded-md hover:bg-slate-100"
-              >
-                Close
-              </button>
             </div>
-          )}
+          </>
+        )}
 
-          <div className="p-4">
-            {visibleNews ? (
-              <GroupNews
-                tabActive={tabActiveInNews}
-                onBack={handleOnBack}
-                onChange={handleChangeActiveKey}
-              />
-            ) : (
-              <InfoContainer
-                onViewChannel={handleChangeViewChannel}
-                socket={socket}
-                onOpenInfoBlock={() => setIsOpenInfo(true)}
-              />
-            )}
-          </div>
-        </div>
-      </aside>
+        {currentConversation && (
+          <aside
+            className={`
+              hidden lg:flex flex-col
+              transition-all duration-300 ease-out
+              border-l border-slate-200/80 bg-white
+              ${isOpenInfo ? 'lg:w-80' : 'lg:w-0 lg:overflow-hidden lg:border-l-0'}
+            `}
+          >
+            <div className="h-full">
+              {visibleNews ? (
+                <GroupNews
+                  tabActive={tabActiveInNews}
+                  onBack={handleOnBack}
+                  onChange={handleChangeActiveKey}
+                />
+              ) : (
+                <InfoContainer
+                  onViewChannel={handleChangeViewChannel}
+                  socket={socket}
+                  onOpenInfoBlock={() => setIsOpenInfo(true)}
+                  onClose={() => setIsOpenInfo(false)}
+                />
+              )}
+            </div>
+          </aside>
+        )}
+      </>
     );
   };
 
