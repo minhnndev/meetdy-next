@@ -1,7 +1,8 @@
 import React from 'react';
-import { Download } from 'lucide-react';
+import { Download, CheckCheck } from 'lucide-react';
 import fileHelpers from '@/utils/fileHelpers';
 import { FileIcon, defaultStyles } from 'react-file-icon';
+import { Button } from '@/components/ui/button';
 
 type Props = {
   content: string;
@@ -24,40 +25,48 @@ export default function FileMessage({
   const fileExtension = fileHelpers.getFileExtension(fileName);
 
   return (
-    <>
-      <div className="file_info-wrapper flex items-center justify-between gap-3 p-3 rounded-md bg-slate-50">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 flex items-center justify-center bg-white rounded-md shadow-sm">
-            <FileIcon
-              extension={fileExtension}
-              {...(defaultStyles as any)[fileExtension]}
-            />
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between gap-3 p-3 rounded-2xl bg-slate-50/80 border border-slate-100 min-w-[240px] max-w-[320px]">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-11 h-11 flex items-center justify-center bg-white rounded-xl shadow-sm flex-shrink-0">
+            <div className="w-8 h-8">
+              <FileIcon
+                extension={fileExtension}
+                {...(defaultStyles as any)[fileExtension]}
+              />
+            </div>
           </div>
 
-          <div className="min-w-0">
-            <div className="text-sm font-medium truncate">{fileName}</div>
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-medium text-slate-800 truncate">{fileName}</div>
             <div className="text-xs text-slate-500">
-              {fileExtension.toUpperCase()}
+              {fileExtension.toUpperCase()} File
             </div>
           </div>
         </div>
 
-        <button
+        <Button
           onClick={handleOnClickDownLoad}
-          className="p-2 rounded-md hover:bg-slate-100"
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 rounded-xl hover:bg-slate-200/80 flex-shrink-0"
         >
-          <Download className="w-5 h-5 text-slate-700" />
-        </button>
+          <Download className="w-4 h-4 text-slate-600" />
+        </Button>
       </div>
 
-      <div className="mt-2 flex items-center text-xs text-slate-500 gap-2">
-        <div>{`${String(dateAt.getHours()).padStart(2, '0')}:${String(
+      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 select-none">
+        <span>{`${String(dateAt.getHours()).padStart(2, '0')}:${String(
           dateAt.getMinutes(),
-        ).padStart(2, '0')}`}</div>
-        {isSeen && <div className="text-green-600">Đã xem</div>}
+        ).padStart(2, '0')}`}</span>
+        {isSeen && (
+          <span className="flex items-center text-emerald-500">
+            <CheckCheck className="w-3.5 h-3.5" />
+          </span>
+        )}
       </div>
 
       {children}
-    </>
+    </div>
   );
 }

@@ -118,7 +118,7 @@ function ModalShareMessage({ visible = false, onCancel, idMessage }: ModalShareM
 
   return (
     <Dialog open={visible} onOpenChange={(open) => !open && handleCancel()}>
-      <DialogContent className="max-w-lg max-h-[80vh]">
+      <DialogContent className="max-w-lg max-h-[80vh] rounded-2xl">
         <DialogHeader>
           <DialogTitle>Chuyển tiếp tin nhắn</DialogTitle>
         </DialogHeader>
@@ -127,7 +127,7 @@ function ModalShareMessage({ visible = false, onCancel, idMessage }: ModalShareM
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Nhập cuộc trò chuyện bạn muốn tìm kiếm"
-              className="pl-9"
+              className="pl-9 rounded-xl"
               onChange={handleSearch}
               value={frInput}
             />
@@ -142,7 +142,7 @@ function ModalShareMessage({ visible = false, onCancel, idMessage }: ModalShareM
                 {conversations.map((element, index) => (
                   <label
                     key={index}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer"
+                    className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 cursor-pointer transition-colors"
                   >
                     <Checkbox
                       checked={checkList.includes(element._id)}
@@ -184,10 +184,10 @@ function ModalShareMessage({ visible = false, onCancel, idMessage }: ModalShareM
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel}>
+          <Button variant="outline" onClick={handleCancel} className="rounded-xl">
             Hủy
           </Button>
-          <Button onClick={handleOk} disabled={loading || itemSelected.length === 0}>
+          <Button onClick={handleOk} disabled={loading || itemSelected.length === 0} className="rounded-xl">
             {loading ? 'Đang chia sẻ...' : 'Chia sẻ'}
           </Button>
         </DialogFooter>

@@ -6,6 +6,8 @@ import CheckLink, {
 } from '@/utils/linkHelper';
 import { LinkPreview } from '@dhaiwat10/react-link-preview';
 import parse from 'html-react-parser';
+import { Check, CheckCheck } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 import ReplyMessage from '../ReplyMessage';
 TextMessage.propTypes = {
@@ -52,7 +54,7 @@ function TextMessage({
       tags.forEach((ele) => {
         tempContent = tempContent.replace(
           `@${ele.name}`,
-          `<span id='mtc-${ele._id}' className="tag-user" }>@${ele.name}</span>`,
+          `<span id='mtc-${ele._id}' class="text-primary font-medium cursor-pointer hover:underline">@${ele.name}</span>`,
         );
       });
     }
@@ -64,24 +66,17 @@ function TextMessage({
   const renderMessageText = (contentMes) => {
     if (!matchesLink) {
       return (
-        <>
+        <div className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">
           {tags.length > 0
             ? tranferTextToTagUser(contentMes, tags)
             : contentMes}
-        </>
+        </div>
       );
     } else {
       if (matchesLink.length === 1) {
         return (
-          <>
-            <div
-              className={
-                `${replaceConentWithouLink(contentMes, matchesLink[0])}`
-                  .length > 0
-                  ? 'content-single-link'
-                  : ''
-              }
-            >
+          <div className="space-y-2">
+            <div className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">
               {tags.length > 0
                 ? tranferTextToTagUser(
                     replaceConentWithouLink(contentMes, matchesLink[0]),
@@ -92,15 +87,15 @@ function TextMessage({
             <LinkPreview
               url={matchesLink[0]}
               imageHeight="20vh"
-              className="link-preview-custom"
+              className="rounded-xl overflow-hidden border border-slate-200/60"
             />
-          </>
+          </div>
         );
       }
 
       if (matchesLink.length > 1) {
         return (
-          <div className="content-mutiple-link">
+          <div className="text-[15px] leading-relaxed break-words whitespace-pre-wrap">
             {tags.length > 0
               ? tranferTextToTagUser(
                   replaceContentToLink(contentMes, matchesLink),
@@ -114,22 +109,23 @@ function TextMessage({
   };
 
   return (
-    <div className="text-message-item">
+    <div className="space-y-1">
       {replyMessage && Object.keys(replyMessage).length > 0 && (
         <ReplyMessage replyMessage={replyMessage} />
       )}
 
       {renderMessageText(content)}
 
-      <div className="time-and-last_view">
-        <div className="time-send">
-          <span>
-            {`0${dateAt.getHours()}`.slice(-2)}:
-            {`0${dateAt.getMinutes()}`.slice(-2)}
+      <div className="flex items-center gap-1.5 text-[11px] opacity-70 select-none">
+        <span>
+          {`0${dateAt.getHours()}`.slice(-2)}:
+          {`0${dateAt.getMinutes()}`.slice(-2)}
+        </span>
+        {isSeen && (
+          <span className="flex items-center gap-0.5 text-emerald-500">
+            <CheckCheck className="w-3.5 h-3.5" />
           </span>
-        </div>
-
-        {isSeen && <div className="is-seen-message">Đã xem</div>}
+        )}
       </div>
 
       {children}

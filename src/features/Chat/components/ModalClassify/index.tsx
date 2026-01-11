@@ -161,7 +161,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }: ModalClassifyProps) {
   return (
     <>
       <Dialog open={isVisible} onOpenChange={(open) => !open && handleCancel()}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold">
               Quản lý thẻ phân loại
@@ -171,7 +171,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }: ModalClassifyProps) {
             {classifies.map((ele: any, index: number) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+                className="flex items-center justify-between p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <Tag
@@ -201,7 +201,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }: ModalClassifyProps) {
               </div>
             ))}
             <Button
-              className="w-full mt-4"
+              className="w-full mt-4 rounded-xl"
               onClick={handleShowModalAdd}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -212,7 +212,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }: ModalClassifyProps) {
       </Dialog>
 
       <Dialog open={isShowModalAdd} onOpenChange={(open) => !open && handleCancelModalAdd()}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md rounded-2xl">
           <DialogHeader>
             <div className="flex items-center gap-3">
               <Button
@@ -236,7 +236,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }: ModalClassifyProps) {
                   value={nameTag}
                   placeholder="Nhập tên thẻ phân loại"
                   onChange={handleInputChange}
-                  className="flex-1"
+                  className="flex-1 rounded-xl"
                 />
                 <Popover>
                   <PopoverTrigger asChild>
@@ -269,10 +269,10 @@ function ModalClassify({ isVisible, onCancel, onOpen }: ModalClassifyProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={handleCancelModalAdd}>
+            <Button variant="outline" onClick={handleCancelModalAdd} className="rounded-xl">
               Hủy
             </Button>
-            <Button onClick={handleCreateClassify} disabled={isSubmitDisabled}>
+            <Button onClick={handleCreateClassify} disabled={isSubmitDisabled} className="rounded-xl">
               {isModalEdit ? 'Cập nhật' : 'Thêm phân loại'}
             </Button>
           </DialogFooter>
@@ -280,7 +280,7 @@ function ModalClassify({ isVisible, onCancel, onOpen }: ModalClassifyProps) {
       </Dialog>
 
       <AlertDialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Cảnh báo</AlertDialogTitle>
             <AlertDialogDescription>

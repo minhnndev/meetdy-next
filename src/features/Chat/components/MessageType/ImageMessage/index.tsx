@@ -1,4 +1,5 @@
 import React from 'react';
+import { CheckCheck } from 'lucide-react';
 import MESSAGE_STYLE from '@/constants/MessageStyle/messageStyle';
 
 type Props = {
@@ -15,26 +16,29 @@ export default function ImageMessage({
   isSeen = false,
 }: Props) {
   return (
-    <>
-      <div className="messsage-image-wrapper">
-        <div className="message-image--main rounded-md overflow-hidden">
+    <div className="space-y-1.5">
+      <div className="relative group">
+        <div className="rounded-2xl overflow-hidden shadow-sm">
           <img
             src={content}
             alt="image"
             style={MESSAGE_STYLE.imageStyle}
-            className="w-full h-auto object-contain"
+            className="w-full h-auto object-contain max-w-[320px] max-h-[400px] cursor-pointer transition-transform hover:scale-[1.02]"
           />
         </div>
-
         {children}
       </div>
 
-      <div className="mt-2 flex items-center text-xs text-slate-500 gap-2">
-        <div>{`${String(dateAt.getHours()).padStart(2, '0')}:${String(
+      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 select-none">
+        <span>{`${String(dateAt.getHours()).padStart(2, '0')}:${String(
           dateAt.getMinutes(),
-        ).padStart(2, '0')}`}</div>
-        {isSeen && <div className="text-green-600">Đã xem</div>}
+        ).padStart(2, '0')}`}</span>
+        {isSeen && (
+          <span className="flex items-center text-emerald-500">
+            <CheckCheck className="w-3.5 h-3.5" />
+          </span>
+        )}
       </div>
-    </>
+    </div>
   );
 }

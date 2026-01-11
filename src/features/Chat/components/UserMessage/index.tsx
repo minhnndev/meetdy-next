@@ -283,23 +283,23 @@ function UserMessage({
               >
                 <div
                   className={cn(
-                    'relative min-w-0',
+                    'relative min-w-0 max-w-[75%]',
                     type === 'IMAGE' || type === 'VIDEO' || type === 'STICKER'
-                      ? 'rounded-xl'
-                      : 'rounded-2xl',
+                      ? 'rounded-2xl'
+                      : 'rounded-[18px]',
                     isMyMessage &&
                       type !== 'IMAGE' &&
                       type !== 'VIDEO' &&
                       type !== 'STICKER' &&
-                      'bg-primary text-primary-foreground',
+                      'bg-gradient-to-br from-primary to-primary/90 text-primary-foreground shadow-sm',
                     !isMyMessage &&
                       type !== 'IMAGE' &&
                       type !== 'VIDEO' &&
                       type !== 'STICKER' &&
-                      'bg-muted text-foreground',
+                      'bg-slate-100 text-slate-900 shadow-sm',
                     type === 'IMAGE' || type === 'VIDEO' || type === 'STICKER'
                       ? 'bg-transparent'
-                      : 'px-3 py-2',
+                      : 'px-4 py-2.5',
                   )}
                 >
                   <span className="sr-only">{name}</span>
@@ -443,7 +443,7 @@ function UserMessage({
 
                 <div
                   className={cn(
-                    'flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100',
+                    'flex items-center gap-0.5 opacity-0 transition-all duration-200 group-hover:opacity-100',
                     isDeleted && 'hidden',
                   )}
                 >
@@ -451,20 +451,20 @@ function UserMessage({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-7 w-7 rounded-lg hover:bg-slate-100"
                     onClick={handleReplyMessage}
                   >
-                    <Reply className="h-4 w-4" />
+                    <Reply className="h-3.5 w-3.5 text-slate-500" />
                   </Button>
 
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-7 w-7 rounded-lg hover:bg-slate-100"
                     onClick={handleOpenModalShare}
                   >
-                    <ReplyAll className="h-4 w-4" />
+                    <ReplyAll className="h-3.5 w-3.5 text-slate-500" />
                   </Button>
 
                   <DropdownMenu>
@@ -473,15 +473,15 @@ function UserMessage({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8"
+                        className="h-7 w-7 rounded-lg hover:bg-slate-100"
                       >
-                        <MoreHorizontal className="h-4 w-4" />
+                        <MoreHorizontal className="h-3.5 w-3.5 text-slate-500" />
                       </Button>
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent
                       align={isMyMessage ? 'end' : 'start'}
-                      className="min-w-44"
+                      className="min-w-44 rounded-xl"
                     >
                       {isGroup && !currentChannel && type !== 'STICKER' ? (
                         <DropdownMenuItem
