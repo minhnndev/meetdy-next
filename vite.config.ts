@@ -1,7 +1,6 @@
 import path from 'path';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react-swc';
-
 import { defineConfig } from 'vite';
 import runtimeEnv from 'vite-plugin-runtime-env';
 
@@ -20,9 +19,8 @@ export default defineConfig({
     },
   },
   server: {
-    host: '0.0.0.0',
-    port: 5000,
-    allowedHosts: true,
+    host: true,
+    port: 9000,
   },
   build: {
     outDir: path.resolve(__dirname, 'dist'),

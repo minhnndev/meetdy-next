@@ -1,14 +1,14 @@
 {
-  "name": "meetdy-chat",
-  "version": "0.1.0",
+  "name": "meetdy-frontend",
   "private": true,
+  "version": "0.0.1",
+  "type": "module",
   "scripts": {
-    "start": "vite",
+    "dev": "vite",
     "build": "vite build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "prepare": "husky install",
-    "dev": "vite"
+    "build:tsc": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.0",
@@ -107,33 +107,5 @@
     "vite": "^7.0.0",
     "vite-plugin-runtime-env": "^1.0.0",
     "vite-tsconfig-paths": "^4.3.2"
-  },
-  "npmConfig": {
-    "legacy-peer-deps": true
-  },
-  "overrides": {
-    "ajv": "8.12.0",
-    "ajv-keywords": "5.1.0"
-  },
-  "lint-staged": {
-    "src/**/*.js": "prettier --write"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   }
 }
