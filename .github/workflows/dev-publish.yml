@@ -3,7 +3,7 @@ name: Meetdy Frontend Dev Environment
 on:
   push:
     branches:
-      - dev
+      - master
 
 env:
   APP_NAME: meetdy-frontend-dev
