@@ -5,7 +5,7 @@ import { fetchListMyRequestFriend } from '@/features/Friend/friendSlice';
 import FriendCard from '../FriendCard';
 
 function ListMyFriendRequest({ data = [] }) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<any>();
 
   const handleRemoveMyRequest = async (value) => {
     await friendApi.deleteSentRequestFriend(value._id);
@@ -16,9 +16,9 @@ function ListMyFriendRequest({ data = [] }) {
     <div className="space-y-3">
       {data &&
         data.length > 0 &&
-        data.map((ele, index) => (
+        data.map((ele) => (
           <FriendCard
-            key={index}
+            key={ele._id ?? ele.id}
             isMyRequest={true}
             data={ele}
             onCancel={handleRemoveMyRequest}

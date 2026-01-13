@@ -7,9 +7,7 @@ import { fetchListClassify } from '@/features/Chat/slice/chatSlice';
 import ModalClassify from '@/features/Chat/components/ModalClassify';
 
 import {
-  DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuTrigger,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuLabel,
@@ -17,55 +15,49 @@ import {
 
 interface SubMenuClassifyProps {
   data: any[];
-  idConver: string;
+  chatId: string;
 }
 
 export default function SubMenuClassify({
   data,
-  idConver,
+  chatId,
 }: SubMenuClassifyProps) {
   const [visible, setVisible] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<any>();
 
   const handleClickClassify = async (id: string) => {
-    await ClassifyApi.addClassifyForConversation(id, idConver);
-    dispatch(fetchListClassify());
+    await ClassifyApi.addClassifyForConversation(id, chatId);
+    dispatch(fetchListClassify() as any);
   };
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 cursor-pointer font-medium">
-          Phân loại
-        </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuLabel className="text-sm font-semibold px-3 py-1">
+          Danh sách thẻ
+        </DropdownMenuLabel>
 
-        <DropdownMenuContent className="w-56">
-          <DropdownMenuLabel className="text-sm font-semibold px-3 py-1">
-            Danh sách thẻ
-          </DropdownMenuLabel>
+        {data.length > 0 &&
+          data.map((ele) => (
+            <DropdownMenuItem
+              key={ele._id}
+              onClick={() => handleClickClassify(ele._id)}
+              className="cursor-pointer flex items-center gap-2"
+            >
+              <Tag className="w-4 h-4" style={{ color: ele.color.code }} />
+              {ele.name}
+            </DropdownMenuItem>
+          ))}
 
-          {data.length > 0 &&
-            data.map((ele) => (
-              <DropdownMenuItem
-                key={ele._id}
-                onClick={() => handleClickClassify(ele._id)}
-                className="cursor-pointer flex items-center gap-2"
-              >
-                <Tag className="w-4 h-4" style={{ color: ele.color.code }} />
-                {ele.name}
-              </DropdownMenuItem>
-            ))}
+        <DropdownMenuSeparator />
 
-          <DropdownMenuSeparator />
-
-          <DropdownMenuItem
-            onClick={() => setVisible(true)}
-            className="cursor-pointer flex items-center gap-2 font-medium"
-          >
-            <Tag className="w-4 h-4" /> Quản lý thẻ phân loại
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+        <DropdownMenuItem
+          onClick={() => setVisible(true)}
+          className="cursor-pointer flex items-center gap-2"
+        >
+          <Tag className="w-4 h-4" /> Quản lý thẻ phân loại
+        </DropdownMenuItem>
+      </DropdownMenuContent>
 
       <ModalClassify
         isVisible={visible}

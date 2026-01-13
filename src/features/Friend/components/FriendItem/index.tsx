@@ -11,7 +11,6 @@ import dateUtils from '@/utils/dateUtils';
 
 import PersonalIcon from '@/features/Chat/components/PersonalIcon';
 
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -19,16 +18,16 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { Icon } from '@/components/ui/icon';
-import { Delete, DotIcon, Info, Menu } from 'lucide-react';
+import { Delete, Info, Menu } from 'lucide-react';
 
 type FriendItemProps = {
-  data: any;
-  onClickMenu?: (key: string, id: string) => void;
+  readonly data: any;
+  readonly onClickMenu?: (key: string, id: string) => void;
 };
 
 export default function FriendItem({ data, onClickMenu }: FriendItemProps) {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<any>();
 
   const handleMenuSelect = (key: string) => {
     onClickMenu?.(key, data._id);
@@ -51,42 +50,39 @@ export default function FriendItem({ data, onClickMenu }: FriendItemProps) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <div
-          className="flex items-center justify-between w-full p-3 rounded-lg cursor-pointer hover:bg-accent select-none"
-          onContextMenu={(e) => {
-            e.preventDefault();
-          }}
+      <div className="flex items-center justify-between w-full p-3 rounded-xl border bg-card hover:shadow-sm transition select-none">
+        <button
+          type="button"
+          className="flex items-center gap-3 flex-1 text-left"
+          onClick={handleOpenConversation}
         >
-          <div
-            className="flex items-center gap-3 flex-1"
-            onClick={handleOpenConversation}
-          >
-            <PersonalIcon
-              isActive={data.isOnline}
-              avatar={data.avatar}
-              name={data.name}
-              color={data.avatarColor}
-            />
+          <PersonalIcon
+            isActive={data.isOnline}
+            avatar={data.avatar}
+            name={data.name}
+            color={data.avatarColor}
+          />
 
-            <div className="flex flex-col">
-              <span className="font-medium text-sm">{data.name}</span>
+          <div className="flex flex-col">
+            <span className="font-medium text-sm">{data.name}</span>
 
-              {data.lastLogin && (
-                <span className="text-xs text-muted-foreground">
-                  Truy cập {dateUtils.toTime(data.lastLogin)} trước
-                </span>
-              )}
-            </div>
+            {data.lastLogin && (
+              <span className="text-xs text-muted-foreground">
+                Truy cập {dateUtils.toTime(data.lastLogin)} trước
+              </span>
+            )}
           </div>
+        </button>
 
-          <DropdownMenuTrigger asChild>
-            <button className="h-8 w-8 rounded-full hover:bg-muted">
-              <Icon icon={Menu} />
-            </button>
-          </DropdownMenuTrigger>
-        </div>
-      </DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="h-8 w-8 rounded-full hover:bg-muted flex items-center justify-center"
+          >
+            <Icon icon={Menu} />
+          </button>
+        </DropdownMenuTrigger>
+      </div>
 
       <DropdownMenuContent className="w-40">
         <DropdownMenuItem onClick={() => handleMenuSelect('1')}>

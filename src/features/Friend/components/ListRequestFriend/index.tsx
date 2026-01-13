@@ -12,7 +12,7 @@ import {
 import FriendCard from '../FriendCard';
 
 function ListRequestFriend({ data = [] }) {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<any>();
 
   const { amountNotify } = useSelector((state: any) => state.friend);
 
@@ -25,9 +25,9 @@ function ListRequestFriend({ data = [] }) {
 
   const handleOnAccept = async (value) => {
     await friendApi.acceptRequestFriend(value._id);
-    dispatch(fetchListRequestFriend());
-    dispatch(fetchFriends({ name: '' }));
-    dispatch(fetchListFriends({ name: '' }));
+    dispatch(fetchListRequestFriend() as any);
+    dispatch(fetchFriends({ name: '' } as any) as any);
+    dispatch(fetchListFriends({ name: '' } as any) as any);
     dispatch(setAmountNotify(amountNotify - 1));
 
     toast.success('Thêm bạn thành công');
@@ -37,14 +37,13 @@ function ListRequestFriend({ data = [] }) {
     <div>
       {data &&
         data.length > 0 &&
-        data.map((ele, index) => (
+        data.map((ele) => (
           <FriendCard
-            key={index}
+            key={ele._id ?? ele.id}
             data={ele}
             isMyRequest={false}
             onDeny={handleRequestDeny}
             onAccept={handleOnAccept}
-            onCancel={() => {}}
           />
         ))}
     </div>

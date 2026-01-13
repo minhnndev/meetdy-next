@@ -25,6 +25,8 @@ export default function ConversationAvatar({
   frameSize = 48,
   avatarColor = '',
 }: Props) {
+  const avatarList = Array.isArray(avatar) ? avatar : [];
+
   const renderSingleAvatar = () => (
     <div className="relative inline-block">
       {isActived && (
@@ -48,11 +50,11 @@ export default function ConversationAvatar({
           style={{ width: frameSize, height: frameSize }}
         >
           <div className="absolute left-0 top-1/2 -translate-y-1/2">
-            <AvatarBubble avatar={avatar[0]} size={dimension} />
+            <AvatarBubble avatar={avatarList[0]} size={dimension} />
           </div>
 
           <div className="absolute right-0 top-1/2 -translate-y-1/2 border border-white rounded-full">
-            <AvatarBubble avatar={avatar[1]} size={dimension} />
+            <AvatarBubble avatar={avatarList[1]} size={dimension} />
           </div>
         </div>
       );
@@ -65,18 +67,18 @@ export default function ConversationAvatar({
           style={{ width: frameSize, height: frameSize }}
         >
           <div className="absolute left-0 top-0">
-            <AvatarBubble avatar={avatar[0]} size={dimension} />
+            <AvatarBubble avatar={avatarList[0]} size={dimension} />
           </div>
 
           <div className="absolute right-0 top-0">
-            <AvatarBubble avatar={avatar[1]} size={dimension} />
+            <AvatarBubble avatar={avatarList[1]} size={dimension} />
           </div>
 
           <div
             className="absolute left-1/2 top-1/2 -translate-x-1/2"
             style={{ marginTop: -(dimension / 6) }}
           >
-            <AvatarBubble avatar={avatar[2]} size={dimension} />
+            <AvatarBubble avatar={avatarList[2]} size={dimension} />
           </div>
         </div>
       );
@@ -89,15 +91,15 @@ export default function ConversationAvatar({
           style={{ width: frameSize, height: frameSize }}
         >
           <div className="absolute left-0 top-0">
-            <AvatarBubble avatar={avatar[0]} size={dimension} />
+            <AvatarBubble avatar={avatarList[0]} size={dimension} />
           </div>
 
           <div className="absolute right-0 top-0">
-            <AvatarBubble avatar={avatar[1]} size={dimension} />
+            <AvatarBubble avatar={avatarList[1]} size={dimension} />
           </div>
 
           <div className="absolute left-0 bottom-0">
-            <AvatarBubble avatar={avatar[2]} size={dimension} />
+            <AvatarBubble avatar={avatarList[2]} size={dimension} />
           </div>
 
           <div className="absolute right-0 bottom-0 bg-indigo-600 text-white text-xs w-7 h-7 flex items-center justify-center rounded-full border-2 border-white">

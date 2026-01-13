@@ -34,15 +34,18 @@ function ContactItem({ data }: ContactItemProps) {
   };
 
   return (
-    <div className="flex items-center justify-between p-4 bg-card rounded-xl border hover:shadow-sm transition-shadow">
+    <div className="flex items-center justify-between w-full p-3 rounded-xl border bg-card hover:shadow-sm transition">
       <button
+        type="button"
+        className="flex items-center gap-3 flex-1 text-left"
         onClick={handleViewDetail}
-        className="flex items-center gap-4 text-left"
       >
-        <PersonalIcon avatar={data.avatar} dimension={56} name={data.name} />
-        <div>
-          <div className="font-medium">{data.name}</div>
-          <div className="mt-1">{getStatusBadge()}</div>
+        <PersonalIcon avatar={data.avatar} dimension={48} name={data.name} />
+        <div className="flex flex-col">
+          <span className="font-medium text-sm">{data.name}</span>
+          <span className="mt-1 text-xs text-muted-foreground inline-flex items-center gap-1">
+            {getStatusBadge()}
+          </span>
         </div>
       </button>
 

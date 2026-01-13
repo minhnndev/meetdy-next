@@ -150,7 +150,7 @@ export default function ConversationContainer({ valueClassify }: Props) {
                   <div className="p-2">
                     <SubMenuClassify
                       data={classifies}
-                      idConver={conversationEle._id}
+                      chatId={conversationEle._id}
                     />
                     {user._id === conversationEle.leaderId && (
                       <button

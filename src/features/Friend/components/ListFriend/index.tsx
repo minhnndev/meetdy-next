@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import Scrollbars from 'react-custom-scrollbars-2';
 import { useDispatch } from 'react-redux';
 import { toast } from 'sonner';
 
@@ -45,8 +44,7 @@ function ListFriend({ data = [] }: Props) {
       return;
     }
 
-    const realUser = await userApi.getUser(tempUser.username as any);
-    console.log('🚀 ~ realUser:', realUser);
+    await userApi.getUser(tempUser.username as any);
   };
 
   const handleDeleteFriend = async () => {

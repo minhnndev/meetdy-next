@@ -439,10 +439,8 @@ const chatSlice = createSlice({
       state.currentConversation = '';
     },
     isDeletedFromGroup: (state, action) => {
-      const idConver = action.payload;
-      const newConver = state.conversations.filter(
-        (ele) => ele._id !== idConver,
-      );
+      const chatId = action.payload;
+      const newConver = state.conversations.filter((ele) => ele._id !== chatId);
       state.conversations = newConver;
     },
     setCurrentConversation: (state, action) => {
