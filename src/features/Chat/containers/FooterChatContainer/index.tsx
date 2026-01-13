@@ -42,8 +42,12 @@ export default function FooterChatContainer({
   const preMention = useRef<MentionUser | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const { currentConversation, conversations, currentChannel, memberInConversation } =
-    useSelector((state: RootState) => state.chat);
+  const {
+    currentConversation,
+    conversations,
+    currentChannel,
+    memberInConversation,
+  } = useSelector((state: RootState) => state.chat);
   const { user } = useSelector((state: RootState) => state.global);
 
   const [showTextFormat, setShowTextFormat] = useState(false);
@@ -57,7 +61,9 @@ export default function FooterChatContainer({
   const [showMentionDropdown, setShowMentionDropdown] = useState(false);
   const [filteredMentions, setFilteredMentions] = useState<MentionUser[]>([]);
 
-  const currentConver = conversations.find((ele) => ele._id === currentConversation);
+  const currentConver = conversations.find(
+    (ele) => ele._id === currentConversation,
+  );
   const getTypeConversation = currentConver?.type ?? false;
 
   useEffect(() => {
@@ -67,16 +73,25 @@ export default function FooterChatContainer({
       let tempValueText = valueText;
 
       if (preMention.current) {
-        const exists = tempMentionSelect.some((m) => m._id === preMention.current?._id);
+        const exists = tempMentionSelect.some(
+          (m) => m._id === preMention.current?._id,
+        );
         if (exists) {
           const regex = new RegExp(`^@${preMention.current?.name}`);
           tempValueText = tempValueText.replace(regex, '');
-          tempMentionSelect = tempMentionSelect.filter((ele) => ele._id !== preMention.current?._id);
-          tempMentionList = [...tempMentionList, preMention.current as MentionUser];
+          tempMentionSelect = tempMentionSelect.filter(
+            (ele) => ele._id !== preMention.current?._id,
+          );
+          tempMentionList = [
+            ...tempMentionList,
+            preMention.current as MentionUser,
+          ];
         }
       }
 
-      const checkExist = tempMentionSelect.some((m) => m._id === userMention._id);
+      const checkExist = tempMentionSelect.some(
+        (m) => m._id === userMention._id,
+      );
 
       if (!checkExist) {
         if (getTypeConversation) {
@@ -84,7 +99,9 @@ export default function FooterChatContainer({
         }
         setValueText(tempValueText);
         setMentionSelect([...tempMentionSelect, userMention]);
-        tempMentionList = tempMentionList.filter((ele) => ele._id !== userMention._id);
+        tempMentionList = tempMentionList.filter(
+          (ele) => ele._id !== userMention._id,
+        );
         setMentionsList(tempMentionList);
       }
       preMention.current = userMention;
@@ -106,7 +123,9 @@ export default function FooterChatContainer({
 
   useEffect(() => {
     if (currentConversation) {
-      const tempConver = conversations.find((conver) => conver._id === currentConversation);
+      const tempConver = conversations.find(
+        (conver) => conver._id === currentConversation,
+      );
       if (tempConver) {
         setDetailConversation(tempConver);
       }
@@ -127,6 +146,7 @@ export default function FooterChatContainer({
       conversationId: currentConversation,
       tags: listId,
     };
+
     if (replyMessage && Object.keys(replyMessage || {}).length > 0) {
       newMessage.replyMessageId = replyMessage._id;
     }
@@ -135,12 +155,39 @@ export default function FooterChatContainer({
       newMessage.channelId = currentChannel;
     }
 
+    const sendViaSocket = async () => {
+      if (!socket?.connected) {
+        throw new Error('Socket not connected');
+      }
+
+      const emitter = socket.timeout ? socket.timeout(5000) : socket;
+      const response = await emitter.emitWithAck('send-message', newMessage);
+
+      if (response?.error) {
+        throw new Error(response.error);
+      }
+
+      return response;
+    };
+
     try {
-      const res = await messageApi.sendTextMessage(newMessage);
-      if (res && res._id) {
+      const res = await sendViaSocket();
+      if (res?._id) {
         handleOnScroll(res._id);
       }
-    } catch (err) {}
+    } catch (err) {
+      console.warn('Send via socket failed, fallback to REST', err);
+      // Fallback to REST in case socket send fails
+      try {
+        const res = await messageApi.sendTextMessage(newMessage);
+        if (res?._id) {
+          handleOnScroll(res._id);
+        }
+      } catch (error_) {
+        // Optionally log the error; UI feedback handled by socket listeners elsewhere
+        console.error('Send message failed via socket and REST', error_);
+      }
+    }
 
     setMentionsList(memberInConversation || []);
     setMentionSelect([]);
@@ -175,7 +222,9 @@ export default function FooterChatContainer({
     const remaining = mentionSelect.filter((m) => text.includes(`@${m.name}`));
     if (remaining.length !== mentionSelect.length) {
       setMentionSelect(remaining);
-      const removed = mentionSelect.filter((m) => !remaining.some((r) => r._id === m._id));
+      const removed = mentionSelect.filter(
+        (m) => !remaining.some((r) => r._id === m._id),
+      );
       if (removed.length > 0 && onRemoveMention) {
         onRemoveMention();
       }
@@ -200,7 +249,10 @@ export default function FooterChatContainer({
       setMentionQuery(q);
       const filtered = (mentionList || [])
         .filter((m) => m.name.toLowerCase().includes(q.toLowerCase()))
-        .filter((m) => !mentionSelect.some((s) => s._id === m._id) && m._id !== user?._id);
+        .filter(
+          (m) =>
+            !mentionSelect.some((s) => s._id === m._id) && m._id !== user?._id,
+        );
       setFilteredMentions(filtered);
       setShowMentionDropdown(true);
     } else {
@@ -234,7 +286,11 @@ export default function FooterChatContainer({
 
   const handleOnFocus = () => {
     if (currentChannel) {
-      socket.emit('conversation-last-view', currentConversation, currentChannel);
+      socket.emit(
+        'conversation-last-view',
+        currentConversation,
+        currentChannel,
+      );
     } else {
       socket.emit('conversation-last-view', currentConversation);
     }
@@ -256,8 +312,14 @@ export default function FooterChatContainer({
 
     const value = valueText;
     const lastAtIndex = value.lastIndexOf('@' + mentionQuery);
-    const before = value.slice(0, lastAtIndex >= 0 ? lastAtIndex : value.length);
-    const after = value.slice((lastAtIndex >= 0 ? lastAtIndex : value.length) + (`@${mentionQuery}`).length);
+    const before = value.slice(
+      0,
+      lastAtIndex >= 0 ? lastAtIndex : value.length,
+    );
+    const after = value.slice(
+      (lastAtIndex >= 0 ? lastAtIndex : value.length) +
+        `@${mentionQuery}`.length,
+    );
     const inserted = `${before}@${member.name} ${after}`;
     setValueText(inserted);
     setMentionSelect((prev) => [...prev, member]);
@@ -275,7 +337,9 @@ export default function FooterChatContainer({
 
   useEffect(() => {
     if (mentionSelect.length > 0) {
-      const newMentions = mentionList.filter((m) => !mentionSelect.some((s) => s._id === m._id));
+      const newMentions = mentionList.filter(
+        (m) => !mentionSelect.some((s) => s._id === m._id),
+      );
       setMentionsList(newMentions);
     }
   }, []);
@@ -286,10 +350,12 @@ export default function FooterChatContainer({
         <ReplyBlock replyMessage={replyMessage} onCloseReply={onCloseReply} />
       )}
 
-      <div className={cn(
-        "rounded-2xl border border-slate-200 bg-slate-50/50 transition-all duration-200",
-        isHightLight && "border-primary/50 bg-white ring-2 ring-primary/10"
-      )}>
+      <div
+        className={cn(
+          'rounded-2xl border border-slate-200 bg-slate-50/50 transition-all duration-200',
+          isHightLight && 'border-primary/50 bg-white ring-2 ring-primary/10',
+        )}
+      >
         <div className="px-3 pt-2">
           <NavigationChatBox
             isFocus={isHightLight}
@@ -302,10 +368,12 @@ export default function FooterChatContainer({
           />
         </div>
 
-        <div className={cn(
-          "flex items-end gap-2 px-3 pb-3",
-          showTextFormat && "flex-col"
-        )}>
+        <div
+          className={cn(
+            'flex items-end gap-2 px-3 pb-3',
+            showTextFormat && 'flex-col',
+          )}
+        >
           <div className="flex-1 w-full relative">
             {showTextFormat ? (
               <TextEditor
@@ -325,7 +393,9 @@ export default function FooterChatContainer({
                   onKeyDown={handleKeyPress}
                   onFocus={handleOnFocus}
                   onBlur={handleOnBlur}
-                  placeholder={`Nhắn tin tới ${detailConversation?.name ?? ''}...`}
+                  placeholder={`Nhắn tin tới ${
+                    detailConversation?.name ?? ''
+                  }...`}
                   rows={1}
                   className="w-full resize-none overflow-auto rounded-lg border-none bg-transparent px-1 py-2 text-sm placeholder:text-slate-400 focus:outline-none"
                   spellCheck={false}
@@ -334,19 +404,26 @@ export default function FooterChatContainer({
                   <div className="absolute left-0 bottom-full mb-2 max-h-48 w-72 overflow-auto rounded-xl border border-slate-200 bg-white shadow-xl">
                     <div className="p-1">
                       {filteredMentions.map((m) => (
-                        <div
+                        <button
+                          type="button"
                           key={m._id}
                           onMouseDown={(e) => {
                             e.preventDefault();
                             handleSelectMention(m);
                           }}
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors"
+                          className="flex w-full items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors text-left"
                         >
-                          <div className="w-8 h-8 flex-shrink-0">
-                            <PersonalIcon dimension={32} avatar={m.avatar} name={m.name} />
+                          <div className="w-8 h-8 shrink-0">
+                            <PersonalIcon
+                              dimension={32}
+                              avatar={m.avatar}
+                              name={m.name}
+                            />
                           </div>
-                          <span className="text-sm font-medium text-slate-700">{m.name}</span>
-                        </div>
+                          <span className="text-sm font-medium text-slate-700">
+                            {m.name}
+                          </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -355,19 +432,21 @@ export default function FooterChatContainer({
             )}
           </div>
 
-          <div className={cn(
-            "flex items-center gap-1",
-            showTextFormat && "self-end"
-          )}>
+          <div
+            className={cn(
+              'flex items-center gap-1',
+              showTextFormat && 'self-end',
+            )}
+          >
             <Button
               onClick={handleSentMessage}
               disabled={!valueText.trim()}
               size="icon"
               className={cn(
-                "h-9 w-9 rounded-xl transition-all duration-200",
-                valueText.trim() 
-                  ? "bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg" 
-                  : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                'h-9 w-9 rounded-xl transition-all duration-200',
+                valueText.trim()
+                  ? 'bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg'
+                  : 'bg-slate-200 text-slate-400 cursor-not-allowed',
               )}
               aria-label="Gửi tin nhắn"
             >

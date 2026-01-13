@@ -6,7 +6,9 @@ const KEY = 'MEDIA';
 export const fetchAllMedia = createAsyncThunk(
   `${KEY}/fetchAllMedia`,
   async ({ conversationId }) => {
-    const media = await mediaApi.getAllMedia(conversationId);
+    const media = await mediaApi.getAllMedia({
+      conversationId,
+    });
     return media;
   },
 );

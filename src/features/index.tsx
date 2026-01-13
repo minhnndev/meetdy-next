@@ -37,7 +37,7 @@ import {
 import { fetchInfoWebs } from '@/features/Home/homeSlice';
 import useWindowUnloadEffect from '@/hooks/useWindowUnloadEffect';
 
-import { init, socket } from '@/utils/socketClient';
+import { createSocketConnection as init, socket } from '@/lib/socket';
 
 init();
 

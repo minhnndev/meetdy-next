@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
-import { Pencil, AlertCircle, Search } from "lucide-react";
-import PersonalIcon from "../PersonalIcon";
-import ItemsSelected from "../ItemsSelected";
+import { Pencil, AlertCircle, Search } from 'lucide-react';
+import PersonalIcon from '../PersonalIcon';
+import ItemsSelected from '../ItemsSelected';
 
 type Props = {
   isVisible: boolean;
@@ -28,27 +28,34 @@ export default function ModalCreateGroup({
   onCancel,
   onOk,
   loading,
-}: Props) {
+}: Readonly<Props>) {
   const [checkList, setCheckList] = useState<string[]>([]);
   const [itemSelected, setItemSelected] = useState<any[]>([]);
   const [isShowError, setIsShowError] = useState(false);
-  const [nameGroup, setNameGroup] = useState("");
-  const [frInput, setFrInput] = useState("");
-  const [initalFriend, setInitalFriend] = useState<any[]>([]);
+  const [nameGroup, setNameGroup] = useState('');
+  const [frInput, setFrInput] = useState('');
 
   const { friends } = useSelector((state: any) => state.chat);
 
   useEffect(() => {
-    if (isVisible) {
-      setInitalFriend(friends);
-    } else {
-      setFrInput("");
+    if (!isVisible) {
+      setFrInput('');
       setCheckList([]);
       setItemSelected([]);
-      setNameGroup("");
+      setNameGroup('');
       setIsShowError(false);
     }
   }, [isVisible]);
+
+  const filteredFriends = useMemo(() => {
+    const value = frInput.trim();
+    if (!isVisible) return [];
+    if (!value) return friends;
+
+    return friends.filter((f: any) =>
+      f.name?.toLowerCase().includes(value.toLowerCase()),
+    );
+  }, [friends, frInput, isVisible]);
 
   const handleOk = () => {
     const userIds = itemSelected.map((item) => item._id);
@@ -60,22 +67,12 @@ export default function ModalCreateGroup({
   };
 
   const handleOnBlur = () => {
-    setIsShowError(!(nameGroup.length > 0));
+    setIsShowError(nameGroup.length <= 0);
   };
 
   const handleChangeFriend = (e: any) => {
     const value = e.target.value;
     setFrInput(value);
-
-    if (!value) {
-      setInitalFriend(friends);
-      return;
-    }
-
-    const filtered = friends.filter((f: any) =>
-      f.name.toLowerCase().includes(value.toLowerCase())
-    );
-    setInitalFriend(filtered);
   };
 
   const handleChangeCheckBox = (id: string) => {
@@ -88,7 +85,7 @@ export default function ModalCreateGroup({
       newItems = newItems.filter((ele) => ele._id !== id);
     } else {
       newList.push(id);
-      const user = initalFriend.find((ele) => ele._id === id);
+      const user = filteredFriends.find((ele) => ele._id === id);
       if (user) newItems.push(user);
     }
 
@@ -105,9 +102,7 @@ export default function ModalCreateGroup({
     <Dialog open={isVisible} onOpenChange={(v) => onCancel(v)}>
       <DialogContent className="max-w-lg rounded-2xl">
         <DialogHeader>
-          <DialogTitle>
-            Tạo nhóm
-          </DialogTitle>
+          <DialogTitle>Tạo nhóm</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -148,14 +143,14 @@ export default function ModalCreateGroup({
         <div className="flex gap-4">
           <div
             className={`flex-1 transition-all ${
-              itemSelected.length === 0 ? "w-full" : ""
+              itemSelected.length === 0 ? 'w-full' : ''
             }`}
           >
             <div className="font-medium mb-2">Danh sách bạn bè</div>
 
             <ScrollArea className="h-60 pr-2">
               <div className="flex flex-col gap-3">
-                {initalFriend.map((ele) => (
+                {filteredFriends.map((ele) => (
                   <label
                     key={ele._id}
                     className="flex items-center gap-3 cursor-pointer hover:bg-slate-50 p-2 rounded-lg transition-colors"
@@ -183,14 +178,21 @@ export default function ModalCreateGroup({
                 Đã chọn: {itemSelected.length}
               </div>
               <ScrollArea className="h-60 pr-2">
-                <ItemsSelected items={itemSelected} onRemove={handleRemoveItem} />
+                <ItemsSelected
+                  items={itemSelected}
+                  onRemove={handleRemoveItem}
+                />
               </ScrollArea>
             </div>
           )}
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onCancel(false)} className="rounded-xl">
+          <Button
+            variant="outline"
+            onClick={() => onCancel(false)}
+            className="rounded-xl"
+          >
             Hủy
           </Button>
           <Button

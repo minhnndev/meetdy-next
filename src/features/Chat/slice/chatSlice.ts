@@ -8,6 +8,12 @@ import pinMessageApi from '@/api/pinMessageApi';
 import stickerApi from '@/api/stickerApi';
 import voteApi from '@/api/voteApi';
 import dateUtils from '@/utils/dateUtils';
+import {
+  IGroupConversation,
+  IIndividualConversation,
+  TCreateGroup,
+  TGetListConversations,
+} from '@/models/conversation.model';
 
 const KEY = 'chat';
 
@@ -29,12 +35,10 @@ export const fetchListClassify = createAsyncThunk(
 
 export const fetchListConversations = createAsyncThunk(
   `${KEY}/fetchListConversations`,
-  async (params, thunkApi) => {
-    const { name, type } = params;
-    const conversations = await conversationApi.getListConversations(
-      name,
-      type,
-    );
+  async (
+    params: TGetListConversations = {},
+  ): Promise<Array<IIndividualConversation | IGroupConversation>> => {
+    const conversations = await conversationApi.getListConversations(params);
 
     return conversations;
   },
@@ -42,7 +46,7 @@ export const fetchListConversations = createAsyncThunk(
 
 export const fetchListMessages = createAsyncThunk(
   `${KEY}/fetchListMessages`,
-  async (params, thunkApi) => {
+  async (params: { conversationId: string; page?: number; size?: number }) => {
     const { conversationId, page, size } = params;
 
     const messages = await messageApi.getListMessages(
@@ -60,7 +64,7 @@ export const fetchListMessages = createAsyncThunk(
 
 export const fetchNextPageMessage = createAsyncThunk(
   `${KEY}/fetchNextPageMessage`,
-  async (params, thunkApi) => {
+  async (params: { conversationId: string; page: number; size: number }) => {
     const { conversationId, page, size } = params;
 
     const messages = await messageApi.getListMessages(
@@ -77,7 +81,7 @@ export const fetchNextPageMessage = createAsyncThunk(
 
 export const fetchNextPageMessageOfChannel = createAsyncThunk(
   `${KEY}/fetchNextPageMessageOfChannel`,
-  async (params, thunkApi) => {
+  async (params: { page: number; size: number; channelId: string }) => {
     const { page, size, channelId } = params;
 
     const messages = await channelApi.getMessageInChannel(
@@ -85,31 +89,39 @@ export const fetchNextPageMessageOfChannel = createAsyncThunk(
       page,
       size,
     );
-    return messages;
+
+    const totalPages = size ? Math.max(1, Math.ceil(messages.total / size)) : 1;
+
+    return {
+      messages: {
+        data: messages.data,
+        page,
+        totalPages,
+      },
+      channelId,
+    };
   },
 );
 
 export const fetchListFriends = createAsyncThunk(
   `${KEY}/fetchListFriends`,
-  async (params, thunkApi) => {
+  async (params: { name: string }) => {
     const { name } = params;
-    const friends = await friendApi.getFriends(name);
+    const friends = await friendApi.getFriends({ name });
     return friends;
   },
 );
 
 export const createGroup = createAsyncThunk(
   `${KEY}/createGroup`,
-  async (params, thunkApi) => {
-    const { name, userIds } = params;
-    const idNewGroup = await conversationApi.createGroup({ name, userIds });
-    return idNewGroup;
+  async ({ name, userIds }: TCreateGroup): Promise<void> => {
+    await conversationApi.createGroup({ name, userIds });
   },
 );
 
 export const fetchConversationById = createAsyncThunk(
   `${KEY}/fetchConversationById`,
-  async (params, thunkApi) => {
+  async (params: { conversationId: string }) => {
     const { conversationId } = params;
     const conversation = await conversationApi.getConversationById(
       conversationId,
@@ -121,7 +133,7 @@ export const fetchConversationById = createAsyncThunk(
 
 export const deleteConversation = createAsyncThunk(
   `${KEY}/deleteConversation/`,
-  async (params, thunkApi) => {
+  async (params: { conversationId: string }) => {
     const { conversationId } = params;
     await conversationApi.deleteConversation(conversationId);
     return conversationId;
@@ -130,7 +142,7 @@ export const deleteConversation = createAsyncThunk(
 
 export const getMembersConversation = createAsyncThunk(
   `${KEY}/getMembersConversation`,
-  async (params, thunkApi) => {
+  async (params: { conversationId: string }) => {
     const { conversationId } = params;
     const members = await conversationApi.getMemberInConversation(
       conversationId,
@@ -141,7 +153,7 @@ export const getMembersConversation = createAsyncThunk(
 
 export const fetchPinMessages = createAsyncThunk(
   `${KEY}/fetchPinMessages`,
-  async (params, _) => {
+  async (params: { conversationId: string }) => {
     const { conversationId } = params;
     const pinMessages = await pinMessageApi.getPinMessages(conversationId);
     return pinMessages;
@@ -150,7 +162,7 @@ export const fetchPinMessages = createAsyncThunk(
 
 export const getLastViewOfMembers = createAsyncThunk(
   `${KEY}/getLastViewOfMembers`,
-  async (params, _) => {
+  async (params: { conversationId: string }) => {
     const { conversationId } = params;
     const lastViews = await conversationApi.getLastViewOfMembers(
       conversationId,
@@ -162,7 +174,7 @@ export const getLastViewOfMembers = createAsyncThunk(
 
 export const fetchChannels = createAsyncThunk(
   `${KEY}/fetchChannels`,
-  async (params, _) => {
+  async (params: { conversationId: string }) => {
     const { conversationId } = params;
     const data = await channelApi.getChannel(conversationId);
     return data;
@@ -171,12 +183,18 @@ export const fetchChannels = createAsyncThunk(
 
 export const fetchMessageInChannel = createAsyncThunk(
   `${KEY}/fetchMessageInChannel`,
-  async (params, _) => {
+  async (params: { channelId: string; page: number; size: number }) => {
     const { channelId, page, size } = params;
     const data = await channelApi.getMessageInChannel(channelId, page, size);
 
+    const totalPages = size ? Math.max(1, Math.ceil(data.total / size)) : 1;
+
     return {
-      messages: data,
+      messages: {
+        data: data.data,
+        page,
+        totalPages,
+      },
       channelId,
     };
   },
@@ -184,7 +202,7 @@ export const fetchMessageInChannel = createAsyncThunk(
 
 export const getLastViewChannel = createAsyncThunk(
   `${KEY}/getLastViewChannel`,
-  async (params, _) => {
+  async (params: { channelId: string }) => {
     const { channelId } = params;
     const lastViews = await channelApi.getLastViewChannel(channelId);
 
@@ -202,7 +220,7 @@ export const fetchAllSticker = createAsyncThunk(
 
 export const fetchVotes = createAsyncThunk(
   `${KEY}/fetchVotes`,
-  async (params, _) => {
+  async (params: { conversationId: string; page: number; size: number }) => {
     const { conversationId, page, size } = params;
     const data = await voteApi.getVotes(conversationId, page, size);
     return data;
@@ -219,8 +237,8 @@ const chatSlice = createSlice({
     friends: [],
     memberInConversation: [],
     type: false,
-    currentPage: '',
-    totalPages: '',
+    currentPage: 0,
+    totalPages: 0,
     toTalUnread: 0,
     classifies: [],
     colors: [],
@@ -310,9 +328,14 @@ const chatSlice = createSlice({
 
       state.totalChannelNotify = notify;
     },
-    setRaisePage: (state, action) => {
-      if (state.currentPage < state.totalPages - 1) {
-        state.currentPage = state.currentPage + 1;
+    setRaisePage: (state) => {
+      if (state.isLoading) return;
+
+      const currentPage = Number(state.currentPage) || 0;
+      const totalPages = Number(state.totalPages) || 0;
+
+      if (currentPage < totalPages - 1) {
+        state.currentPage = currentPage + 1;
       }
     },
 
@@ -467,21 +490,17 @@ const chatSlice = createSlice({
     updateLastViewOfMembers: (state, action) => {
       const { conversationId, userId, lastView, channelId } = action.payload;
 
-      if (channelId) {
-        if (state.currentChannel === channelId) {
-          const index = state.lastViewOfMember.findIndex(
-            (ele) => ele.user._id === userId,
-          );
-          state.lastViewOfMember[index].lastView = lastView;
-        }
-      } else {
-        if (
-          conversationId === state.currentConversation &&
-          !state.currentChannel
-        ) {
-          const index = state.lastViewOfMember.findIndex(
-            (ele) => ele.user._id === userId,
-          );
+      const isChannelMatched = channelId && state.currentChannel === channelId;
+      const isConversationMatched =
+        !channelId &&
+        conversationId === state.currentConversation &&
+        !state.currentChannel;
+
+      if (isChannelMatched || isConversationMatched) {
+        const index = state.lastViewOfMember.findIndex(
+          (ele) => ele.user._id === userId,
+        );
+        if (index >= 0) {
           state.lastViewOfMember[index].lastView = lastView;
         }
       }
@@ -660,8 +679,8 @@ const chatSlice = createSlice({
 
         state.currentChannel = channelId;
         state.messages = messages.data;
-        state.currentPage = messages.page;
-        state.totalPages = messages.totalPages;
+        state.currentPage = messages.page ?? 0;
+        state.totalPages = messages.totalPages ?? 0;
       })
       .addCase(fetchMessageInChannel.rejected, (state) => {
         state.isLoading = false;
@@ -670,11 +689,15 @@ const chatSlice = createSlice({
       // Pagination
       .addCase(fetchNextPageMessage.fulfilled, (state, action) => {
         state.messages = [...action.payload.messages.data, ...state.messages];
-        state.currentPage = action.payload.messages.page;
+        state.currentPage = action.payload.messages.page ?? state.currentPage;
+        state.totalPages =
+          action.payload.messages.totalPages ?? state.totalPages;
       })
       .addCase(fetchNextPageMessageOfChannel.fulfilled, (state, action) => {
-        state.messages = [...action.payload.data, ...state.messages];
-        state.currentPage = action.payload.page;
+        const { messages } = action.payload;
+        state.messages = [...messages.data, ...state.messages];
+        state.currentPage = messages.page ?? state.currentPage;
+        state.totalPages = messages.totalPages ?? state.totalPages;
       })
 
       // Friends
@@ -711,7 +734,6 @@ const chatSlice = createSlice({
         state.isLoading = false;
       })
       .addCase(fetchListClassify.rejected, (state, action) => {
-        state.classifies = action.payload;
         state.isLoading = false;
       })
 
@@ -722,7 +744,8 @@ const chatSlice = createSlice({
 
       // Pin messages
       .addCase(fetchPinMessages.fulfilled, (state, action) => {
-        state.pinMessages = action.payload.reverse();
+        const reversed = [...(action.payload || [])].reverse();
+        state.pinMessages = reversed;
       })
 
       // Last view
@@ -730,7 +753,9 @@ const chatSlice = createSlice({
         state.lastViewOfMember = action.payload;
       })
       .addCase(getLastViewChannel.fulfilled, (state, action) => {
-        state.lastViewOfMember = action.payload;
+        state.lastViewOfMember = Array.isArray(action.payload)
+          ? action.payload
+          : [];
       })
 
       // Channels

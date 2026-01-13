@@ -5,7 +5,7 @@ import { AlertCircle } from 'lucide-react';
 
 import conversationApi from '@/api/conversationApi';
 import { fetchListGroup } from '@/features/Friend/friendSlice';
-import { socket } from '@/utils/socketClient';
+import { socket } from '@/lib/socket';
 import GroupCard from '../GroupCard';
 
 import {

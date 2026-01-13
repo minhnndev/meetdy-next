@@ -6,6 +6,7 @@ import {
   TCreateGroup,
   TGetListConversations,
 } from '@/models/conversation.model';
+import { IFriend } from '@/models/friend.model';
 
 const PATH = '/conversations';
 
@@ -52,9 +53,9 @@ const ServiceConversation = {
     return response.data;
   },
 
-  getMemberInConversation: async (id: string): Promise<any> => {
+  getMemberInConversation: async (id: string): Promise<IFriend[]> => {
     const url = `${PATH}/${id}/members`;
-    const response = await get<any>(url);
+    const response = await get<IFriend[]>(url);
     return response.data;
   },
 
