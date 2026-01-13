@@ -58,7 +58,7 @@ jobs:
       - name: Update image tag
         run: |
           sed -i \
-            's|image: ghcr.io/meetdy/meetdy-frontend:.*|image: ghcr.io/meetdy/meetdy-frontend:${{ env.VERSION }}|' \
+            's|image: *"ghcr.io/meetdy/meetdy-frontend:[^"]*"|image: "ghcr.io/meetdy/meetdy-frontend:'"$VERSION"'"|' \
             infra/manifests/frontend/deployment.yaml
 
       # 📤 Commit & push
@@ -69,7 +69,7 @@ jobs:
           git config user.email "actions@github.com"
 
           if git diff --quiet manifests/frontend/deployment.yaml; then
-            echo "No changes detected, skipping commit."
+            echo "No image change detected. Skipping commit."
             exit 0
           fi
 
