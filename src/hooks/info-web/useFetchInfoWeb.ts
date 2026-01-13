@@ -1,0 +1,15 @@
+import ServiceInfoWeb, { IWebInfo } from "@/api/infoWebApi";
+import { createQueryKey } from "@/queries/core";
+import { useQuery } from "@tanstack/react-query";
+
+export function useFetchInfoWeb({ enabled = true }: { enabled?: boolean } = {}) {
+    const { data } = useQuery<IWebInfo[]>({
+        queryKey: createQueryKey("getInfoWeb", {}),
+        queryFn: () => ServiceInfoWeb.fetchInfoWeb(),
+        enabled,
+    });
+
+    return {
+        infoWeb: data as IWebInfo[],
+    };
+}

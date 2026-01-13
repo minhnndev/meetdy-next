@@ -1,0 +1,39 @@
+import ServiceConversation from "@/api/conversationApi";
+import { createQueryKey, queryClient } from "@/queries/core";
+import { useQuery } from "@tanstack/react-query";
+
+const fetchLastViewOfMembersKey = (conversationId: string) =>
+    createQueryKey("fetchLastViewOfMembers", { conversationId });
+
+interface UseFetchLastViewOfMembersProps {
+    conversationId: string;
+    enabled?: boolean;
+}
+export function useFetchLastViewOfMembers({
+    conversationId,
+    enabled = true,
+}: UseFetchLastViewOfMembersProps) {
+    const { data, isFetched } = useQuery<any>({
+        queryKey: fetchLastViewOfMembersKey(conversationId),
+        queryFn: () => ServiceConversation.fetchLastViewOfMembers(conversationId),
+        enabled,
+    });
+    return {
+        lastViewOfMembers: data,
+        isFetched,
+    };
+}
+
+export async function checkAndFetchLastViewOfMembers(conversationId: string): Promise<any> {
+    const cachedLastViewOfMembers = queryClient.getQueryData<any>(
+        fetchLastViewOfMembersKey(conversationId)
+    );
+    if (cachedLastViewOfMembers) return cachedLastViewOfMembers;
+
+    const lastViewOfMembers = await queryClient.fetchQuery({
+        queryKey: fetchLastViewOfMembersKey(conversationId),
+        queryFn: () => ServiceConversation.fetchLastViewOfMembers(conversationId),
+        staleTime: Infinity,
+    });
+    return lastViewOfMembers;
+}

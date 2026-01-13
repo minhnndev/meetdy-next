@@ -1,0 +1,18 @@
+import ServiceClassify from "@/api/classifyApi";
+import { IClassify } from "@/models/classify.model";
+import { createQueryKey } from "@/queries/core";
+import { useQuery } from "@tanstack/react-query";
+
+export function useFetchListClassify() {
+    const { data, isFetched, isFetching } = useQuery<IClassify[]>({
+        queryKey: createQueryKey("classifies", {}),
+        queryFn: async () => {
+            return await ServiceClassify.fetchClassifies();
+        },
+    });
+    return {
+        classifies: (data || []) as IClassify[],
+        isFetched,
+        isFetching,
+    };
+}
